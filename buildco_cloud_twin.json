@@ -1,0 +1,319 @@
+{
+  "company": "BuildCo Construction Pte Ltd",
+  "scan_date": "2026-06-20",
+  "currency": "USD",
+  "_comment": "Digital twin of BuildCo's cloud estate. Each resource holds RAW config (security/cost/usage). Your rule engine derives findings + scores from this. Do NOT pre-bake findings here - let the engine compute them so judges see the engine working.",
+  "region_carbon_intensity_gco2_per_kwh": {
+    "us-east-1": 379,
+    "us-west-2": 117,
+    "eu-west-1": 291,
+    "ap-southeast-1": 408
+  },
+  "business_value_weight": { "high": 1.0, "medium": 0.6, "low": 0.2 },
+  "resources": [
+    {
+      "id": "ec2-safety-gpu-01",
+      "name": "Worker Safety AI - GPU Inference",
+      "type": "EC2 (GPU)",
+      "service": "Worker Safety AI",
+      "region": "ap-southeast-1",
+      "business_value": "high",
+      "monthly_cost_usd": 2150.00,
+      "utilization_pct": 19,
+      "kwh_month": 1450,
+      "security": {
+        "public_access": false,
+        "encryption_at_rest": true,
+        "encryption_in_transit": true,
+        "open_ports": [443],
+        "iam": { "over_privileged": false, "mfa_enabled": true, "access_key_age_days": 41 }
+      },
+      "tags": { "env": "prod", "owner": "safety-team" }
+    },
+    {
+      "id": "s3-safety-footage",
+      "name": "Site Camera Footage Store",
+      "type": "S3 Bucket",
+      "service": "Worker Safety AI",
+      "region": "ap-southeast-1",
+      "business_value": "high",
+      "monthly_cost_usd": 320.00,
+      "utilization_pct": 88,
+      "kwh_month": 90,
+      "security": {
+        "public_access": true,
+        "encryption_at_rest": false,
+        "encryption_in_transit": true,
+        "open_ports": [],
+        "iam": { "over_privileged": true, "mfa_enabled": false, "access_key_age_days": 410 }
+      },
+      "tags": { "env": "prod", "owner": "safety-team" }
+    },
+    {
+      "id": "ec2-bim-render-01",
+      "name": "BIM Rendering Compute",
+      "type": "EC2 (Compute)",
+      "service": "BIM Processing",
+      "region": "eu-west-1",
+      "business_value": "high",
+      "monthly_cost_usd": 980.00,
+      "utilization_pct": 12,
+      "kwh_month": 720,
+      "security": {
+        "public_access": false,
+        "encryption_at_rest": true,
+        "encryption_in_transit": true,
+        "open_ports": [443, 22],
+        "iam": { "over_privileged": false, "mfa_enabled": true, "access_key_age_days": 60 }
+      },
+      "tags": { "env": "prod", "owner": "bim-team" }
+    },
+    {
+      "id": "s3-bim-models",
+      "name": "BIM Model Repository",
+      "type": "S3 Bucket",
+      "service": "BIM Processing",
+      "region": "eu-west-1",
+      "business_value": "high",
+      "monthly_cost_usd": 540.00,
+      "utilization_pct": 76,
+      "kwh_month": 110,
+      "security": {
+        "public_access": false,
+        "encryption_at_rest": false,
+        "encryption_in_transit": true,
+        "open_ports": [],
+        "iam": { "over_privileged": false, "mfa_enabled": true, "access_key_age_days": 95 }
+      },
+      "tags": { "env": "prod", "owner": "bim-team" }
+    },
+    {
+      "id": "rds-bim-meta",
+      "name": "BIM Metadata Database",
+      "type": "RDS (PostgreSQL)",
+      "service": "BIM Processing",
+      "region": "eu-west-1",
+      "business_value": "medium",
+      "monthly_cost_usd": 410.00,
+      "utilization_pct": 34,
+      "kwh_month": 260,
+      "security": {
+        "public_access": false,
+        "encryption_at_rest": true,
+        "encryption_in_transit": true,
+        "open_ports": [5432],
+        "iam": { "over_privileged": false, "mfa_enabled": true, "access_key_age_days": 30 }
+      },
+      "tags": { "env": "prod", "owner": "bim-team" }
+    },
+    {
+      "id": "ec2-crane-ingest-01",
+      "name": "Crane Sensor Ingest Gateway",
+      "type": "EC2 (Compute)",
+      "service": "Crane IoT Monitoring",
+      "region": "ap-southeast-1",
+      "business_value": "high",
+      "monthly_cost_usd": 290.00,
+      "utilization_pct": 67,
+      "kwh_month": 220,
+      "security": {
+        "public_access": true,
+        "encryption_at_rest": true,
+        "encryption_in_transit": false,
+        "open_ports": [1883, 8883, 22],
+        "iam": { "over_privileged": true, "mfa_enabled": false, "access_key_age_days": 188 }
+      },
+      "tags": { "env": "prod", "owner": "iot-team" }
+    },
+    {
+      "id": "dynamodb-crane-telemetry",
+      "name": "Crane Telemetry Store",
+      "type": "DynamoDB",
+      "service": "Crane IoT Monitoring",
+      "region": "ap-southeast-1",
+      "business_value": "high",
+      "monthly_cost_usd": 175.00,
+      "utilization_pct": 71,
+      "kwh_month": 80,
+      "security": {
+        "public_access": false,
+        "encryption_at_rest": true,
+        "encryption_in_transit": true,
+        "open_ports": [],
+        "iam": { "over_privileged": false, "mfa_enabled": true, "access_key_age_days": 22 }
+      },
+      "tags": { "env": "prod", "owner": "iot-team" }
+    },
+    {
+      "id": "ec2-orphan-04",
+      "name": "Untagged Legacy Instance",
+      "type": "EC2 (Compute)",
+      "service": "Crane IoT Monitoring",
+      "region": "ap-southeast-1",
+      "business_value": "low",
+      "monthly_cost_usd": 240.00,
+      "utilization_pct": 0,
+      "kwh_month": 180,
+      "security": {
+        "public_access": true,
+        "encryption_at_rest": false,
+        "encryption_in_transit": false,
+        "open_ports": [22, 3389],
+        "iam": { "over_privileged": true, "mfa_enabled": false, "access_key_age_days": 540 }
+      },
+      "tags": { "env": "unknown", "owner": "none" }
+    },
+    {
+      "id": "lambda-material-scan",
+      "name": "Material Barcode Processor",
+      "type": "Lambda",
+      "service": "Material Tracking",
+      "region": "ap-southeast-1",
+      "business_value": "medium",
+      "monthly_cost_usd": 45.00,
+      "utilization_pct": 58,
+      "kwh_month": 15,
+      "security": {
+        "public_access": false,
+        "encryption_at_rest": true,
+        "encryption_in_transit": true,
+        "open_ports": [],
+        "iam": { "over_privileged": false, "mfa_enabled": true, "access_key_age_days": 18 }
+      },
+      "tags": { "env": "prod", "owner": "logistics-team" }
+    },
+    {
+      "id": "rds-material-inventory",
+      "name": "Material Inventory Database",
+      "type": "RDS (MySQL)",
+      "service": "Material Tracking",
+      "region": "ap-southeast-1",
+      "business_value": "medium",
+      "monthly_cost_usd": 380.00,
+      "utilization_pct": 41,
+      "kwh_month": 250,
+      "security": {
+        "public_access": false,
+        "encryption_at_rest": true,
+        "encryption_in_transit": true,
+        "open_ports": [3306],
+        "iam": { "over_privileged": true, "mfa_enabled": false, "access_key_age_days": 295 }
+      },
+      "tags": { "env": "prod", "owner": "logistics-team" }
+    },
+    {
+      "id": "s3-material-docs",
+      "name": "Delivery Docs Archive",
+      "type": "S3 Bucket",
+      "service": "Material Tracking",
+      "region": "ap-southeast-1",
+      "business_value": "low",
+      "monthly_cost_usd": 90.00,
+      "utilization_pct": 30,
+      "kwh_month": 40,
+      "security": {
+        "public_access": false,
+        "encryption_at_rest": true,
+        "encryption_in_transit": true,
+        "open_ports": [],
+        "iam": { "over_privileged": false, "mfa_enabled": true, "access_key_age_days": 70 }
+      },
+      "tags": { "env": "prod", "owner": "logistics-team" }
+    },
+    {
+      "id": "redshift-site-analytics",
+      "name": "Site Analytics Warehouse",
+      "type": "Redshift (GPU cluster)",
+      "service": "Site Analytics",
+      "region": "us-east-1",
+      "business_value": "medium",
+      "monthly_cost_usd": 1890.00,
+      "utilization_pct": 23,
+      "kwh_month": 1320,
+      "security": {
+        "public_access": false,
+        "encryption_at_rest": true,
+        "encryption_in_transit": true,
+        "open_ports": [5439],
+        "iam": { "over_privileged": false, "mfa_enabled": true, "access_key_age_days": 88 }
+      },
+      "tags": { "env": "prod", "owner": "data-team" }
+    },
+    {
+      "id": "ec2-analytics-dash",
+      "name": "Analytics Dashboard Server",
+      "type": "EC2 (Compute)",
+      "service": "Site Analytics",
+      "region": "us-east-1",
+      "business_value": "medium",
+      "monthly_cost_usd": 160.00,
+      "utilization_pct": 44,
+      "kwh_month": 130,
+      "security": {
+        "public_access": true,
+        "encryption_at_rest": true,
+        "encryption_in_transit": true,
+        "open_ports": [443, 22],
+        "iam": { "over_privileged": false, "mfa_enabled": true, "access_key_age_days": 51 }
+      },
+      "tags": { "env": "prod", "owner": "data-team" }
+    },
+    {
+      "id": "ebs-unattached-vol-09",
+      "name": "Unattached Storage Volume",
+      "type": "EBS Volume",
+      "service": "Site Analytics",
+      "region": "us-east-1",
+      "business_value": "low",
+      "monthly_cost_usd": 85.00,
+      "utilization_pct": 0,
+      "kwh_month": 20,
+      "security": {
+        "public_access": false,
+        "encryption_at_rest": false,
+        "encryption_in_transit": false,
+        "open_ports": [],
+        "iam": { "over_privileged": false, "mfa_enabled": true, "access_key_age_days": 120 }
+      },
+      "tags": { "env": "unknown", "owner": "none" }
+    },
+    {
+      "id": "s3-analytics-backups",
+      "name": "Analytics Backup Bucket",
+      "type": "S3 Bucket",
+      "service": "Site Analytics",
+      "region": "us-east-1",
+      "business_value": "low",
+      "monthly_cost_usd": 210.00,
+      "utilization_pct": 9,
+      "kwh_month": 60,
+      "security": {
+        "public_access": true,
+        "encryption_at_rest": true,
+        "encryption_in_transit": true,
+        "open_ports": [],
+        "iam": { "over_privileged": false, "mfa_enabled": true, "access_key_age_days": 200 }
+      },
+      "tags": { "env": "prod", "owner": "data-team" }
+    },
+    {
+      "id": "ec2-safety-gpu-02",
+      "name": "Worker Safety AI - GPU Standby",
+      "type": "EC2 (GPU)",
+      "service": "Worker Safety AI",
+      "region": "ap-southeast-1",
+      "business_value": "low",
+      "monthly_cost_usd": 2150.00,
+      "utilization_pct": 3,
+      "kwh_month": 1400,
+      "security": {
+        "public_access": false,
+        "encryption_at_rest": true,
+        "encryption_in_transit": true,
+        "open_ports": [443],
+        "iam": { "over_privileged": false, "mfa_enabled": true, "access_key_age_days": 41 }
+      },
+      "tags": { "env": "prod", "owner": "safety-team" }
+    }
+  ]
+}
