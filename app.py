@@ -1,13 +1,42 @@
-import os, json
-from flask import Flask, jsonify, request
+"""
+ConstructGuard AI - Feature 4 BACKEND
+=====================================
+Pure backend. No UI of its own. It:
+  1. Serves your team's frontend at /frontend/...
+  2. Answers GET /api/analyze with the exact JSON your
+     construction-ready-ops.html expects (scores, metrics,
+     recommendations, projected_after, resource table).
+
+Folder layout (important):
+    Hackathon/
+        app.py                                <- this file
+        .env                                  <- optional, for real Claude AI
+        frontend/
+            construction-ready-ops.html       <- your existing frontend
+
+Run it:
+    pip install flask
+    python app.py
+Then open:  http://localhost:8000
+(redirects to http://localhost:8000/frontend/construction-ready-ops.html)
+
+Works with NO API key (built-in rule engine -> badge shows "Rule Engine").
+For real Claude AI (badge shows "Claude AI"):
+    pip install anthropic
+    create a .env file containing:  ANTHROPIC_API_KEY=sk-ant-...
+"""
+
+import os
+import json
+from flask import Flask, jsonify, request, send_from_directory, abort
 
 # ---- tiny .env loader (no extra package needed) ----
 if os.path.exists(".env"):
     for _line in open(".env"):
         _line = _line.strip()
         if _line and not _line.startswith("#") and "=" in _line:
-            k, v = _line.split("=", 1)
-            os.environ.setdefault(k.strip(), v.strip())
+            _k, _v = _line.split("=", 1)
+            os.environ.setdefault(_k.strip(), _v.strip())
 
 # ---- optional Claude SDK ----
 try:
@@ -15,10 +44,21 @@ try:
 except ImportError:
     anthropic = None
 
+# static_url_path/static_folder makes /frontend/<file> serve from ./frontend
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FRONTEND_DIR = os.path.join(BASE_DIR, "frontend")
+
 app = Flask(__name__)
 
+
+@app.after_request
+def add_cors(resp):
+    resp.headers["Access-Control-Allow-Origin"] = "*"
+    return resp
+
+
 # =========================================================================
-#  DIGITAL TWIN (shared data foundation) + RULE ENGINE (Features 1, 2, 3)
+#  DIGITAL TWIN (shared data) + RULE ENGINE (Features 1, 2, 3)
 # =========================================================================
 REGION_CI = {"us-east-1": 379, "us-west-2": 117, "eu-west-1": 291, "ap-southeast-1": 408}
 DANGEROUS_PORTS = {22: "SSH", 3389: "RDP", 1883: "MQTT (plaintext)", 3306: "MySQL", 5432: "Postgres"}
@@ -105,6 +145,9 @@ def analyze():
     }
 
 
+# =========================================================================
+#  RECOMMENDATIONS (Feature 4) - Claude with deterministic fallback
+# =========================================================================
 def findings_text(base):
     rows = []
     for f in base["findings"]:
@@ -155,7 +198,7 @@ def local_fallback(base):
     ranked = ranked[:6]
     for i, r in enumerate(ranked):
         r["rank"] = i + 1
-    return {"recommendations": ranked, "projected_after": project_after(base, ranked), "ai": False}
+    return {"recommendations": ranked, "ai": False}
 
 
 def call_claude(base):
@@ -175,9 +218,7 @@ def call_claude(base):
         '{"recommendations":[{"rank":1,"resource_id":"...","resource_name":"...",'
         '"action":"short imperative action","category":"security|cost|carbon",'
         '"rationale":"one sentence, construction context",'
-        '"impact":{"security_points":0,"cost_saving_usd":0,"carbon_saving_kg":0}}],'
-        '"projected_after":{"security":0,"efficiency":0,"sustainability":0,"chs":0,'
-        '"cost_saving_usd":0,"carbon_saving_kg":0}}\n'
+        '"impact":{"security_points":0,"cost_saving_usd":0,"carbon_saving_kg":0}}]}\n'
         "Give the 6 highest-impact recommendations, ranked. Keep each action under 12 words."
     )
     try:
@@ -193,210 +234,76 @@ def call_claude(base):
         return None
 
 
+_CACHE = {}
+
+
+def build_payload(force=False):
+    if "result" in _CACHE and not force:
+        return _CACHE["result"]
+    base = analyze()
+    rec = call_claude(base) or local_fallback(base)
+    projected = project_after(base, rec["recommendations"])
+    resources = [{
+        "id": f["id"], "name": f["name"], "service": f["service"], "region": f["region"],
+        "monthly_cost_usd": f["monthly_cost_usd"], "utilization_pct": f["utilization_pct"],
+        "carbon": f["carbon"], "issues": f["issues"], "waste": f["waste"],
+    } for f in base["findings"]]
+    result = {
+        "ai": rec.get("ai", False),
+        "current": {
+            "scores": base["scores"],
+            "total_cost": base["total_cost"],
+            "wasted": base["wasted"],
+            "total_carbon": base["total_carbon"],
+            "high": base["high"],
+            "med": base["med"],
+            "clean": base["clean"],
+            "resources": resources,
+        },
+        "recommendations": rec["recommendations"],
+        "projected_after": projected,
+    }
+    _CACHE["result"] = result
+    return result
+
+
 # =========================================================================
 #  ROUTES
 # =========================================================================
+def serve_file(filename):
+    """Serve a file from frontend/ (preferred) or next to app.py."""
+    for d in (FRONTEND_DIR, BASE_DIR):
+        if os.path.isfile(os.path.join(d, filename)):
+            return send_from_directory(d, filename)
+    # helpful 404 so you can see what went wrong
+    available = []
+    for d in (FRONTEND_DIR, BASE_DIR):
+        if os.path.isdir(d):
+            for f in sorted(os.listdir(d)):
+                if f.endswith(".html"):
+                    available.append(os.path.basename(d) + "/" + f)
+    msg = ("<h2>404 - '" + filename + "' not found</h2>"
+           "<p>Looked in:<br><code>" + FRONTEND_DIR + "</code><br><code>" + BASE_DIR + "</code></p>"
+           "<p>HTML files I can actually see:</p><ul>"
+           + "".join("<li>" + a + "</li>" for a in available)
+           + "</ul><p>Check the file name matches exactly and sits in the <b>frontend</b> folder.</p>")
+    return msg, 404
+
+
 @app.route("/")
-def index():
-    return PAGE
+def home():
+    return serve_file("index.html")
 
 
-@app.route("/api/base")
-def api_base():
-    b = analyze()
-    return jsonify({"scores": b["scores"], "high": b["high"], "med": b["med"],
-                    "wasted": b["wasted"], "total_carbon": b["total_carbon"],
-                    "total_cost": b["total_cost"], "clean": b["clean"]})
+@app.route("/api/analyze")
+def api_analyze():
+    return jsonify(build_payload(force=request.args.get("refresh") == "1"))
 
 
-@app.route("/api/recommend", methods=["POST"])
-def api_recommend():
-    base = analyze()
-    result = call_claude(base) or local_fallback(base)
-    result["base_chs"] = base["scores"]["chs"]
-    result["base_security"] = base["scores"]["security"]
-    return jsonify(result)
+@app.route("/<path:filename>")
+def any_file(filename):
+    return serve_file(filename)
 
-
-# =========================================================================
-#  FRONTEND (custom HTML/CSS/JS - your own UI/UX design)
-# =========================================================================
-PAGE = r"""<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>ConstructGuard AI - AI Recommendation Engine</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap');
-:root{--bg:#0E141B;--surface:#18222E;--surface2:#1F2C3A;--border:#2A3A4A;--text:#EAF0F6;
---muted:#8696A7;--amber:#FFB020;--red:#FF5C5C;--teal:#2DD4BF;--green:#45D483;}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;
-background-image:linear-gradient(#2A3A4A22 1px,transparent 1px),linear-gradient(90deg,#2A3A4A22 1px,transparent 1px);
-background-size:34px 34px;padding:28px 22px;min-height:100vh;}
-.wrap{max-width:920px;margin:0 auto}
-.head{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px}
-.eyebrow{font-size:11px;letter-spacing:2px;color:var(--amber);font-family:'JetBrains Mono',monospace}
-.brand{font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;margin-top:2px}
-.brand span{color:var(--amber)}
-.headr{text-align:right;font-size:12px;color:var(--muted)}
-.headr b{color:var(--text)}
-.mono{font-family:'JetBrains Mono',monospace}
-.panel{display:grid;grid-template-columns:auto 1fr;gap:24px;background:var(--surface);
-border:1px solid var(--border);border-radius:16px;padding:24px;align-items:center}
-.gauge-wrap{text-align:center}
-.gauge{position:relative;width:170px;height:170px}
-.gauge .num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.gauge .num .v{font-family:'JetBrains Mono',monospace;font-size:44px;font-weight:700;line-height:1}
-.gauge .num .l{font-size:11px;color:var(--muted);letter-spacing:1.5px;margin-top:4px}
-.delta{margin-top:10px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--green)}
-.pillar{margin-bottom:14px}
-.pillar .top{display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px}
-.pillar .top .n{color:var(--muted);letter-spacing:.5px}
-.pillar .top .v{font-family:'JetBrains Mono',monospace}
-.bar{height:7px;background:var(--border);border-radius:6px;overflow:hidden}
-.bar > i{display:block;height:100%;border-radius:6px;width:0;transition:width .9s cubic-bezier(.22,1,.36,1)}
-.chips{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
-.chip{font-family:'JetBrains Mono',monospace;font-size:11px;padding:3px 8px;border-radius:6px;white-space:nowrap}
-.center{text-align:center;margin:24px 0}
-button{background:var(--amber);color:#1A1206;border:none;border-radius:10px;padding:13px 26px;
-font-size:15px;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .15s}
-button:hover:not(:disabled){filter:brightness(1.08);transform:translateY(-1px)}
-button:disabled{opacity:.7;cursor:default}
-.note{margin-top:12px;font-size:13px;color:var(--muted);font-family:'JetBrains Mono',monospace}
-.offline{margin-top:10px;font-size:12px;color:var(--amber)}
-.outcomes{display:flex;gap:14px;margin-bottom:22px;flex-wrap:wrap}
-.outcome{flex:1 1 160px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
-.outcome .v{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700}
-.outcome .l{font-size:12px;color:var(--muted);margin-top:3px}
-.sec-title{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;margin:4px 0 14px}
-.rec{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;
-margin-bottom:10px;display:flex;gap:14px;animation:rise .5s both}
-.rec .rank{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--muted);min-width:26px}
-.rec .body{flex:1}
-.rec .r1{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.rec .act{font-weight:600;font-size:15px}
-.rec .cat{font-size:11px;text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace}
-.rec .why{font-size:12.5px;color:var(--muted);margin:5px 0 9px}
-.rec .imp{display:flex;gap:8px;flex-wrap:wrap}
-@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
-.pulse{animation:pulse 1.4s infinite}
-@media(max-width:640px){.panel{grid-template-columns:1fr}}
-</style>
-</head>
-<body>
-<div class="wrap">
-  <div class="head">
-    <div>
-      <div class="eyebrow">FEATURE 4 - AI RECOMMENDATION ENGINE</div>
-      <div class="brand">ConstructGuard <span>AI</span></div>
-    </div>
-    <div class="headr"><b>BuildCo Construction</b><div class="mono">digital twin &middot; 16 resources</div></div>
-  </div>
-
-  <div class="panel">
-    <div class="gauge-wrap">
-      <div class="gauge">
-        <svg width="170" height="170" style="transform:rotate(-90deg)">
-          <circle cx="85" cy="85" r="71" stroke="#2A3A4A" stroke-width="11" fill="none"/>
-          <circle id="arc" cx="85" cy="85" r="71" stroke="#FF5C5C" stroke-width="11" fill="none"
-            stroke-linecap="round" stroke-dasharray="446" stroke-dashoffset="446"
-            style="transition:stroke-dashoffset .9s cubic-bezier(.22,1,.36,1),stroke .6s"/>
-        </svg>
-        <div class="num"><div class="v" id="score">0</div><div class="l" id="scoreLabel">CLOUD HEALTH</div></div>
-      </div>
-      <div class="delta" id="delta" style="display:none"></div>
-    </div>
-    <div>
-      <div class="pillar"><div class="top"><span class="n">SECURITY</span><span class="v" id="pSecV">0/100</span></div><div class="bar"><i id="pSec" style="background:var(--red)"></i></div></div>
-      <div class="pillar"><div class="top"><span class="n">EFFICIENCY</span><span class="v" id="pEffV">0/100</span></div><div class="bar"><i id="pEff" style="background:var(--amber)"></i></div></div>
-      <div class="pillar"><div class="top"><span class="n">SUSTAINABILITY</span><span class="v" id="pSusV">0/100</span></div><div class="bar"><i id="pSus" style="background:var(--teal)"></i></div></div>
-      <div class="chips" id="chips"></div>
-    </div>
-  </div>
-
-  <div class="center">
-    <button id="go" onclick="generate()">Generate AI Recommendations</button>
-    <div class="note pulse" id="loading" style="display:none">prioritising findings &middot; estimating impact &middot; simulating outcome</div>
-    <div class="offline" id="offline" style="display:none">Using built-in engine (live AI unavailable) - demo still fully functional.</div>
-  </div>
-
-  <div class="outcomes" id="outcomes" style="display:none"></div>
-  <div id="recsTitle" class="sec-title" style="display:none">Prioritised actions</div>
-  <div id="recs"></div>
-</div>
-
-<script>
-var BASE=null;
-function scoreColor(v){return v<40?'#FF5C5C':v<70?'#FFB020':'#45D483';}
-function setBar(id,vid,val){document.getElementById(id).style.width=val+'%';document.getElementById(vid).textContent=val+'/100';}
-function setGauge(target,label){
-  var arc=document.getElementById('arc');
-  arc.style.strokeDashoffset=446*(1-target/100);
-  arc.setAttribute('stroke',scoreColor(target));
-  document.getElementById('scoreLabel').textContent=label;
-  var el=document.getElementById('score'),start=performance.now(),from=parseInt(el.textContent)||0;
-  function tick(now){var p=Math.min(1,(now-start)/900),e=1-Math.pow(1-p,3);
-    el.textContent=Math.round(from+(target-from)*e);if(p<1)requestAnimationFrame(tick);}
-  requestAnimationFrame(tick);
-}
-function chip(color,text){return '<span class="chip" style="color:'+color+';background:'+color+'1A;border:1px solid '+color+'40">'+text+'</span>';}
-
-fetch('/api/base').then(function(r){return r.json();}).then(function(b){
-  BASE=b;var s=b.scores;
-  setGauge(s.chs,'CLOUD HEALTH');
-  setBar('pSec','pSecV',s.security);setBar('pEff','pEffV',s.efficiency);setBar('pSus','pSusV',s.sustainability);
-  document.getElementById('chips').innerHTML=
-    chip('#FF5C5C',b.high+' HIGH / '+b.med+' MED findings')+
-    chip('#FFB020','$'+b.wasted.toLocaleString()+'/mo at risk')+
-    chip('#2DD4BF',b.total_carbon.toLocaleString()+' kgCO2/mo');
-});
-
-function generate(){
-  var btn=document.getElementById('go');
-  btn.disabled=true;btn.textContent='Analysing cloud estate...';
-  document.getElementById('loading').style.display='block';
-  document.getElementById('offline').style.display='none';
-  fetch('/api/recommend',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'})
-  .then(function(r){return r.json();}).then(function(d){
-    document.getElementById('loading').style.display='none';
-    btn.disabled=false;btn.textContent='Re-run AI Analysis';
-    if(d.ai===false)document.getElementById('offline').style.display='block';
-    var a=d.projected_after;
-    setGauge(a.chs,'AFTER');
-    setBar('pSec','pSecV',a.security);setBar('pEff','pEffV',a.efficiency);setBar('pSus','pSusV',a.sustainability);
-    var dl=document.getElementById('delta');dl.style.display='block';
-    dl.textContent='\u25B2 '+(a.chs-d.base_chs)+' from '+d.base_chs;
-    document.getElementById('outcomes').style.display='flex';
-    document.getElementById('outcomes').innerHTML=
-      outcome('$'+(a.cost_saving_usd||0).toLocaleString(),'Monthly cost saved','#FFB020')+
-      outcome((a.carbon_saving_kg||0).toLocaleString()+' kg','Carbon reduced','#2DD4BF')+
-      outcome(d.base_security+' \u2192 '+a.security,'Security pillar','#45D483');
-    document.getElementById('recsTitle').style.display='block';
-    var cat={security:'#FF5C5C',cost:'#FFB020',carbon:'#2DD4BF'};
-    var html='';
-    d.recommendations.forEach(function(r,i){
-      var imp='';
-      if(r.impact.security_points>0)imp+=chip('#FF5C5C','+'+r.impact.security_points+' security');
-      if(r.impact.cost_saving_usd>0)imp+=chip('#FFB020','-$'+r.impact.cost_saving_usd+'/mo');
-      if(r.impact.carbon_saving_kg>0)imp+=chip('#2DD4BF','-'+r.impact.carbon_saving_kg+' kgCO2');
-      var c=cat[r.category]||'#8696A7';
-      html+='<div class="rec" style="border-left:3px solid '+c+';animation-delay:'+(i*0.06)+'s">'+
-        '<div class="rank">'+r.rank+'</div><div class="body">'+
-        '<div class="r1"><div class="act">'+r.action+'</div>'+
-        '<span class="cat" style="color:'+c+'">'+r.category+'</span></div>'+
-        '<div class="why">'+r.resource_name+' &middot; '+r.rationale+'</div>'+
-        '<div class="imp">'+imp+'</div></div></div>';
-    });
-    document.getElementById('recs').innerHTML=html;
-  });
-}
-function outcome(v,l,c){return '<div class="outcome"><div class="v" style="color:'+c+'">'+v+'</div><div class="l">'+l+'</div></div>';}
-</script>
-</body>
-</html>"""
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=8000)

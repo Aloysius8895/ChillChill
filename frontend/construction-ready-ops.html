@@ -3,111 +3,527 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Construction-Ready Ops — Track 02 · Hilti</title>
+  <title>Construction-Ready Ops — ConstructGuard AI · Hilti</title>
   <meta name="theme-color" content="#dcd8c0" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <style>
-    :root { --bg:#dcd8c0; --text:#535352; --border:rgba(83,83,82,0.2); --border-strong:rgba(83,83,82,0.4); }
-    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
-    html { scroll-behavior:smooth; }
+    :root {
+      --bg: #dcd8c0;
+      --text: #535352;
+      --border: rgba(83,83,82,0.2);
+      --border-strong: rgba(83,83,82,0.4);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
     body {
-      font-family:'Plus Jakarta Sans',sans-serif; color:var(--text); letter-spacing:-0.01em;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--text);
+      letter-spacing: -0.01em;
       background:
         linear-gradient(rgba(83,83,82,0.05) 1px, transparent 1px),
         linear-gradient(90deg, rgba(83,83,82,0.05) 1px, transparent 1px),
         var(--bg);
-      background-size:64px 64px,64px 64px,auto;
-      min-height:100vh;
+      background-size: 64px 64px, 64px 64px, auto;
+      min-height: 100vh;
     }
-    .noise { position:fixed; inset:0; z-index:50; pointer-events:none; opacity:0.06;
-      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-size:150px 150px; }
-    .container { width:100%; max-width:1100px; margin:0 auto; padding:0 1.5rem; }
-    @media (min-width:768px){ .container { padding:0 3rem; } }
-    header { position:sticky; top:0; z-index:100; background:rgba(220,216,192,0.82); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); }
-    .header-inner { display:flex; align-items:center; justify-content:space-between; padding:1rem 0; }
-    .logo { display:flex; flex-direction:column; line-height:1.1; text-decoration:none; color:var(--text); font-weight:800; font-size:0.85rem; text-transform:uppercase; }
-    .logo span:last-child { opacity:0.55; }
-    .back { display:inline-flex; align-items:center; gap:0.5rem; text-decoration:none; color:var(--text);
-      font-family:'IBM Plex Mono',monospace; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em;
-      border:1px solid var(--border-strong); padding:0.55rem 1rem; transition:background 0.3s,color 0.3s; }
-    .back:hover { background:var(--text); color:var(--bg); }
-    main { padding:5rem 0 6rem; }
-    .eyebrow { font-family:'IBM Plex Mono',monospace; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.2em; opacity:0.55; }
-    .bignum { font-weight:800; font-size:clamp(4rem,16vw,12rem); line-height:0.85; letter-spacing:-0.04em; opacity:0.12; margin-top:0.5rem; margin-bottom:0.1em; }
-    .title { font-weight:800; font-size:clamp(2.6rem,7vw,5.5rem); line-height:0.92; letter-spacing:-0.03em; text-transform:uppercase; margin-top:-0.2em; }
-    .lead { font-size:clamp(1.05rem,2vw,1.4rem); line-height:1.5; max-width:680px; margin-top:1.75rem; }
-    .panel { margin-top:3.5rem; width:100%; aspect-ratio:21/9; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.8rem;
-      background:repeating-linear-gradient(45deg, rgba(83,83,82,0.07) 0 11px, rgba(83,83,82,0.02) 11px 22px); }
-    .panel .ph-lbl { font-family:'IBM Plex Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.22em; opacity:0.5; }
-    .panel .ph-big { font-weight:800; font-size:clamp(2rem,5vw,3.4rem); opacity:0.78; }
-    .cap { margin-top:4rem; display:grid; grid-template-columns:1fr 2fr; gap:2.5rem; border-top:1px solid var(--border); padding-top:2.5rem; }
-    @media (max-width:760px){ .cap { grid-template-columns:1fr; gap:1.25rem; } }
-    .cap-label { font-family:'IBM Plex Mono',monospace; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.15em; opacity:0.5; }
-    .cap-heading { font-weight:700; font-size:clamp(1.3rem,2.4vw,1.9rem); text-transform:uppercase; letter-spacing:-0.01em; margin-bottom:1rem; }
-    .cap-detail { font-size:1rem; line-height:1.7; max-width:620px; opacity:0.85; }
-    .tags { display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:1.5rem; }
-    .tag { font-family:'IBM Plex Mono',monospace; font-size:0.65rem; text-transform:uppercase; letter-spacing:0.08em;
-      border:1px solid var(--border-strong); padding:0.4rem 0.7rem; opacity:0.8; }
-    .nav-foot { margin-top:5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; border-top:1px solid var(--border); padding-top:2rem; }
-    .nav-foot a { text-decoration:none; color:var(--text); }
-    .foot-back { font-family:'IBM Plex Mono',monospace; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em; opacity:0.6; transition:opacity 0.2s; }
-    .foot-back:hover { opacity:1; }
-    .next-link { display:inline-flex; flex-direction:column; align-items:flex-end; gap:0.25rem; }
-    .next-link .nl-lbl { font-family:'IBM Plex Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.15em; opacity:0.5; }
-    .next-link .nl-name { font-weight:800; font-size:clamp(1.1rem,2.5vw,1.6rem); text-transform:uppercase; letter-spacing:-0.01em; border-bottom:2px solid var(--text); padding-bottom:0.15rem; transition:opacity 0.2s; }
-    .next-link:hover .nl-name { opacity:0.6; }
+    .noise {
+      position: fixed; inset: 0; z-index: 50; pointer-events: none; opacity: 0.06;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 150px 150px;
+    }
+    .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+    @media (min-width: 768px) { .container { padding: 0 3rem; } }
+
+    /* Header */
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(220,216,192,0.82); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; }
+    .logo { display: flex; flex-direction: column; line-height: 1.1; text-decoration: none; color: var(--text); font-weight: 800; font-size: 0.85rem; text-transform: uppercase; }
+    .logo span:last-child { opacity: 0.55; }
+    .back {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      text-decoration: none; color: var(--text);
+      font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      border: 1px solid var(--border-strong); padding: 0.55rem 1rem;
+      transition: background 0.3s, color 0.3s;
+    }
+    .back:hover { background: var(--text); color: var(--bg); }
+
+    /* Page header */
+    main { padding: 4rem 0 6rem; }
+    .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.2em; opacity: 0.55; }
+    .bignum { font-weight: 800; font-size: clamp(4rem, 16vw, 12rem); line-height: 0.85; letter-spacing: -0.04em; opacity: 0.12; margin-top: 0.5rem; }
+    .title { font-weight: 800; font-size: clamp(2.2rem, 6vw, 4.5rem); line-height: 0.92; letter-spacing: -0.03em; text-transform: uppercase; margin-top: -0.15em; }
+    .lead { font-size: clamp(1rem, 2vw, 1.25rem); line-height: 1.6; max-width: 640px; margin-top: 1.5rem; opacity: 0.8; }
+
+    /* Loading state */
+    .loading-state {
+      margin-top: 3rem;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 1rem; padding: 4rem 0; border: 1px solid var(--border);
+      background: repeating-linear-gradient(45deg, rgba(83,83,82,0.04) 0 11px, rgba(83,83,82,0.01) 11px 22px);
+    }
+    .loading-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.22em; opacity: 0.5; }
+    .loading-spinner {
+      width: 2rem; height: 2rem;
+      border: 2px solid var(--border);
+      border-top-color: var(--text);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Score bar */
+    .score-bar {
+      margin-top: 3rem;
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px;
+      border: 1px solid var(--border);
+      background: var(--border);
+    }
+    @media (max-width: 640px) { .score-bar { grid-template-columns: 1fr 1fr; } }
+    .score-cell {
+      padding: 1.5rem 1.25rem;
+      background: var(--bg);
+      display: flex; flex-direction: column; gap: 0.4rem;
+    }
+    .score-cell.chs { background: rgba(83,83,82,0.07); }
+    .score-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.18em; opacity: 0.5; }
+    .score-value { font-weight: 800; font-size: clamp(2rem, 5vw, 3.5rem); line-height: 0.9; letter-spacing: -0.03em; }
+    .score-unit { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; font-weight: 700; opacity: 0.45; }
+    .score-bar-track { height: 3px; background: var(--border); margin-top: 0.5rem; }
+    .score-bar-fill { height: 100%; background: var(--text); transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+
+    /* Metric row */
+    .metric-row {
+      margin-top: 2px;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+      border: 1px solid var(--border); border-top: none;
+      background: var(--border);
+    }
+    @media (max-width: 640px) { .metric-row { grid-template-columns: 1fr; } }
+    .metric-cell {
+      padding: 1.25rem 1.25rem;
+      background: rgba(220,216,192,0.6);
+      display: flex; flex-direction: column; gap: 0.3rem;
+    }
+    .metric-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.56rem; text-transform: uppercase; letter-spacing: 0.16em; opacity: 0.5; }
+    .metric-value { font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 1rem; letter-spacing: 0.02em; }
+    .metric-sub { font-size: 0.78rem; opacity: 0.6; margin-top: 0.1rem; }
+
+    /* Section heading */
+    .section-heading {
+      margin-top: 3.5rem; padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
+    }
+    .section-heading h2 { font-weight: 800; font-size: clamp(1.2rem, 2.5vw, 1.75rem); text-transform: uppercase; letter-spacing: -0.02em; }
+    .section-tag { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.14em; opacity: 0.45; }
+
+    /* AI badge */
+    .ai-badge {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      border: 1px solid var(--border-strong); padding: 0.3rem 0.65rem;
+    }
+    .ai-dot { width: 0.45rem; height: 0.45rem; background: var(--text); border-radius: 50%; }
+    .ai-badge.powered .ai-dot { animation: pulse 1.8s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    /* Recommendations grid */
+    .recs-grid {
+      margin-top: 1.5rem;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+      background: var(--border);
+    }
+    @media (max-width: 900px) { .recs-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 560px) { .recs-grid { grid-template-columns: 1fr; } }
+    .rec-card {
+      background: var(--bg); padding: 1.5rem;
+      display: flex; flex-direction: column; gap: 1rem;
+      transition: background 0.3s;
+    }
+    .rec-card:hover { background: rgba(83,83,82,0.05); }
+    .rec-rank { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.16em; opacity: 0.4; }
+    .rec-action { font-weight: 700; font-size: 0.95rem; line-height: 1.35; text-transform: uppercase; letter-spacing: -0.01em; }
+    .rec-rationale { font-size: 0.82rem; line-height: 1.6; opacity: 0.7; }
+    .rec-category {
+      font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em;
+      border: 1px solid var(--border-strong); padding: 0.3rem 0.6rem; align-self: flex-start;
+    }
+    .rec-impacts { display: flex; flex-direction: column; gap: 0.3rem; margin-top: auto; }
+    .rec-impact { display: flex; justify-content: space-between; align-items: center; }
+    .rec-impact-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.45; }
+    .rec-impact-value { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; font-weight: 700; }
+
+    /* Projected after */
+    .projected-panel {
+      margin-top: 2px;
+      padding: 1.5rem;
+      border: 1px solid var(--border);
+      background: rgba(83,83,82,0.04);
+      display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: center;
+    }
+    @media (max-width: 640px) { .projected-panel { grid-template-columns: 1fr; } }
+    .projected-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.18em; opacity: 0.5; margin-bottom: 0.5rem; }
+    .projected-scores { display: flex; gap: 2rem; flex-wrap: wrap; margin-top: 0.5rem; }
+    .projected-score { display: flex; flex-direction: column; gap: 0.2rem; }
+    .projected-score-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.12em; opacity: 0.45; }
+    .projected-score-value { font-weight: 800; font-size: 1.5rem; letter-spacing: -0.02em; }
+    .projected-savings { text-align: right; }
+    @media (max-width: 640px) { .projected-savings { text-align: left; } }
+    .projected-save-big { font-weight: 800; font-size: clamp(1.5rem, 4vw, 2.5rem); letter-spacing: -0.03em; }
+    .projected-save-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.14em; opacity: 0.45; margin-top: 0.25rem; }
+
+    /* Resource table */
+    .table-wrap {
+      margin-top: 1.5rem;
+      border: 1px solid var(--border);
+      overflow-x: auto;
+    }
+    table { width: 100%; border-collapse: collapse; min-width: 700px; }
+    thead th {
+      font-family: 'IBM Plex Mono', monospace; font-size: 0.56rem;
+      text-transform: uppercase; letter-spacing: 0.14em; opacity: 0.45;
+      padding: 0.85rem 1rem; text-align: left;
+      background: rgba(83,83,82,0.04);
+      border-bottom: 1px solid var(--border);
+    }
+    tbody td {
+      padding: 0.85rem 1rem; border-bottom: 1px solid var(--border);
+      font-size: 0.82rem; vertical-align: top;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: rgba(83,83,82,0.03); }
+    .td-name { font-weight: 700; font-size: 0.88rem; }
+    .td-service { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; opacity: 0.55; margin-top: 0.2rem; }
+    .badge-list { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .badge {
+      font-family: 'IBM Plex Mono', monospace; font-size: 0.56rem;
+      text-transform: uppercase; letter-spacing: 0.07em;
+      padding: 0.25rem 0.5rem; border: 1px solid var(--border);
+    }
+    .badge-high { border-color: rgba(83,83,82,0.6); background: rgba(83,83,82,0.1); }
+    .badge-med { border-color: var(--border); }
+    .badge-waste { border-color: rgba(83,83,82,0.35); font-style: italic; }
+    .badge-ok { opacity: 0.4; }
+    .cost-val { font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 0.82rem; }
+    .carbon-val { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; opacity: 0.7; }
+    .util-val { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; }
+    .util-zero { color: var(--text); font-weight: 700; }
+
+    /* Nav foot */
+    .nav-foot {
+      margin-top: 5rem; display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 1rem; border-top: 1px solid var(--border); padding-top: 2rem;
+    }
+    .nav-foot a { text-decoration: none; color: var(--text); }
+    .foot-back { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.6; transition: opacity 0.2s; }
+    .foot-back:hover { opacity: 1; }
+    .next-link { display: inline-flex; flex-direction: column; align-items: flex-end; gap: 0.25rem; }
+    .next-link .nl-lbl { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.5; }
+    .next-link .nl-name { font-weight: 800; font-size: clamp(1.1rem, 2.5vw, 1.6rem); text-transform: uppercase; letter-spacing: -0.01em; border-bottom: 2px solid var(--text); padding-bottom: 0.15rem; transition: opacity 0.2s; }
+    .next-link:hover .nl-name { opacity: 0.6; }
+
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
   <div class="noise" aria-hidden="true"></div>
+
   <header>
     <div class="container">
       <div class="header-inner">
-        <a href="../index.html" class="logo"><span>Track 02</span><span>Hilti</span></a>
-        <a href="../index.html#works" class="back">← Back to overview</a>
+        <a href="index.html" class="logo"><span>Track 02</span><span>Hilti</span></a>
+        <a href="index.html#works" class="back">← Back to overview</a>
       </div>
     </div>
   </header>
+
   <main>
     <div class="container">
       <div class="eyebrow">Feature 04 // Track 02 · Hilti</div>
       <div class="bignum">04</div>
       <h1 class="title">Construction-Ready Ops</h1>
-      <p class="lead">Better support for construction workflows and higher overall operational efficiency.</p>
+      <p class="lead">AI-powered cloud governance — security, cost efficiency, and carbon footprint analysed across your full cloud estate.</p>
 
-      <div class="panel">
-        <span class="ph-lbl">[ feature visual ]</span>
-        <span class="ph-big">Construction Workflow</span>
+      <!-- Loading -->
+      <div class="loading-state" id="loading">
+        <div class="loading-spinner"></div>
+        <div class="loading-label">Scanning cloud estate...</div>
       </div>
 
-      <section class="cap">
-        <div>
-          <div class="cap-label">// Capability</div>
-        </div>
-        <div>
-          <h2 class="cap-heading">Workflow Support</h2>
-          <p class="cap-detail">Fit the real workflows of construction work, raising overall operational efficiency so security and energy savings truly serve on-site operations.</p>
-          <div class="tags">
-          <span class="tag">Workflow integration</span>
-          <span class="tag">Operational efficiency</span>
-          <span class="tag">On-site support</span>
-          <span class="tag">Resource scheduling</span>
-          <span class="tag">Team collaboration</span>
+      <!-- Dashboard (hidden until data loads) -->
+      <div id="dashboard" class="hidden">
+
+        <!-- Scores -->
+        <div class="score-bar" id="score-bar">
+          <div class="score-cell chs">
+            <div class="score-label">Cloud Health Score</div>
+            <div class="score-value" id="chs-val">—</div>
+            <div class="score-unit">/100</div>
+            <div class="score-bar-track"><div class="score-bar-fill" id="chs-fill" style="width:0%"></div></div>
+          </div>
+          <div class="score-cell">
+            <div class="score-label">Security</div>
+            <div class="score-value" id="sec-val">—</div>
+            <div class="score-unit">/100</div>
+            <div class="score-bar-track"><div class="score-bar-fill" id="sec-fill" style="width:0%"></div></div>
+          </div>
+          <div class="score-cell">
+            <div class="score-label">Efficiency</div>
+            <div class="score-value" id="eff-val">—</div>
+            <div class="score-unit">/100</div>
+            <div class="score-bar-track"><div class="score-bar-fill" id="eff-fill" style="width:0%"></div></div>
+          </div>
+          <div class="score-cell">
+            <div class="score-label">Sustainability</div>
+            <div class="score-value" id="sus-val">—</div>
+            <div class="score-unit">/100</div>
+            <div class="score-bar-track"><div class="score-bar-fill" id="sus-fill" style="width:0%"></div></div>
           </div>
         </div>
-      </section>
+
+        <!-- Metrics -->
+        <div class="metric-row">
+          <div class="metric-cell">
+            <div class="metric-label">Monthly Cloud Spend</div>
+            <div class="metric-value" id="m-cost">—</div>
+            <div class="metric-sub" id="m-wasted">— wasted</div>
+          </div>
+          <div class="metric-cell">
+            <div class="metric-label">Carbon Footprint</div>
+            <div class="metric-value" id="m-carbon">—</div>
+            <div class="metric-sub">kgCO₂ / month</div>
+          </div>
+          <div class="metric-cell">
+            <div class="metric-label">Security Findings</div>
+            <div class="metric-value" id="m-findings">—</div>
+            <div class="metric-sub" id="m-clean">— resources clean</div>
+          </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="section-heading">
+          <h2>AI Recommendations</h2>
+          <span class="ai-badge" id="ai-badge"><span class="ai-dot"></span><span id="ai-label">Analysing</span></span>
+        </div>
+
+        <div class="recs-grid" id="recs-grid"></div>
+
+        <!-- Projected after -->
+        <div class="projected-panel" id="projected-panel">
+          <div>
+            <div class="projected-label">Projected after applying all recommendations</div>
+            <div class="projected-scores">
+              <div class="projected-score">
+                <div class="projected-score-label">CHS</div>
+                <div class="projected-score-value" id="p-chs">—</div>
+              </div>
+              <div class="projected-score">
+                <div class="projected-score-label">Security</div>
+                <div class="projected-score-value" id="p-sec">—</div>
+              </div>
+              <div class="projected-score">
+                <div class="projected-score-label">Efficiency</div>
+                <div class="projected-score-value" id="p-eff">—</div>
+              </div>
+              <div class="projected-score">
+                <div class="projected-score-label">Sustainability</div>
+                <div class="projected-score-value" id="p-sus">—</div>
+              </div>
+            </div>
+          </div>
+          <div class="projected-savings">
+            <div class="projected-save-big" id="p-cost-save">—</div>
+            <div class="projected-save-label">Est. monthly saving</div>
+            <div class="projected-save-big" id="p-carbon-save" style="margin-top:0.75rem">—</div>
+            <div class="projected-save-label">Carbon reduction (kg/mo)</div>
+          </div>
+        </div>
+
+        <!-- Resource table -->
+        <div class="section-heading">
+          <h2>Resource Scan</h2>
+          <span class="section-tag" id="resource-count">— resources</span>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Resource</th>
+                <th>Security Score</th>
+                <th>Efficiency Score</th>
+                <th>Carbon Score</th>
+                <th>AI Recommendation</th>
+                <th>Cost Saved</th>
+                <th>Reduced Carbon Emission</th>
+              </tr>
+            </thead>
+            <tbody id="resource-tbody"></tbody>
+          </table>
+        </div>
+
+      </div><!-- /dashboard -->
 
       <div class="nav-foot">
-        <a href="../index.html#works" class="foot-back">← All outcomes</a>
+        <a href="index.html#works" class="foot-back">← All outcomes</a>
         <a href="secure-lean-cloud.html" class="next-link">
           <span class="nl-lbl">Next feature</span>
-          <span class="nl-name">Secure & Lean Cloud →</span>
+          <span class="nl-name">Secure &amp; Lean Cloud →</span>
         </a>
       </div>
     </div>
   </main>
+
+  <script>
+    async function load() {
+      try {
+        const res = await fetch('/api/analyze');
+        const data = await res.json();
+        render(data);
+      } catch (e) {
+        document.getElementById('loading').innerHTML =
+          '<div class="loading-label" style="color:var(--text);opacity:0.7">Unable to reach API — is Flask running?</div>';
+      }
+    }
+
+    function fmt(n) { return '$' + Number(n).toLocaleString(); }
+    function fmtKg(n) { return Number(n).toLocaleString() + ' kg'; }
+
+    function render(data) {
+      const recs  = data.recommendations || [];
+      const proj  = data.projected_after || {};
+      const cur   = data.current || {};
+      const sc    = cur.scores || {};
+      const ai    = data.ai === true;
+
+      // Current scores
+      setText('chs-val', sc.chs ?? '—');
+      setText('sec-val', sc.security ?? '—');
+      setText('eff-val', sc.efficiency ?? '—');
+      setText('sus-val', sc.sustainability ?? '—');
+      setTimeout(() => {
+        setWidth('chs-fill', sc.chs);
+        setWidth('sec-fill', sc.security);
+        setWidth('eff-fill', sc.efficiency);
+        setWidth('sus-fill', sc.sustainability);
+      }, 80);
+
+      // Summary metrics
+      setText('m-cost', cur.total_cost != null ? fmt(cur.total_cost) + '/mo' : '—');
+      setText('m-wasted', cur.wasted != null ? fmt(cur.wasted) + ' wasted' : '—');
+      setText('m-carbon', cur.total_carbon != null ? cur.total_carbon.toLocaleString() : '—');
+      setText('m-findings', (cur.high ?? '—') + ' HIGH · ' + (cur.med ?? '—') + ' MED');
+      setText('m-clean', (cur.clean ?? '—') + ' resources clean');
+
+      // AI badge
+      const badge = document.getElementById('ai-badge');
+      document.getElementById('ai-label').textContent = ai ? 'Claude AI' : 'Rule Engine';
+      if (ai) badge.classList.add('powered');
+
+      // Recommendations
+      const grid = document.getElementById('recs-grid');
+      grid.innerHTML = recs.map(r => `
+        <div class="rec-card">
+          <div class="rec-rank">// Rec ${r.rank}</div>
+          <div class="rec-category">${r.category}</div>
+          <div class="rec-action">${r.action}</div>
+          <div class="rec-rationale">${r.rationale}</div>
+          <div class="rec-impacts">
+            ${r.impact.cost_saving_usd ? `<div class="rec-impact"><span class="rec-impact-label">Cost saving</span><span class="rec-impact-value">${fmt(r.impact.cost_saving_usd)}/mo</span></div>` : ''}
+            ${r.impact.carbon_saving_kg ? `<div class="rec-impact"><span class="rec-impact-label">Carbon saving</span><span class="rec-impact-value">${r.impact.carbon_saving_kg.toLocaleString()} kg/mo</span></div>` : ''}
+            ${r.impact.security_points ? `<div class="rec-impact"><span class="rec-impact-label">Security pts</span><span class="rec-impact-value">+${r.impact.security_points}</span></div>` : ''}
+          </div>
+        </div>
+      `).join('');
+
+      // Projected scores
+      setText('p-chs', proj.chs ?? '—');
+      setText('p-sec', proj.security ?? '—');
+      setText('p-eff', proj.efficiency ?? '—');
+      setText('p-sus', proj.sustainability ?? '—');
+      setText('p-cost-save', proj.cost_saving_usd != null ? fmt(proj.cost_saving_usd) + '/mo' : '—');
+      setText('p-carbon-save', proj.carbon_saving_kg != null ? proj.carbon_saving_kg.toLocaleString() + ' kg' : '—');
+
+      // Resource table from full findings list
+      const resources = cur.resources || [];
+      document.getElementById('resource-count').textContent = resources.length + ' resources scanned';
+      const tbody = document.getElementById('resource-tbody');
+      tbody.innerHTML = resources.map(r => {
+        const issueBadges = r.issues.map(([sev, msg]) =>
+          `<span class="badge badge-${sev === 'HIGH' ? 'high' : 'med'}">${sev}: ${msg}</span>`
+        ).join('');
+        const wasteBadges = r.waste.map(w =>
+          `<span class="badge badge-waste">${w}</span>`
+        ).join('');
+        const allBadges = issueBadges + wasteBadges || '<span class="badge badge-ok">Clean</span>';
+        const utilClass = r.utilization_pct === 0 ? 'util-zero' : '';
+        return `
+          <tr>
+            <td>
+              <div class="td-name">${r.name}</div>
+              <div class="td-service">${r.service} · ${r.id}</div>
+            </td>
+            <td><span class="cost-val">${fmt(r.monthly_cost_usd)}/mo</span></td>
+            <td><span class="carbon-val">${r.carbon} kgCO₂</span></td>
+            <td><span class="util-val ${utilClass}">${r.utilization_pct}%</span></td>
+            <td><div class="badge-list">${allBadges}</div></td>
+            <td></td>
+            <td></td>
+          </tr>
+        `;
+      }).join('');
+
+      // Append 2 additional static rows
+      tbody.innerHTML += `
+        <tr>
+          <td>
+            <div class="td-name">Fleet Tracking Database</div>
+            <div class="td-service">Field Operations · rds-fleet-01</div>
+          </td>
+          <td><span class="cost-val">$620/mo</span></td>
+          <td><span class="carbon-val">112.3 kgCO₂</span></td>
+          <td><span class="util-val">41%</span></td>
+          <td><div class="badge-list"><span class="badge badge-high">HIGH: PORT 3306 OPEN (MYSQL)</span><span class="badge badge-med">MEDIUM: NO ENCRYPTION AT REST</span></div></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>
+            <div class="td-name">Project Mgmt IoT Edge</div>
+            <div class="td-service">Site Automation · iot-edge-pm-02</div>
+          </td>
+          <td><span class="cost-val">$185/mo</span></td>
+          <td><span class="carbon-val">44.6 kgCO₂</span></td>
+          <td><span class="util-val">73%</span></td>
+          <td><div class="badge-list"><span class="badge badge-med">MEDIUM: MFA NOT ENABLED</span><span class="badge badge-med">MEDIUM: KEY NOT ROTATED (380D)</span></div></td>
+          <td></td>
+          <td></td>
+        </tr>
+      `;
+
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('dashboard').classList.remove('hidden');
+    }
+
+    function setText(id, val) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = val;
+    }
+    function setWidth(id, pct) {
+      const el = document.getElementById(id);
+      if (el) el.style.width = (pct || 0) + '%';
+    }
+
+    load();
+  </script>
 </body>
 </html>

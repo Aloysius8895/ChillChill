@@ -192,10 +192,6 @@
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
       background-size: 180px 180px;
     }
-    .hero-canvas {
-      position: absolute; inset: 0; z-index: 6;
-      pointer-events: none;
-    }
     .floating-word {
       position: absolute;
       font-family: 'Newsreader', serif; font-style: italic;
@@ -206,96 +202,241 @@
       transition: opacity 0.18s ease;
       text-shadow: 0 1px 0 rgba(255,255,255,0.18);
     }
-    .floating-word::after {
-      content: "";
-      position: absolute; left: 50%; top: 50%;
-      width: 7px; height: 7px;
-      background: rgba(83,83,82,0.28);
-      transform: translate(-50%, -50%) scale(0);
-      opacity: 0;
-      transition: transform 0.18s ease, opacity 0.18s ease;
-    }
     .floating-word:hover { opacity: 1; }
-    .floating-word.is-connected::after {
-      transform: translate(-50%, -50%) scale(1);
-      opacity: 1;
-    }
-    .hero-wordmark {
+    .cloud-platform-panel {
       position: absolute; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      z-index: 20; opacity: 1; cursor: pointer;
-      width: min(72vw, 1040px);
-      text-align: center;
-      overflow: visible;
+      z-index: 20; opacity: 1;
+      width: min(76vw, 920px);
+      padding: 1rem;
+      color: var(--text);
+      border: 1px solid rgba(83,83,82,0.28);
+      background:
+        linear-gradient(rgba(220,216,192,0.88), rgba(220,216,192,0.74)),
+        linear-gradient(rgba(83,83,82,0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(83,83,82,0.045) 1px, transparent 1px);
+      background-size: auto, 28px 28px, 28px 28px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 20px 70px rgba(83,83,82,0.08);
+      max-height: calc(100vh - 8rem);
+      overflow: hidden;
       contain: layout;
     }
-    .hero-title {
+    .cloud-platform-panel::before {
+      content: "";
+      position: absolute; inset: 0;
+      border: 1px solid rgba(255,255,255,0.18);
+      pointer-events: none;
+    }
+    .cloud-panel-header {
       position: relative;
-      display: inline-block;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: clamp(4.2rem, 11.5vw, 11.2rem);
-      font-weight: 800;
-      line-height: 0.8;
-      letter-spacing: 0;
-      color: var(--text);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 1rem;
+      align-items: start;
+      padding: 0.25rem 0.25rem 0.9rem;
+      border-bottom: 1px solid rgba(83,83,82,0.2);
+    }
+    .cloud-panel-kicker,
+    .cloud-metric-label,
+    .cloud-platform-table th,
+    .cloud-status {
+      font-family: 'IBM Plex Mono', monospace;
       text-transform: uppercase;
-      user-select: none;
-      transform: translateZ(0);
+      letter-spacing: 0.12em;
     }
-    .hero-title-letter {
-      display: inline-block;
-      transform: translate3d(0, 0, 0) rotate(0deg) scaleY(1);
-      transform-origin: 50% 72%;
-      transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
-      will-change: transform;
-    }
-    .hero-title.is-waving .hero-title-letter {
-      transition-duration: 130ms;
-    }
-    .hero-title::before,
-    .hero-title::after {
-      content: attr(data-text);
-      position: absolute;
-      inset: 0;
-      color: inherit;
-      pointer-events: none;
-      opacity: 0;
-      clip-path: circle(var(--glitch-radius, 0px) at var(--glitch-x, 50%) var(--glitch-y, 50%));
-      filter: blur(0.3px);
-    }
-    .hero-title.glitching::before {
-      opacity: 0.7;
-      animation: synapser-glitch-a 180ms steps(2, end) both;
-    }
-    .hero-title.glitching::after {
+    .cloud-panel-kicker {
+      font-size: 0.62rem;
       opacity: 0.55;
-      animation: synapser-glitch-b 180ms steps(2, end) both;
+      margin-bottom: 0.35rem;
     }
-    .hero-title.glitching {
-      animation: synapser-text-flicker 180ms steps(2, end) both;
+    .cloud-panel-title {
+      font-weight: 800;
+      font-size: clamp(1.6rem, 3.4vw, 3.1rem);
+      line-height: 0.95;
+      text-transform: uppercase;
+      letter-spacing: 0;
     }
-    .hero-title-slice {
-      position: absolute;
-      left: 0;
-      top: var(--slice-top, 0px);
-      width: 100%;
-      height: var(--slice-height, 12px);
-      overflow: hidden;
-      color: inherit;
-      opacity: 0;
-      pointer-events: none;
-      transform: translateX(var(--slice-shift, 0px));
+    .cloud-panel-subtitle {
+      margin-top: 0.55rem;
+      max-width: 520px;
+      font-size: 0.82rem;
+      line-height: 1.5;
+      opacity: 0.68;
     }
-    .hero-title-slice span {
-      position: absolute;
-      left: 0;
+    .cloud-score-card {
+      min-width: 138px;
+      padding: 0.75rem 0.85rem;
+      border: 1px solid rgba(83,83,82,0.24);
+      background: rgba(83,83,82,0.045);
+      text-align: right;
+    }
+    .cloud-score-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.58rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      opacity: 0.55;
+    }
+    .cloud-score-value {
+      margin-top: 0.35rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(1.7rem, 3vw, 2.45rem);
+      font-weight: 800;
+      line-height: 0.9;
+    }
+    .cloud-score-value span {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      opacity: 0.55;
+    }
+    .cloud-metrics {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1px;
+      margin: 1px 0 0;
+      background: rgba(83,83,82,0.18);
+      border: 1px solid rgba(83,83,82,0.18);
+      border-top: none;
+    }
+    .cloud-metric {
+      padding: 0.7rem 0.8rem;
+      background: rgba(220,216,192,0.6);
+    }
+    .cloud-metric-label {
+      font-size: 0.56rem;
+      opacity: 0.5;
+    }
+    .cloud-metric-value {
+      margin-top: 0.25rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+    .cloud-table-wrap {
+      position: relative;
+      overflow: auto;
+      max-height: 360px;
+      border: 1px solid rgba(83,83,82,0.2);
+      border-top: none;
+    }
+    .cloud-table-actions {
+      position: sticky;
       top: 0;
+      z-index: 5;
+      display: flex;
+      justify-content: flex-end;
+      padding: 0.55rem;
+      border-bottom: 1px solid rgba(83,83,82,0.16);
+      background: rgba(220,216,192,0.72);
+      backdrop-filter: blur(8px);
+    }
+    .cloud-add-btn {
+      width: 2rem;
+      height: 2rem;
+      border: 1px solid rgba(83,83,82,0.42);
+      background: rgba(220,216,192,0.58);
+      color: var(--text);
+      cursor: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 1rem;
+      line-height: 1;
+      transition: background 0.2s, color 0.2s, transform 0.2s;
+    }
+    .cloud-add-btn:hover,
+    .cloud-add-btn[aria-expanded="true"] {
+      background: var(--text);
+      color: var(--bg);
+    }
+    .cloud-add-btn[aria-expanded="true"] { transform: rotate(45deg); }
+    .cloud-add-form {
+      display: none;
+      grid-template-columns: minmax(150px, 1.35fr) minmax(130px, 1fr) minmax(110px, 0.75fr) auto;
+      gap: 1px;
+      border-bottom: 1px solid rgba(83,83,82,0.18);
+      background: rgba(83,83,82,0.18);
+    }
+    .cloud-add-form.is-open { display: grid; }
+    .cloud-add-form input,
+    .cloud-add-form select {
+      min-width: 0;
+      border: none;
+      border-radius: 0;
+      padding: 0.82rem 0.85rem;
+      background: rgba(220,216,192,0.82);
+      color: var(--text);
+      font: 700 0.72rem 'IBM Plex Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      outline: none;
+    }
+    .cloud-add-form input::placeholder {
+      color: rgba(83,83,82,0.45);
+      opacity: 1;
+    }
+    .cloud-add-submit {
+      border: none;
+      padding: 0 1rem;
+      background: var(--text);
+      color: var(--bg);
+      cursor: none;
+      font: 700 0.66rem 'IBM Plex Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .cloud-platform-table {
       width: 100%;
+      border-collapse: collapse;
+      min-width: 560px;
+      background: rgba(220,216,192,0.46);
     }
-    .hero-title.glitching .hero-title-slice {
-      opacity: 0.7;
-      animation: synapser-slice-fade 180ms steps(2, end) both;
+    .cloud-platform-table th,
+    .cloud-platform-table td {
+      padding: 0.86rem 0.95rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(83,83,82,0.16);
     }
+    .cloud-platform-table th {
+      font-size: 0.58rem;
+      opacity: 0.48;
+      background: rgba(83,83,82,0.045);
+    }
+    .cloud-platform-table tr:last-child td { border-bottom: none; }
+    .cloud-platform-name {
+      font-weight: 800;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+    .cloud-subsidiary {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.78rem;
+      color: rgba(83,83,82,0.72);
+    }
+    .cloud-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      min-width: 6.4rem;
+      font-size: 0.66rem;
+      font-weight: 700;
+    }
+    .cloud-status::before {
+      content: "";
+      width: 0.48rem;
+      height: 0.48rem;
+      border: 1px solid currentColor;
+      background: currentColor;
+    }
+    .cloud-status-critical { color: #5b4f4b; }
+    .cloud-status-watch { color: #706642; }
+    .cloud-status-healthy { color: #536453; }
     .hero-scroll {
       position: absolute; bottom: 2.5rem; width: 100%; text-align: center;
       z-index: 20; opacity: 0;
@@ -305,34 +446,30 @@
       font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.2em;
       color: var(--text); opacity: 0.5;
     }
-    @keyframes synapser-glitch-a {
-      0% { transform: translate(0, 0); }
-      25% { transform: translate(10px, -2px); }
-      50% { transform: translate(-8px, 2px); }
-      75% { transform: translate(4px, 0); }
-      100% { transform: translate(0, 0); }
-    }
-    @keyframes synapser-glitch-b {
-      0% { transform: translate(0, 0); }
-      20% { transform: translate(-7px, 1px); }
-      45% { transform: translate(9px, -1px); }
-      70% { transform: translate(-4px, 2px); }
-      100% { transform: translate(0, 0); }
-    }
-    @keyframes synapser-text-flicker {
-      0%, 100% { filter: none; }
-      30% { filter: blur(0.6px); }
-      60% { filter: blur(0.2px); }
-    }
-    @keyframes synapser-slice-fade {
-      0% { opacity: 0; }
-      20%, 78% { opacity: 0.7; }
-      100% { opacity: 0; }
-    }
     @media (max-width: 720px) {
-      #hero { min-height: 86vh; }
-      .hero-wordmark { width: 94vw; }
-      .hero-title { font-size: clamp(3.35rem, 15vw, 5.8rem); }
+      #hero { min-height: 92vh; }
+      .cloud-platform-panel {
+        width: calc(100vw - 1.5rem);
+        padding: 0.8rem;
+      }
+      .cloud-panel-header {
+        grid-template-columns: 1fr;
+        gap: 0.85rem;
+      }
+      .cloud-score-card {
+        min-width: 0;
+        text-align: left;
+      }
+      .cloud-panel-subtitle { display: none; }
+      .cloud-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .cloud-metric { padding: 0.55rem 0.5rem; }
+      .cloud-metric-value { font-size: 0.64rem; }
+      .cloud-table-wrap { max-height: 42vh; }
+      .cloud-table-actions { padding: 0.45rem; }
+      .cloud-add-form { grid-template-columns: 1fr; }
+      .cloud-add-submit { min-height: 2.5rem; }
+      .cloud-platform-table th,
+      .cloud-platform-table td { padding: 0.72rem 0.75rem; }
       .floating-word { font-size: 1rem; }
       .floating-word:nth-of-type(n+11) { display: none; }
     }
@@ -935,8 +1072,6 @@
 
     <!-- ─── HERO ─────────────────────────────────────── -->
     <section id="hero">
-      <canvas class="hero-canvas" id="hero-canvas"></canvas>
-
       <!-- Floating words -->
       <div class="floating-word" data-x="10" data-y="18" data-depth="0.3">cloud</div>
       <div class="floating-word" data-x="19" data-y="38" data-depth="0.5">security</div>
@@ -957,9 +1092,86 @@
       <div class="floating-word" data-x="23" data-y="24" data-depth="0.5">vulnerability</div>
       <div class="floating-word" data-x="81" data-y="72" data-depth="0.4">infrastructure</div>
 
-      <!-- SYNAPSER wordmark -->
-      <div class="hero-wordmark" id="hero-wordmark">
-        <div class="hero-title" id="hero-title" data-text="HILTI" aria-label="HILTI">HILTI</div>
+      <!-- Cloud estate table -->
+      <div class="cloud-platform-panel" id="hero-cloud-panel" aria-label="Connected cloud platform status">
+        <div class="cloud-panel-header">
+          <div>
+            <div class="cloud-panel-kicker">BuildCo Cloud Estate // 2026-06-20</div>
+            <div class="cloud-panel-title">Connected Cloud Platforms</div>
+            <p class="cloud-panel-subtitle">Embedded scan summary from BuildCo's cloud twin, grouped by business platform and regional subsidiary.</p>
+          </div>
+          <div class="cloud-score-card" aria-label="Cloud health score">
+            <div class="cloud-score-label">Cloud Health</div>
+            <div class="cloud-score-value">23<span>/100</span></div>
+          </div>
+        </div>
+
+        <div class="cloud-metrics" aria-label="Cloud scan totals">
+          <div class="cloud-metric">
+            <div class="cloud-metric-label">Resources</div>
+            <div class="cloud-metric-value">16 scanned</div>
+          </div>
+          <div class="cloud-metric">
+            <div class="cloud-metric-label">Findings</div>
+            <div class="cloud-metric-value">17 HIGH / 16 MED</div>
+          </div>
+          <div class="cloud-metric">
+            <div class="cloud-metric-label">Scan</div>
+            <div class="cloud-metric-value">2026-06-20</div>
+          </div>
+        </div>
+
+        <div class="cloud-table-wrap">
+          <div class="cloud-table-actions">
+            <button class="cloud-add-btn" id="cloud-add-toggle" type="button" aria-label="Add connected cloud platform" aria-expanded="false" aria-controls="cloud-add-form">+</button>
+          </div>
+          <form class="cloud-add-form" id="cloud-add-form" autocomplete="off">
+            <input id="cloud-platform-input" name="platform" type="text" placeholder="Cloud platform" required />
+            <input id="cloud-subsidiary-input" name="subsidiary" type="text" placeholder="Subsidiary" required />
+            <select id="cloud-status-input" name="status" required aria-label="Platform status">
+              <option value="Critical">Critical</option>
+              <option value="Watch" selected>Watch</option>
+              <option value="Healthy">Healthy</option>
+            </select>
+            <button class="cloud-add-submit" type="submit">Add</button>
+          </form>
+          <table class="cloud-platform-table">
+            <thead>
+              <tr>
+                <th>Cloud Platform</th>
+                <th>Subsidiary</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="cloud-platform-list">
+              <tr>
+                <td class="cloud-platform-name">Worker Safety AI</td>
+                <td class="cloud-subsidiary">BuildCo APAC</td>
+                <td><span class="cloud-status cloud-status-critical">Critical</span></td>
+              </tr>
+              <tr>
+                <td class="cloud-platform-name">BIM Processing</td>
+                <td class="cloud-subsidiary">BuildCo Europe</td>
+                <td><span class="cloud-status cloud-status-critical">Critical</span></td>
+              </tr>
+              <tr>
+                <td class="cloud-platform-name">Crane IoT Monitoring</td>
+                <td class="cloud-subsidiary">BuildCo APAC</td>
+                <td><span class="cloud-status cloud-status-critical">Critical</span></td>
+              </tr>
+              <tr>
+                <td class="cloud-platform-name">Material Tracking</td>
+                <td class="cloud-subsidiary">BuildCo APAC</td>
+                <td><span class="cloud-status cloud-status-watch">Watch</span></td>
+              </tr>
+              <tr>
+                <td class="cloud-platform-name">Site Analytics</td>
+                <td class="cloud-subsidiary">BuildCo Americas</td>
+                <td><span class="cloud-status cloud-status-critical">Critical</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <!-- Scroll hint -->
@@ -1095,7 +1307,7 @@
                   <span style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.22em;color:var(--text);opacity:0.5;">[ outcome visual ]</span>
                   <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:2.4rem;line-height:1;color:var(--text);opacity:0.78;">O1</span>
                   <span style="font-family:'IBM Plex Mono',monospace;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--text);opacity:0.6;text-align:center;padding:0 1.5rem;">Secure & Lean Cloud</span>
-                  <a href="features/secure-lean-cloud.html" class="outcome-btn" style="position:absolute;left:50%;bottom:13%;transform:translateX(-50%);">Explore feature <span class="arrow">→</span></a>
+                  <a href="secure-lean-cloud.html" class="outcome-btn" style="position:absolute;left:50%;bottom:13%;transform:translateX(-50%);">Explore feature <span class="arrow">→</span></a>
                 </div>
               </div>
               <div class="slide-meta">
@@ -1111,7 +1323,7 @@
                   <span style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.22em;color:var(--text);opacity:0.5;">[ outcome visual ]</span>
                   <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:2.4rem;line-height:1;color:var(--text);opacity:0.78;">O2</span>
                   <span style="font-family:'IBM Plex Mono',monospace;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--text);opacity:0.6;text-align:center;padding:0 1.5rem;">Lower Carbon, Lower Cost</span>
-                  <a href="features/lower-carbon-lower-cost.html" class="outcome-btn" style="position:absolute;left:50%;bottom:13%;transform:translateX(-50%);">Explore feature <span class="arrow">→</span></a>
+                  <a href="lower-carbon-lower-cost.html" class="outcome-btn" style="position:absolute;left:50%;bottom:13%;transform:translateX(-50%);">Explore feature <span class="arrow">→</span></a>
                 </div>
               </div>
               <div class="slide-meta">
@@ -1127,7 +1339,7 @@
                   <span style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.22em;color:var(--text);opacity:0.5;">[ outcome visual ]</span>
                   <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:2.4rem;line-height:1;color:var(--text);opacity:0.78;">O3</span>
                   <span style="font-family:'IBM Plex Mono',monospace;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--text);opacity:0.6;text-align:center;padding:0 1.5rem;">Continuous Optimization</span>
-                  <a href="features/continuous-optimization.html" class="outcome-btn" style="position:absolute;left:50%;bottom:13%;transform:translateX(-50%);">Explore feature <span class="arrow">→</span></a>
+                  <a href="continuous-optimization.html" class="outcome-btn" style="position:absolute;left:50%;bottom:13%;transform:translateX(-50%);">Explore feature <span class="arrow">→</span></a>
                 </div>
               </div>
               <div class="slide-meta">
@@ -1143,7 +1355,7 @@
                   <span style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.22em;color:var(--text);opacity:0.5;">[ outcome visual ]</span>
                   <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:2.4rem;line-height:1;color:var(--text);opacity:0.78;">O4</span>
                   <span style="font-family:'IBM Plex Mono',monospace;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--text);opacity:0.6;text-align:center;padding:0 1.5rem;">Construction-Ready Ops</span>
-                  <a href="features/construction-ready-ops.html" class="outcome-btn" style="position:absolute;left:50%;bottom:13%;transform:translateX(-50%);">Explore feature <span class="arrow">→</span></a>
+                  <a href="construction-ready-ops.html" class="outcome-btn" style="position:absolute;left:50%;bottom:13%;transform:translateX(-50%);">Explore feature <span class="arrow">→</span></a>
                 </div>
               </div>
               <div class="slide-meta">
@@ -1158,7 +1370,7 @@
       <!-- Outcome info below slider -->
       <div class="works-info" id="works-info">
         <div class="works-info-row">
-          <a href="#" class="project-title-large" id="active-project-title">Secure &amp; Lean Cloud</a>
+          <a href="secure-lean-cloud.html" class="project-title-large" id="active-project-title">Secure &amp; Lean Cloud</a>
         </div>
         <div class="project-meta-grid">
           <div>
@@ -1178,7 +1390,7 @@
             <div class="meta-value" id="active-project-location">Construction Tech</div>
           </div>
           <div>
-            <a href="#" class="btn-view-project">Learn more</a>
+            <a href="secure-lean-cloud.html" class="btn-view-project" id="active-project-link">Learn more</a>
           </div>
         </div>
       </div>
@@ -1585,24 +1797,60 @@
   })();
 
   // ─── Floating words parallax ─────────────────────────
-  const floatWords = document.querySelectorAll('.floating-word-old');
+  const floatWords = document.querySelectorAll('.floating-word');
   let mouseX = 0, mouseY = 0;
+  let mouseClientX = -9999, mouseClientY = -9999;
+  let heroWordRect = null;
 
   document.addEventListener('mousemove', e => {
+    mouseClientX = e.clientX;
+    mouseClientY = e.clientY;
     mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
     mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
   });
+  document.addEventListener('mouseleave', () => {
+    mouseClientX = -9999;
+    mouseClientY = -9999;
+  });
 
-  function animWords() {
+  function positionWords() {
+    heroWordRect = document.getElementById('hero').getBoundingClientRect();
+    floatWords.forEach(w => {
+      w.style.left = `${parseFloat(w.dataset.x) || 50}%`;
+      w.style.top = `${parseFloat(w.dataset.y) || 50}%`;
+    });
+  }
+
+  function animWords(time = 0) {
     if (!floatWords.length) return;
+    if (!heroWordRect) heroWordRect = document.getElementById('hero').getBoundingClientRect();
     floatWords.forEach(w => {
       const d = parseFloat(w.dataset.depth) || 0.3;
-      const tx = mouseX * d * 25;
-      const ty = mouseY * d * 25;
-      w.style.transform = `translate(${tx}px, ${ty}px)`;
+      const xPct = parseFloat(w.dataset.x) || 50;
+      const yPct = parseFloat(w.dataset.y) || 50;
+      const phase = xPct * 0.09 + yPct * 0.04;
+      const baseX = heroWordRect.left + heroWordRect.width * xPct / 100;
+      const baseY = heroWordRect.top + heroWordRect.height * yPct / 100;
+      const dx = baseX - mouseClientX;
+      const dy = baseY - mouseClientY;
+      const dist = Math.max(Math.hypot(dx, dy), 1);
+      const dodgeRadius = 190;
+      const dodge = dist < dodgeRadius ? Math.pow(1 - dist / dodgeRadius, 1.7) : 0;
+      const dodgeX = (dx / dist) * dodge * 145;
+      const dodgeY = (dy / dist) * dodge * 110;
+      const driftX = Math.sin(time * 0.00078 + phase) * d * 48;
+      const driftY = Math.cos(time * 0.00068 + phase) * d * 38;
+      const tx = mouseX * d * 34 + driftX + dodgeX;
+      const ty = mouseY * d * 34 + driftY + dodgeY;
+      w.style.transform = `translate(-50%, -50%) translate3d(${tx}px, ${ty}px, 0)`;
     });
     requestAnimationFrame(animWords);
   }
+  positionWords();
+  window.addEventListener('resize', positionWords);
+  window.addEventListener('scroll', () => {
+    heroWordRect = document.getElementById('hero').getBoundingClientRect();
+  }, { passive: true });
   animWords();
 
   // Click floating word → scroll to section
@@ -1613,9 +1861,85 @@
   });
 
   // ─── GSAP + ScrollTrigger animations ─────────────────
+  (function initCloudPlatformForm() {
+    const toggle = document.getElementById('cloud-add-toggle');
+    const form = document.getElementById('cloud-add-form');
+    const list = document.getElementById('cloud-platform-list');
+    if (!toggle || !form || !list) return;
+
+    const storageKey = 'connectedCloudPlatforms';
+    const platformInput = document.getElementById('cloud-platform-input');
+    const subsidiaryInput = document.getElementById('cloud-subsidiary-input');
+    const statusInput = document.getElementById('cloud-status-input');
+
+    function statusClass(status) {
+      return `cloud-status-${String(status).toLowerCase()}`;
+    }
+
+    function createRow(platform) {
+      const row = document.createElement('tr');
+      const platformCell = document.createElement('td');
+      const subsidiaryCell = document.createElement('td');
+      const statusCell = document.createElement('td');
+      const status = document.createElement('span');
+
+      platformCell.className = 'cloud-platform-name';
+      platformCell.textContent = platform.platform;
+      subsidiaryCell.className = 'cloud-subsidiary';
+      subsidiaryCell.textContent = platform.subsidiary;
+      status.className = `cloud-status ${statusClass(platform.status)}`;
+      status.textContent = platform.status;
+      statusCell.appendChild(status);
+      row.append(platformCell, subsidiaryCell, statusCell);
+      return row;
+    }
+
+    function loadSavedPlatforms() {
+      try {
+        return JSON.parse(localStorage.getItem(storageKey) || '[]');
+      } catch {
+        return [];
+      }
+    }
+
+    function savePlatform(platform) {
+      const platforms = loadSavedPlatforms();
+      platforms.unshift(platform);
+      localStorage.setItem(storageKey, JSON.stringify(platforms));
+    }
+
+    function addPlatformToList(platform) {
+      list.prepend(createRow(platform));
+    }
+
+    loadSavedPlatforms().reverse().forEach(addPlatformToList);
+
+    toggle.addEventListener('click', () => {
+      const isOpen = form.classList.toggle('is-open');
+      toggle.setAttribute('aria-expanded', String(isOpen));
+      if (isOpen) platformInput.focus();
+    });
+
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      const platform = {
+        platform: platformInput.value.trim(),
+        subsidiary: subsidiaryInput.value.trim(),
+        status: statusInput.value
+      };
+      if (!platform.platform || !platform.subsidiary) return;
+      addPlatformToList(platform);
+      savePlatform(platform);
+      form.reset();
+      statusInput.value = 'Watch';
+      platformInput.focus();
+    });
+  })();
+
   (function initHeroNetwork() {
     const hero = document.getElementById('hero');
     const canvas = document.getElementById('hero-canvas');
+    if (!hero || !canvas) return;
     const ctx = canvas.getContext('2d');
     const words = Array.from(document.querySelectorAll('.floating-word'));
     const title = document.getElementById('hero-title');
@@ -1963,8 +2287,10 @@
 
   function initAnimations() {
     if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
-      document.getElementById('hero-wordmark').style.opacity = '1';
-      document.getElementById('hero-scroll').style.opacity = '1';
+      const heroPanel = document.getElementById('hero-cloud-panel');
+      const heroScroll = document.getElementById('hero-scroll');
+      if (heroPanel) heroPanel.style.opacity = '1';
+      if (heroScroll) heroScroll.style.opacity = '1';
       document.querySelectorAll('.reveal-item').forEach(el => {
         el.style.opacity = '1';
         el.style.transform = 'none';
@@ -1973,14 +2299,14 @@
     }
     gsap.registerPlugin(ScrollTrigger);
 
-    // Keep the main wordmark visible immediately on first paint.
-    gsap.set('#hero-wordmark', { opacity: 1 });
+    // Keep the hero cloud table visible immediately on first paint.
+    gsap.set('#hero-cloud-panel', { opacity: 1 });
     gsap.to('#hero-scroll', {
       opacity: 1, duration: 0.8, ease: 'power2.out', delay: 0.35
     });
 
-    // Hero wordmark scale on scroll
-    gsap.to('#hero-wordmark', {
+    // Hero table scale on scroll
+    gsap.to('#hero-cloud-panel', {
       scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 1 },
       scale: 1.03
     });
@@ -2166,6 +2492,7 @@
   const projects = [
     {
       title: 'Secure & Lean Cloud',
+      url: 'secure-lean-cloud.html',
       desc: 'Stronger cloud security with lower energy use — safer, leaner cloud operations.',
       services: 'Real-time vulnerability monitoring, Energy baselining, Security posture',
       industry: 'Security & Efficiency',
@@ -2173,6 +2500,7 @@
     },
     {
       title: 'Lower Carbon, Lower Cost',
+      url: 'lower-carbon-lower-cost.html',
       desc: 'Cut carbon with automated alerts and smart optimization — reducing emissions and cost together.',
       services: 'Carbon footprint tracking, Automated alerts, Smart recommendations, Cost analysis',
       industry: 'Carbon & Cost',
@@ -2180,6 +2508,7 @@
     },
     {
       title: 'Continuous Optimization',
+      url: 'continuous-optimization.html',
       desc: 'Continuously optimize systems for better resource efficiency.',
       services: 'Workload analysis, Resource scheduling, Performance tuning',
       industry: 'Resource Efficiency',
@@ -2187,6 +2516,7 @@
     },
     {
       title: 'Construction-Ready Ops',
+      url: 'construction-ready-ops.html',
       desc: 'Better support for construction workflows and higher overall operational efficiency.',
       services: 'Workflow support, Operational efficiency, On-site integration',
       industry: 'Construction Workflow',
@@ -2223,7 +2553,11 @@
       });
       const p = projects[idx];
       if (!p) return;
-      document.getElementById('active-project-title').textContent = p.title;
+      const activeTitle = document.getElementById('active-project-title');
+      const activeLink = document.getElementById('active-project-link');
+      activeTitle.textContent = p.title;
+      activeTitle.href = p.url;
+      activeLink.href = p.url;
       document.getElementById('active-project-desc').textContent = p.desc;
       document.getElementById('active-project-services').textContent = p.services;
       document.getElementById('active-project-industry').innerHTML = p.industry;
