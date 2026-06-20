@@ -217,6 +217,8 @@
     .carbon-val { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; opacity: 0.7; }
     .util-val { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; }
     .util-zero { color: var(--text); font-weight: 700; }
+    .score-pill { font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 0.82rem; }
+    .recommendation-text { font-weight: 700; line-height: 1.35; margin-bottom: 0.55rem; }
 
     /* Nav foot */
     .nav-foot {
@@ -426,7 +428,7 @@
 
       // AI badge
       const badge = document.getElementById('ai-badge');
-      document.getElementById('ai-label').textContent = ai ? 'Claude AI' : 'Rule Engine';
+      document.getElementById('ai-label').textContent = data.ai_label || (ai ? 'Claude AI' : 'Local Model');
       if (ai) badge.classList.add('powered');
 
       // Recommendations
@@ -465,50 +467,26 @@
           `<span class="badge badge-waste">${w}</span>`
         ).join('');
         const allBadges = issueBadges + wasteBadges || '<span class="badge badge-ok">Clean</span>';
-        const utilClass = r.utilization_pct === 0 ? 'util-zero' : '';
+        const costSaved = Number(r.cost_saved_usd || 0);
+        const carbonSaved = Number(r.reduced_carbon_kg || 0);
         return `
           <tr>
             <td>
               <div class="td-name">${r.name}</div>
               <div class="td-service">${r.service} · ${r.id}</div>
             </td>
-            <td><span class="cost-val">${fmt(r.monthly_cost_usd)}/mo</span></td>
-            <td><span class="carbon-val">${r.carbon} kgCO₂</span></td>
-            <td><span class="util-val ${utilClass}">${r.utilization_pct}%</span></td>
-            <td><div class="badge-list">${allBadges}</div></td>
-            <td></td>
-            <td></td>
+            <td><span class="score-pill">${r.security_score ?? '—'}</span></td>
+            <td><span class="score-pill">${r.efficiency_score ?? '—'}</span></td>
+            <td><span class="score-pill">${r.carbon_score ?? '—'}</span></td>
+            <td>
+              <div class="recommendation-text">${r.ai_recommendation || 'No immediate action'}</div>
+              <div class="badge-list">${allBadges}</div>
+            </td>
+            <td><span class="cost-val">${fmt(costSaved)}/mo</span></td>
+            <td><span class="carbon-val">${carbonSaved.toLocaleString()} kgCO₂/mo</span></td>
           </tr>
         `;
       }).join('');
-
-      // Append 2 additional static rows
-      tbody.innerHTML += `
-        <tr>
-          <td>
-            <div class="td-name">Fleet Tracking Database</div>
-            <div class="td-service">Field Operations · rds-fleet-01</div>
-          </td>
-          <td><span class="cost-val">$620/mo</span></td>
-          <td><span class="carbon-val">112.3 kgCO₂</span></td>
-          <td><span class="util-val">41%</span></td>
-          <td><div class="badge-list"><span class="badge badge-high">HIGH: PORT 3306 OPEN (MYSQL)</span><span class="badge badge-med">MEDIUM: NO ENCRYPTION AT REST</span></div></td>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td>
-            <div class="td-name">Project Mgmt IoT Edge</div>
-            <div class="td-service">Site Automation · iot-edge-pm-02</div>
-          </td>
-          <td><span class="cost-val">$185/mo</span></td>
-          <td><span class="carbon-val">44.6 kgCO₂</span></td>
-          <td><span class="util-val">73%</span></td>
-          <td><div class="badge-list"><span class="badge badge-med">MEDIUM: MFA NOT ENABLED</span><span class="badge badge-med">MEDIUM: KEY NOT ROTATED (380D)</span></div></td>
-          <td></td>
-          <td></td>
-        </tr>
-      `;
 
       document.getElementById('loading').classList.add('hidden');
       document.getElementById('dashboard').classList.remove('hidden');
