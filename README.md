@@ -1,16 +1,104 @@
 # SecEff
 
-SecEff is a cloud governance demo for construction platforms. It connects cloud security, resource efficiency, carbon footprint tracking, and AI recommendations into one static frontend and one Node.js backend.
+AI-powered cloud security, resource efficiency, and carbon intelligence for construction platforms.
 
-The project is built for a hackathon-style workflow: the frontend stays as plain HTML/CSS/JavaScript, while the backend reads a mock cloud estate dataset, analyzes risk and waste, calculates cost/carbon impact, and serves API responses for the dashboards.
+## Project Title and Description
 
-## Key Features
+**SecEff** is a cloud governance demo built for construction technology teams. It helps teams understand whether their connected cloud platforms are secure, resource-efficient, and carbon-aware.
 
-- Cloud Security: finds public access, risky ports, encryption gaps, identity risk, and attack paths.
-- Resource Efficiency: detects idle, orphaned, underused, and over-provisioned cloud resources.
-- Carbon Footprint: estimates monthly carbon impact from energy use and regional carbon intensity.
-- AI Recommendation: generates practical next actions using an API key when available, with a local fallback when not.
-- Unified Demo UI: serves all feature pages from the same backend at `http://localhost:5000/frontend/index.html`.
+The platform analyzes a mock cloud estate dataset and turns raw scan data into four connected outputs:
+
+- **Cloud Security**: public access, risky ports, encryption gaps, identity risk, and attack paths.
+- **Resource Efficiency**: idle, orphaned, underused, and over-provisioned workloads.
+- **Carbon Footprint**: monthly carbon impact based on energy usage and regional carbon intensity.
+- **AI Recommendation**: practical next actions for reducing security risk, cost waste, and carbon emissions.
+
+Instead of showing separate dashboards for security, cost, and sustainability, SecEff combines them into one decision layer for safer and leaner cloud operations.
+
+## Team Name and Team Members
+
+**Team Name:** Chill Chill
+
+**Team Members:**
+
+- Aloysius Ting Zi Heng
+- Edixon Teo Zan Wei
+- Hing Zhen Nam
+- Chong Yi Han
+- Hassan Mehdi
+
+## Technologies Used
+
+- **HTML, CSS, JavaScript** - static frontend pages and interactive UI.
+- **Node.js** - backend runtime.
+- **Express.js** - REST API server and static frontend hosting.
+- **CORS** - frontend/backend API access.
+- **Python** - backend analysis worker for Feature 4.
+- **JSON** - mock cloud estate dataset and API response format.
+- **vis-network** - cloud security relationship graph visualization.
+- **Chart.js** - dashboard charts and metrics visualization.
+- **Anthropic API** - optional AI recommendation generation when an API key is available.
+- **Local rule-based recommendation engine** - fallback recommendation logic when no API key is configured.
+- **GitHub** - version control and project submission.
+
+## Challenge and Approach
+
+### Challenge
+
+Construction cloud platforms often support many different workflows: worker safety AI, BIM processing, IoT monitoring, site analytics, and operational dashboards. These systems can create security exposure, wasted cloud spend, and high carbon impact.
+
+The main challenge is that these problems are usually reviewed separately:
+
+- security teams look at vulnerabilities and attack paths;
+- operations teams look at resource usage and cost;
+- sustainability teams look at energy and carbon impact.
+
+This makes it hard to decide which cloud resources need attention first.
+
+### Approach
+
+SecEff uses one shared mock cloud dataset and runs it through four engines:
+
+1. **Security Audit** identifies risky cloud configurations and connected attack paths.
+2. **Resource Efficiency** detects idle, orphaned, and over-provisioned resources.
+3. **Carbon Intelligence** estimates carbon emissions using energy consumption and regional carbon intensity.
+4. **AI Recommendation** summarizes the best next actions based on security, cost, and carbon impact.
+
+The goal is not just to detect problems, but to explain which actions will create the highest operational value.
+
+### Cost and Carbon Logic
+
+Cost savings are only counted when a resource is wasteful. Fixing a security issue does not automatically reduce cost.
+
+```text
+Idle or orphaned resource:
+saved_per_month = monthly_cost * 1.0
+
+Over-provisioned resource:
+saved_per_month = monthly_cost * 0.6
+
+Security-only or healthy resource:
+saved_per_month = 0
+```
+
+Carbon emissions are calculated with:
+
+```text
+carbon_kg = kwh_month * region_carbon_intensity / 1000
+```
+
+Carbon reduction follows the same waste-removal logic:
+
+```text
+Idle or orphaned resource:
+reduced_carbon_kg = carbon_kg * 1.0
+
+Over-provisioned resource:
+reduced_carbon_kg = carbon_kg * 0.6
+
+Security-only or healthy resource:
+reduced_carbon_kg = 0
+```
 
 ## System Architecture
 
@@ -50,16 +138,6 @@ backend/server.js
             Visual assets
             pic/*.jpg, pic/*.png
 ```
-
-## Architecture Layers
-
-| Layer | Role | Main Files |
-| --- | --- | --- |
-| Data Sources | Mock cloud resources, relationships, usage, cost, security settings, and carbon inputs. | `backend/data/hilti-cloud-data.json` |
-| Backend | Express server, CORS, JSON middleware, static frontend hosting, and API routing. | `backend/server.js` |
-| Core Engines | Security audit, resource efficiency, carbon intelligence, and AI recommendation logic. | `backend/services/*`, `backend/python/analyze_feature4.py` |
-| Frontend | Static dashboard pages with existing SecEff visual style. No React, no Vite, no build step. | `frontend/*.html` |
-| Assets | Homepage and feature visuals. | `pic/*` |
 
 ## Project Structure
 
@@ -102,9 +180,11 @@ ImagineHack/
       old Python and JSX prototype files
 ```
 
-Note: the active demo is served by `backend/server.js`. Older prototype scripts were moved into `legacy/prototypes/` so the project root only contains active entry points and documentation.
+The active demo is served by `backend/server.js`. Older prototype scripts are kept in `legacy/prototypes/` for reference only.
 
-## Requirements
+## Usage Instructions
+
+### Prerequisites
 
 - Node.js
 - npm
@@ -113,9 +193,9 @@ Note: the active demo is served by `backend/server.js`. Older prototype scripts 
 Optional:
 
 - `ANTHROPIC_API_KEY` for remote AI recommendations.
-- If no API key is configured, Feature 4 automatically uses the local recommendation fallback.
+- If no API key is configured, SecEff uses the local fallback recommendation engine.
 
-## How To Run
+### Run the Project
 
 From the project root:
 
@@ -125,19 +205,19 @@ npm install
 npm run dev
 ```
 
-Then open:
+Open the frontend:
 
 ```text
 http://localhost:5000/frontend/index.html
 ```
 
-Backend health check:
+Health check:
 
 ```text
 http://localhost:5000/api/health
 ```
 
-Feature 4 API:
+Feature 4 analysis API:
 
 ```text
 http://localhost:5000/api/analyze
@@ -172,83 +252,9 @@ npm run dev
 | `GET /api/security/resources/:id` | Details for a selected cloud resource. |
 | `GET /api/analyze` | Feature 4 output: current state, recommendations, and projected results. |
 
-## Analysis Logic
+## Demo Notes
 
-### Cloud Security
-
-The security engine reviews each resource for issues such as public exposure, risky open ports, missing encryption, weak identity controls, and risky relationships. It returns findings, severity levels, dashboard totals, and graph data.
-
-### Resource Efficiency
-
-The efficiency logic identifies waste by checking utilization, cost, ownership, and idle/orphaned state. Resources can be classified as healthy, idle/orphaned, underused, or over-provisioned.
-
-### Carbon Footprint
-
-Monthly carbon impact is calculated with:
-
-```text
-carbon_kg = kwh_month * region_carbon_intensity / 1000
-```
-
-Example:
-
-```text
-1450 kWh * 408 gCO2/kWh / 1000 = 591.6 kgCO2
-```
-
-### Cost Saved
-
-Savings are calculated only for wasteful resources:
-
-```text
-Idle or orphaned resource:
-saved_per_month = monthly_cost * 1.0
-
-Over-provisioned resource:
-saved_per_month = monthly_cost * 0.6
-
-Security-only or healthy resource:
-saved_per_month = 0
-```
-
-### Reduced Carbon Emission
-
-Carbon reduction follows the same waste-removal logic:
-
-```text
-Idle or orphaned resource:
-reduced_carbon_kg = carbon_kg * 1.0
-
-Over-provisioned resource:
-reduced_carbon_kg = carbon_kg * 0.6
-
-Security-only or healthy resource:
-reduced_carbon_kg = 0
-```
-
-## AI Recommendation Flow
-
-Feature 4 checks for an API key before generating recommendations:
-
-1. If `ANTHROPIC_API_KEY` or `API_KEY` exists, the backend calls the remote AI model.
-2. If no key exists, or the remote call fails, the backend uses the local fallback model.
-3. The response still uses the same dashboard shape, so the frontend keeps working either way.
-
-## Environment Variables
-
-| Variable | Purpose |
-| --- | --- |
-| `PORT` | Backend port. Defaults to `5000`. |
-| `PYTHON_BIN` | Python command used by Node. Defaults to `python`. |
-| `ANTHROPIC_API_KEY` | Optional API key for AI recommendations. |
-| `API_KEY` | Alternate optional API key name. |
-| `ANTHROPIC_MODEL` | Optional model override. |
-| `OPS_ANALYZER_TIMEOUT_MS` | Timeout for the Python analyzer worker. |
-| `AI_RECOMMENDATION_TIMEOUT_MS` | Timeout for AI recommendation calls. |
-
-## Development Notes
-
-- Run the frontend through the backend URL: `http://localhost:5000/frontend/index.html`.
+- The frontend should be opened through `http://localhost:5000/frontend/index.html`.
 - Do not open Feature 4 from a different static server if it needs `/api/analyze`.
 - The dataset filename is still `hilti-cloud-data.json` for compatibility with the current code, even though the visible product name is SecEff.
 - The frontend is intentionally static and does not require a bundler.
