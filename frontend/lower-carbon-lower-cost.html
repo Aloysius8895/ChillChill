@@ -3,111 +3,833 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lower Carbon, Lower Cost — Track 02 · Hilti</title>
+  <title>Lower Carbon, Lower Cost - Resource Efficiency Engine</title>
   <meta name="theme-color" content="#dcd8c0" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <style>
-    :root { --bg:#dcd8c0; --text:#535352; --border:rgba(83,83,82,0.2); --border-strong:rgba(83,83,82,0.4); }
-    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
-    html { scroll-behavior:smooth; }
-    body {
-      font-family:'Plus Jakarta Sans',sans-serif; color:var(--text); letter-spacing:-0.01em;
-      background:
-        linear-gradient(rgba(83,83,82,0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(83,83,82,0.05) 1px, transparent 1px),
-        var(--bg);
-      background-size:64px 64px,64px 64px,auto;
-      min-height:100vh;
+    :root {
+      --bg: #dcd8c0;
+      --panel: rgba(220, 216, 192, 0.76);
+      --panel-strong: rgba(220, 216, 192, 0.92);
+      --line: rgba(83, 83, 82, 0.18);
+      --line-strong: rgba(83, 83, 82, 0.38);
+      --text: #535352;
+      --muted: rgba(83, 83, 82, 0.58);
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --green: #22c55e;
+      --purple: #8b5cf6;
+      --blue: #38bdf8;
+      --slate: #64748b;
     }
-    .noise { position:fixed; inset:0; z-index:50; pointer-events:none; opacity:0.06;
-      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-size:150px 150px; }
-    .container { width:100%; max-width:1100px; margin:0 auto; padding:0 1.5rem; }
-    @media (min-width:768px){ .container { padding:0 3rem; } }
-    header { position:sticky; top:0; z-index:100; background:rgba(220,216,192,0.82); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); }
-    .header-inner { display:flex; align-items:center; justify-content:space-between; padding:1rem 0; }
-    .logo { display:flex; flex-direction:column; line-height:1.1; text-decoration:none; color:var(--text); font-weight:800; font-size:0.85rem; text-transform:uppercase; }
-    .logo span:last-child { opacity:0.55; }
-    .back { display:inline-flex; align-items:center; gap:0.5rem; text-decoration:none; color:var(--text);
-      font-family:'IBM Plex Mono',monospace; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em;
-      border:1px solid var(--border-strong); padding:0.55rem 1rem; transition:background 0.3s,color 0.3s; }
-    .back:hover { background:var(--text); color:var(--bg); }
-    main { padding:5rem 0 6rem; }
-    .eyebrow { font-family:'IBM Plex Mono',monospace; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.2em; opacity:0.55; }
-    .bignum { font-weight:800; font-size:clamp(4rem,16vw,12rem); line-height:0.85; letter-spacing:-0.04em; opacity:0.12; margin-top:0.5rem; margin-bottom:0.1em; }
-    .title { font-weight:800; font-size:clamp(2.6rem,7vw,5.5rem); line-height:0.92; letter-spacing:-0.03em; text-transform:uppercase; margin-top:-0.2em; }
-    .lead { font-size:clamp(1.05rem,2vw,1.4rem); line-height:1.5; max-width:680px; margin-top:1.75rem; }
-    .panel { margin-top:3.5rem; width:100%; aspect-ratio:21/9; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.8rem;
-      background:repeating-linear-gradient(45deg, rgba(83,83,82,0.07) 0 11px, rgba(83,83,82,0.02) 11px 22px); }
-    .panel .ph-lbl { font-family:'IBM Plex Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.22em; opacity:0.5; }
-    .panel .ph-big { font-weight:800; font-size:clamp(2rem,5vw,3.4rem); opacity:0.78; }
-    .cap { margin-top:4rem; display:grid; grid-template-columns:1fr 2fr; gap:2.5rem; border-top:1px solid var(--border); padding-top:2.5rem; }
-    @media (max-width:760px){ .cap { grid-template-columns:1fr; gap:1.25rem; } }
-    .cap-label { font-family:'IBM Plex Mono',monospace; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.15em; opacity:0.5; }
-    .cap-heading { font-weight:700; font-size:clamp(1.3rem,2.4vw,1.9rem); text-transform:uppercase; letter-spacing:-0.01em; margin-bottom:1rem; }
-    .cap-detail { font-size:1rem; line-height:1.7; max-width:620px; opacity:0.85; }
-    .tags { display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:1.5rem; }
-    .tag { font-family:'IBM Plex Mono',monospace; font-size:0.65rem; text-transform:uppercase; letter-spacing:0.08em;
-      border:1px solid var(--border-strong); padding:0.4rem 0.7rem; opacity:0.8; }
-    .nav-foot { margin-top:5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; border-top:1px solid var(--border); padding-top:2rem; }
-    .nav-foot a { text-decoration:none; color:var(--text); }
-    .foot-back { font-family:'IBM Plex Mono',monospace; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em; opacity:0.6; transition:opacity 0.2s; }
-    .foot-back:hover { opacity:1; }
-    .next-link { display:inline-flex; flex-direction:column; align-items:flex-end; gap:0.25rem; }
-    .next-link .nl-lbl { font-family:'IBM Plex Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.15em; opacity:0.5; }
-    .next-link .nl-name { font-weight:800; font-size:clamp(1.1rem,2.5vw,1.6rem); text-transform:uppercase; letter-spacing:-0.01em; border-bottom:2px solid var(--text); padding-bottom:0.15rem; transition:opacity 0.2s; }
-    .next-link:hover .nl-name { opacity:0.6; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      color: var(--text);
+      font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        linear-gradient(rgba(83,83,82,0.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(83,83,82,0.055) 1px, transparent 1px),
+        var(--bg);
+      background-size: 64px 64px, 64px 64px, auto;
+      letter-spacing: -0.01em;
+    }
+
+    .noise-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      pointer-events: none;
+      opacity: 0.06;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-size: 150px 150px;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input, select { font: inherit; }
+
+    .shell {
+      width: min(1440px, 100%);
+      margin: 0 auto;
+      padding: 0 24px 56px;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(220, 216, 192, 0.78);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(14px);
+    }
+
+    .header-inner {
+      width: min(1440px, 100%);
+      margin: 0 auto;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: grid;
+      gap: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    .brand strong {
+      color: var(--text);
+      font-size: 0.9rem;
+      letter-spacing: 0.03em;
+    }
+
+    .back {
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 14px;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      color: var(--muted);
+      transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+    }
+
+    .back:hover {
+      color: var(--text);
+      border-color: var(--text);
+      background: rgba(83, 83, 82, 0.08);
+    }
+
+    main { padding-top: 56px; }
+
+    .hero {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 32px;
+      align-items: stretch;
+    }
+
+    .intro,
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 20px 70px rgba(83, 83, 82, 0.1);
+      backdrop-filter: blur(10px);
+    }
+
+    .intro {
+      padding: clamp(24px, 4vw, 44px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 240px;
+    }
+
+    .eyebrow {
+      color: rgba(83, 83, 82, 0.58);
+      font-family: "IBM Plex Mono", monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      font-size: 0.74rem;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin-top: 0;
+      max-width: 780px;
+      color: var(--text);
+      font-size: clamp(1.65rem, 3.4vw, 3.05rem);
+      line-height: 1;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      margin-top: 18px;
+      max-width: 760px;
+      color: rgba(83, 83, 82, 0.82);
+      font-size: clamp(0.96rem, 1.35vw, 1.08rem);
+      line-height: 1.6;
+      text-align: justify;
+      text-justify: inter-word;
+    }
+
+    .stat-grid {
+      margin-top: 34px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .efficiency-overview {
+      margin-top: 0;
+    }
+
+    .overview-grid {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .overview-grid .stat-grid {
+      margin-top: 0;
+    }
+
+    .stat {
+      min-height: 104px;
+      padding: 16px;
+      background: rgba(83, 83, 82, 0.045);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .stat .num {
+      color: var(--text);
+      font-size: clamp(1.7rem, 3vw, 2.5rem);
+      line-height: 1;
+      font-weight: 800;
+    }
+
+    .stat .label {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      line-height: 1.35;
+    }
+
+    .card { padding: 20px; }
+
+    .card-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      color: var(--text);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.88rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .card-title span {
+      color: var(--muted);
+      font-weight: 600;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .gauge-wrap {
+      min-height: 220px;
+      display: grid;
+      place-items: center;
+    }
+
+    .gauge {
+      width: min(320px, 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .gauge svg {
+      width: 100%;
+      height: auto;
+      overflow: visible;
+    }
+
+    .gauge-value {
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    .gauge-value strong {
+      display: block;
+      color: var(--text);
+      font-size: clamp(2.15rem, 4.6vw, 3.35rem);
+      line-height: 0.9;
+      letter-spacing: 0;
+    }
+
+    .gauge-value span {
+      display: block;
+      margin-top: 8px;
+      color: #5f4e4a;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-size: 0.78rem;
+    }
+
+    .section-grid {
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 32px;
+    }
+
+    .pie-layout {
+      margin-top: 22px;
+      display: grid;
+      grid-template-columns: 180px minmax(0, 1fr);
+      gap: 20px;
+      align-items: center;
+    }
+
+    @media (min-width: 1101px) {
+      .classification-card {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .classification-card .pie-layout {
+        flex: 1;
+        margin-top: 0;
+        align-content: center;
+      }
+    }
+
+    .pie {
+      width: 180px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: conic-gradient(
+        var(--green) 0 78.26deg,
+        var(--yellow) 78.26deg 125.22deg,
+        var(--red) 125.22deg 360deg
+      );
+      position: relative;
+      box-shadow: inset 0 0 0 1px rgba(248, 250, 252, 0.14);
+    }
+
+    .pie::after {
+      content: "23";
+      position: absolute;
+      inset: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 2rem;
+      font-weight: 800;
+    }
+
+    .legend {
+      display: grid;
+      gap: 11px;
+    }
+
+    .legend-row {
+      display: grid;
+      grid-template-columns: 12px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      color: rgba(83, 83, 82, 0.82);
+      font-size: 0.92rem;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--slate);
+    }
+
+    .legend-row strong {
+      color: var(--text);
+      font-weight: 800;
+    }
+
+    .scatter {
+      margin-top: 22px;
+      height: 300px;
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background:
+        linear-gradient(rgba(83, 83, 82, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(83, 83, 82, 0.08) 1px, transparent 1px),
+        rgba(220, 216, 192, 0.42);
+      background-size: 20% 20%;
+      overflow: hidden;
+    }
+
+    .axis-label {
+      position: absolute;
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .axis-x { left: 50%; bottom: 10px; transform: translateX(-50%); }
+    .axis-y { left: 18px; top: 50%; transform: translate(-50%, -50%) rotate(-90deg); transform-origin: center; }
+
+    .point {
+      --x: 0;
+      --y: 0;
+      --color: var(--slate);
+      position: absolute;
+      left: calc(34px + (100% - 70px) * var(--x) / 100);
+      bottom: calc(34px + (100% - 70px) * var(--y) / 100);
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: var(--color);
+      border: 2px solid rgba(220, 216, 192, 0.9);
+      transform: translate(-50%, 50%);
+      cursor: help;
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--color) 22%, transparent);
+    }
+
+    .point:hover::after {
+      content: attr(data-tip);
+      position: absolute;
+      z-index: 4;
+      left: 18px;
+      bottom: 18px;
+      width: max-content;
+      max-width: 260px;
+      padding: 10px 12px;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      background: rgba(220, 216, 192, 0.96);
+      color: var(--text);
+      font-size: 0.78rem;
+      line-height: 1.45;
+      white-space: pre-line;
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.36);
+    }
+
+    .toolbar {
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: 1fr repeat(3, minmax(160px, 220px));
+      gap: 12px;
+    }
+
+    .control {
+      min-height: 44px;
+      width: 100%;
+      color: var(--text);
+      background: rgba(220, 216, 192, 0.56);
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      padding: 0 12px;
+      outline: none;
+    }
+
+    select.control { color-scheme: light; }
+
+    .table-card { margin-top: 24px; overflow: hidden; }
+
+    .table-wrap {
+      width: 100%;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      margin-top: 14px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 980px;
+      border-collapse: collapse;
+      background: rgba(220, 216, 192, 0.34);
+    }
+
+    th, td {
+      padding: 13px 14px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: rgba(83, 83, 82, 0.08);
+      color: var(--text);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+    }
+
+    td {
+      color: rgba(83, 83, 82, 0.82);
+      font-size: 0.9rem;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 0 9px;
+      border-radius: 999px;
+      border: 1px solid currentColor;
+      font-size: 0.76rem;
+      font-weight: 800;
+    }
+
+    .score {
+      display: grid;
+      grid-template-columns: 48px 92px;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .bar {
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(83, 83, 82, 0.14);
+      overflow: hidden;
+    }
+
+    .bar span {
+      display: block;
+      height: 100%;
+      width: calc(var(--score) * 1%);
+      background: var(--score-color);
+    }
+
+    .empty {
+      display: none;
+      margin-top: 14px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 1100px) {
+      .hero,
+      .overview-grid,
+      .section-grid,
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      .stat-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .shell, .header-inner { padding-left: 16px; padding-right: 16px; }
+      .header-inner { align-items: flex-start; flex-direction: column; }
+      .intro { min-height: auto; }
+      .stat-grid, .pie-layout { grid-template-columns: 1fr; }
+      .pie { margin: 0 auto; }
+      .scatter { height: 260px; }
+    }
   </style>
 </head>
 <body>
-  <div class="noise" aria-hidden="true"></div>
+  <div class="noise-layer" aria-hidden="true"></div>
   <header>
-    <div class="container">
-      <div class="header-inner">
-        <a href="index.html" class="logo"><span>Track 02</span><span>Hilti</span></a>
-        <a href="index.html#works" class="back">← Back to overview</a>
-      </div>
+    <div class="header-inner">
+      <a href="index.html" class="brand">
+        <strong>Track 02 - Hilti</strong>
+        <span>Resource Efficiency Engine</span>
+      </a>
+      <a class="back" href="index.html#works">&larr; Back to overview</a>
     </div>
   </header>
-  <main>
-    <div class="container">
-      <div class="eyebrow">Feature 02 // Track 02 · Hilti</div>
-      <div class="bignum">02</div>
-      <h1 class="title">Lower Carbon, Lower Cost</h1>
-      <p class="lead">Cut carbon with automated alerts and smart optimization — reducing emissions and cost together.</p>
 
-      <div class="panel">
-        <span class="ph-lbl">[ feature visual ]</span>
-        <span class="ph-big">Carbon & Cost</span>
+  <main class="shell">
+    <section class="hero">
+      <div class="intro">
+        <div>
+          <h1>Resource Efficiency Engine</h1>
+          <p class="lead">
+            Monitors cloud resource utilization by analyzing CPU, memory, storage, and workload activity metrics to evaluate operational efficiency. It generates efficiency scores and identifies idle, underutilized, or overloaded resources to support cost optimization and sustainable cloud operations.
+          </p>
+        </div>
       </div>
 
-      <section class="cap">
-        <div>
-          <div class="cap-label">// Capability</div>
+      <div class="card efficiency-overview">
+        <div class="card-title">
+          Overall system efficiency
         </div>
-        <div>
-          <h2 class="cap-heading">Energy & Carbon</h2>
-          <p class="cap-detail">Quantify the energy use and carbon footprint of cloud workloads, pinpoint high-carbon and inefficient resources, and build a clear basis for cutting emissions.</p>
-          <div class="tags">
-          <span class="tag">Energy baselining</span>
-          <span class="tag">Carbon tracking</span>
-          <span class="tag">Workload analysis</span>
-          <span class="tag">Efficiency scoring</span>
-          <span class="tag">Cost accounting</span>
+        <div class="overview-grid">
+          <div class="gauge-wrap">
+            <div class="gauge" aria-label="System Efficiency Score 38.2 out of 100">
+              <svg viewBox="0 0 240 140" role="img">
+                <path d="M30 120 A90 90 0 0 1 210 120" fill="none" stroke="rgba(83,83,82,0.16)" stroke-width="20" stroke-linecap="round" />
+                <path d="M30 120 A90 90 0 0 1 84 37" fill="none" stroke="#ef4444" stroke-width="20" stroke-linecap="round" />
+                <path d="M84 37 A90 90 0 0 1 156 37" fill="none" stroke="#f59e0b" stroke-width="20" stroke-linecap="butt" />
+                <path d="M156 37 A90 90 0 0 1 210 120" fill="none" stroke="#22c55e" stroke-width="20" stroke-linecap="round" />
+                <line x1="120" y1="120" x2="78" y2="49" stroke="#535352" stroke-width="4" stroke-linecap="round" />
+                <circle cx="120" cy="120" r="8" fill="#535352" />
+              </svg>
+              <div class="gauge-value">
+                <strong>38.2</strong>
+                <span>Poor efficiency</span>
+              </div>
+            </div>
           </div>
         </div>
-      </section>
-
-      <div class="nav-foot">
-        <a href="index.html#works" class="foot-back">← All outcomes</a>
-        <a href="continuous-optimization.html" class="next-link">
-          <span class="nl-lbl">Next feature</span>
-          <span class="nl-name">Continuous Optimization →</span>
-        </a>
       </div>
-    </div>
+    </section>
+
+    <section class="section-grid single-left">
+      <div class="card classification-card">
+        <div class="card-title">
+          Resource classifications
+        </div>
+        <div class="pie-layout">
+          <div class="pie" aria-label="Classification pie chart"></div>
+          <div class="legend">
+            <div class="legend-row"><span class="dot" style="background: var(--green)"></span><span>Efficient</span><strong>21.7% / 5</strong></div>
+            <div class="legend-row"><span class="dot" style="background: var(--red)"></span><span>Idle</span><strong>65.2% / 15</strong></div>
+            <div class="legend-row"><span class="dot" style="background: var(--yellow)"></span><span>Underutilized</span><strong>13.0% / 3</strong></div>
+            <div class="legend-row"><span class="dot" style="background: var(--purple)"></span><span>Overprovisioned</span><strong>0% / 0</strong></div>
+            <div class="legend-row"><span class="dot" style="background: #dc2626"></span><span>Overloaded</span><strong>0% / 0</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card scatter-card">
+        <div class="card-title">
+          CPU vs memory utilization
+        </div>
+        <div class="scatter" id="scatter" aria-label="CPU versus memory scatter plot">
+          <span class="axis-label axis-y">Memory usage %</span>
+          <span class="axis-label axis-x">CPU usage %</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card table-card">
+      <div class="card-title">
+        Resource details
+      </div>
+
+      <div class="toolbar">
+        <input class="control" id="searchInput" type="search" placeholder="Search resource ID, type, activity, or classification" />
+        <select class="control" id="typeFilter">
+          <option value="all">All resource types</option>
+        </select>
+        <select class="control" id="classFilter">
+          <option value="all">All classifications</option>
+        </select>
+        <select class="control" id="scoreFilter">
+          <option value="0">Min score: 0</option>
+          <option value="20">Min score: 20</option>
+          <option value="40">Min score: 40</option>
+          <option value="60">Min score: 60</option>
+          <option value="80">Min score: 80</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-key="id">Resource ID</th>
+              <th data-key="type">Resource Type</th>
+              <th data-key="cpu">CPU Usage %</th>
+              <th data-key="memory">Memory Usage %</th>
+              <th data-key="storage">Storage Usage %</th>
+              <th data-key="activity">Activity Level</th>
+              <th data-key="classification">Classification</th>
+              <th data-key="score">Efficiency Score</th>
+            </tr>
+          </thead>
+          <tbody id="resourceBody"></tbody>
+        </table>
+      </div>
+      <p class="empty" id="emptyState">No resources match the current filters.</p>
+    </section>
   </main>
+
+  <script>
+    const resources = [
+      { id: "i-0a91f3c7d22", type: "vm", cpu: 42, memory: 55, storage: 56, activity: "High", classification: "Efficient", score: 80.0 },
+      { id: "i-0b82e4d8f31", type: "vm", cpu: 47, memory: 60, storage: 62, activity: "High", classification: "Efficient", score: 80.0 },
+      { id: "i-04c7b1e9aa0", type: "vm", cpu: 4, memory: 7, storage: 30, activity: "Low", classification: "Idle", score: 20.5 },
+      { id: "i-09b4a1f7d80", type: "vm", cpu: 20, memory: 24, storage: 24, activity: "Medium", classification: "Underutilized", score: 55.0 },
+      { id: "i-03e9c2a5f17", type: "vm", cpu: 8, memory: 14, storage: 18, activity: "Low", classification: "Idle", score: 20.5 },
+      { id: "i-0f5d3c8e244", type: "vm", cpu: 30, memory: 40, storage: 44, activity: "High", classification: "Underutilized", score: 66.0 },
+      { id: "i-07a2f8b6c11", type: "vm", cpu: 51, memory: 58, storage: 52, activity: "High", classification: "Efficient", score: 80.0 },
+      { id: "i-0d6a9b3e552", type: "vm", cpu: 6, memory: 11, storage: 12, activity: "Low", classification: "Idle", score: 20.5 },
+      { id: "db-fieldwire-eu1", type: "database", cpu: 48, memory: 61, storage: 70, activity: "High", classification: "Efficient", score: 80.0 },
+      { id: "db-customer-portal", type: "database", cpu: 44, memory: 52, storage: 48, activity: "High", classification: "Efficient", score: 80.0 },
+      { id: "db-reporting-replica", type: "database", cpu: 22, memory: 33, storage: 29.3, activity: "Medium", classification: "Underutilized", score: 55.0 },
+      { id: "s3-blueprints-store", type: "object-storage", cpu: 0, memory: 0, storage: 0, activity: "Low", classification: "Idle", score: 20.5 },
+      { id: "s3-logs-archive", type: "object-storage", cpu: 0, memory: 0, storage: 0, activity: "Low", classification: "Idle", score: 20.5 },
+      { id: "s3-marketing-assets", type: "object-storage", cpu: 0, memory: 0, storage: 0, activity: "Low", classification: "Idle", score: 20.5 },
+      { id: "snap-backup-grp9", type: "block-storage", cpu: 0, memory: 0, storage: 100, activity: "Low", classification: "Idle", score: 16.5 },
+      { id: "vol-0e1c7a9b4d", type: "block-storage", cpu: 0, memory: 0, storage: 22.5, activity: "Low", classification: "Idle", score: 20.5 },
+      { id: "fn-invoice-generator", type: "serverless", cpu: 0, memory: 0, storage: 0, activity: "Low", classification: "Idle", score: 20.5 },
+      { id: "fn-image-resize", type: "serverless", cpu: 0, memory: 0, storage: 0, activity: "Low", classification: "Idle", score: 20.5 },
+      { id: "elb-main-alb", type: "load-balancer", cpu: 0, memory: 0, storage: 0, activity: "Low", classification: "Idle", score: 20.5 },
+      { id: "elb-old-api", type: "load-balancer", cpu: 0, memory: 0, storage: 0, activity: "Low", classification: "Idle", score: 20.5 },
+      { id: "eip-0c3f8a2d61", type: "network", cpu: 0, memory: 0, storage: 0, activity: "Low", classification: "Idle", score: 20.5 },
+      { id: "iam-deploybot", type: "iam", cpu: 0, memory: 0, storage: 0, activity: "Low", classification: "Idle", score: 20.5 },
+      { id: "iam-contractor", type: "iam", cpu: 0, memory: 0, storage: 0, activity: "Low", classification: "Idle", score: 20.5 }
+    ];
+
+    const colors = {
+      Efficient: "#22c55e",
+      Idle: "#ef4444",
+      Underutilized: "#f59e0b",
+      Overprovisioned: "#8b5cf6",
+      Overloaded: "#dc2626"
+    };
+
+    const state = {
+      sortKey: "score",
+      sortDirection: "desc"
+    };
+
+    const body = document.getElementById("resourceBody");
+    const searchInput = document.getElementById("searchInput");
+    const typeFilter = document.getElementById("typeFilter");
+    const classFilter = document.getElementById("classFilter");
+    const scoreFilter = document.getElementById("scoreFilter");
+    const emptyState = document.getElementById("emptyState");
+
+    function scoreColor(score) {
+      if (score < 40) return "#ef4444";
+      if (score < 70) return "#f59e0b";
+      return "#22c55e";
+    }
+
+    function formatPercent(value) {
+      return Number.isInteger(value) ? value.toFixed(0) : value.toFixed(1);
+    }
+
+    function fillFilters() {
+      const types = [...new Set(resources.map((item) => item.type))].sort();
+      const classes = [...new Set(resources.map((item) => item.classification))].sort();
+
+      types.forEach((type) => {
+        const option = document.createElement("option");
+        option.value = type;
+        option.textContent = type;
+        typeFilter.appendChild(option);
+      });
+
+      classes.forEach((classification) => {
+        const option = document.createElement("option");
+        option.value = classification;
+        option.textContent = classification;
+        classFilter.appendChild(option);
+      });
+    }
+
+    function filteredResources() {
+      const query = searchInput.value.trim().toLowerCase();
+      const type = typeFilter.value;
+      const classification = classFilter.value;
+      const minimumScore = Number(scoreFilter.value);
+
+      return resources
+        .filter((item) => type === "all" || item.type === type)
+        .filter((item) => classification === "all" || item.classification === classification)
+        .filter((item) => item.score >= minimumScore)
+        .filter((item) => {
+          if (!query) return true;
+          return Object.values(item).join(" ").toLowerCase().includes(query);
+        })
+        .sort((a, b) => {
+          const aValue = a[state.sortKey];
+          const bValue = b[state.sortKey];
+          const modifier = state.sortDirection === "asc" ? 1 : -1;
+
+          if (typeof aValue === "number" && typeof bValue === "number") {
+            return (aValue - bValue) * modifier;
+          }
+
+          return String(aValue).localeCompare(String(bValue)) * modifier;
+        });
+    }
+
+    function renderTable() {
+      const rows = filteredResources();
+      body.innerHTML = "";
+      emptyState.style.display = rows.length ? "none" : "block";
+
+      rows.forEach((item) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${item.id}</td>
+          <td>${item.type}</td>
+          <td>${formatPercent(item.cpu)}</td>
+          <td>${formatPercent(item.memory)}</td>
+          <td>${formatPercent(item.storage)}</td>
+          <td>${item.activity}</td>
+          <td><span class="pill" style="color: ${colors[item.classification] || "#94a3b8"}">${item.classification}</span></td>
+          <td>
+            <span class="score">
+              <strong style="color: ${scoreColor(item.score)}">${item.score.toFixed(1)}</strong>
+              <span class="bar" style="--score: ${item.score}; --score-color: ${scoreColor(item.score)}"><span></span></span>
+            </span>
+          </td>
+        `;
+        body.appendChild(tr);
+      });
+    }
+
+    function renderScatter() {
+      const scatter = document.getElementById("scatter");
+      const maxCpu = Math.max(...resources.map((item) => item.cpu));
+      const maxMemory = Math.max(...resources.map((item) => item.memory));
+
+      resources.forEach((item, index) => {
+        const point = document.createElement("span");
+        const duplicateSpreadX = ((index % 5) - 2) * 3.2;
+        const duplicateSpreadY = ((Math.floor(index / 5) % 5) - 2) * 3.2;
+        const plotX = 8 + Math.sqrt(item.cpu / maxCpu) * 84 + duplicateSpreadX;
+        const plotY = 8 + Math.sqrt(item.memory / maxMemory) * 84 + duplicateSpreadY;
+
+        point.className = "point";
+        point.style.setProperty("--x", Math.max(4, Math.min(96, plotX)));
+        point.style.setProperty("--y", Math.max(4, Math.min(96, plotY)));
+        point.style.setProperty("--color", colors[item.classification] || "#64748b");
+        point.dataset.tip = `${item.id}\nType: ${item.type}\nScore: ${item.score.toFixed(1)}\nClass: ${item.classification}`;
+        scatter.appendChild(point);
+      });
+    }
+
+    document.querySelectorAll("th[data-key]").forEach((th) => {
+      th.addEventListener("click", () => {
+        const key = th.dataset.key;
+        if (state.sortKey === key) {
+          state.sortDirection = state.sortDirection === "asc" ? "desc" : "asc";
+        } else {
+          state.sortKey = key;
+          state.sortDirection = "asc";
+        }
+        renderTable();
+      });
+    });
+
+    [searchInput, typeFilter, classFilter, scoreFilter].forEach((control) => {
+      control.addEventListener("input", renderTable);
+      control.addEventListener("change", renderTable);
+    });
+
+    fillFilters();
+    renderScatter();
+    renderTable();
+  </script>
 </body>
 </html>
