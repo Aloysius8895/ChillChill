@@ -98,7 +98,7 @@ def print_resource_table(resources: list, title: str):
 
 # --- Main Execution Pipeline ---
 if __name__ == "__main__":
-    # Define the file name containing your Hilti cloud dataset
+    # Define the file name containing your SecEff cloud dataset
     FILE_NAME = "hilti-cloud-data (2).json"
 
     # Step 1: Load the raw JSON file

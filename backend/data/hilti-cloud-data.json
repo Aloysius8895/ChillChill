@@ -1,7 +1,7 @@
 {
   "account": {
-    "id": "hilti-prod-7741",
-    "name": "Hilti",
+    "id": "seceff-prod-7741",
+    "name": "SecEff",
     "provider": "AWS",
     "regions": [
       "ap-southeast-1",

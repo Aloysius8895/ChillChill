@@ -714,6 +714,46 @@
     .outcome-btn:hover { background: var(--text); color: var(--bg); }
     .outcome-btn .arrow { transition: transform 0.3s; }
     .outcome-btn:hover .arrow { transform: translateX(3px); }
+    .outcome-kicker,
+    .outcome-desc {
+      font-family: 'IBM Plex Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text);
+    }
+    .outcome-kicker {
+      font-size: 0.58rem;
+      opacity: 0.9;
+      font-weight: 700;
+    }
+    .outcome-number {
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 800;
+      font-size: 1rem;
+      line-height: 1;
+      color: var(--text);
+      opacity: 0.86;
+    }
+    .outcome-title {
+      max-width: min(86%, 320px);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      font-size: clamp(1.15rem, 1.85vw, 1.9rem);
+      line-height: 1.02;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      opacity: 0.92;
+    }
+    .outcome-desc {
+      max-width: min(88%, 360px);
+      font-size: 0.56rem;
+      font-weight: 700;
+      line-height: 1.45;
+      text-align: center;
+      opacity: 0.86;
+    }
     .keen-slider {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -747,6 +787,41 @@
       width: 100%; flex: 1;
       overflow: hidden; position: relative;
     }
+    .slide-img-wrap > div::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0.5;
+      filter: grayscale(1) sepia(0.18) contrast(0.92) brightness(1.08);
+      mix-blend-mode: multiply;
+      transform: scale(1.04);
+      transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s;
+    }
+    .slide-img-wrap > div::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background:
+        linear-gradient(rgba(220,216,192,0.35), rgba(220,216,192,0.68)),
+        repeating-linear-gradient(45deg, rgba(83,83,82,0.08) 0 11px, rgba(83,83,82,0.02) 11px 22px);
+    }
+    .keen-slider__slide:hover .slide-img-wrap > div::before {
+      transform: scale(1.09);
+      opacity: 0.66;
+    }
+    .slide-img-wrap > div > * {
+      position: relative;
+      z-index: 2;
+    }
+    .keen-slider__slide:nth-child(1) .slide-img-wrap > div::before { background-image: url("../pic/images1.jpg"); }
+    .keen-slider__slide:nth-child(2) .slide-img-wrap > div::before { background-image: url("../pic/images2.jpg"); }
+    .keen-slider__slide:nth-child(3) .slide-img-wrap > div::before { background-image: url("../pic/images3.jpg"); }
+    .keen-slider__slide:nth-child(4) .slide-img-wrap > div::before { background-image: url("../pic/images4.jpg"); }
     .slide-img-wrap img {
       width: 100%; height: 100%; object-fit: cover;
       transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s;
@@ -1343,9 +1418,10 @@
             <div class="slide-inner">
               <div class="slide-img-wrap">
                 <div style="position:relative;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.9rem;background:repeating-linear-gradient(45deg, rgba(83,83,82,0.07) 0 11px, rgba(83,83,82,0.02) 11px 22px);">
-                  <span style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.22em;color:var(--text);opacity:0.5;">[ outcome visual ]</span>
-                  <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:2.4rem;line-height:1;color:var(--text);opacity:0.78;">O1</span>
-                  <span style="font-family:'IBM Plex Mono',monospace;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--text);opacity:0.6;text-align:center;padding:0 1.5rem;">Secure & Lean Cloud</span>
+                  <span class="outcome-kicker">[ security audit ]</span>
+                  <span class="outcome-number">01</span>
+                  <span class="outcome-title">Cloud Security</span>
+                  <span class="outcome-desc">Open ports · public access · attack paths</span>
                   <a href="secure-lean-cloud.html" class="outcome-btn" style="position:absolute;left:50%;bottom:13%;transform:translateX(-50%);">Explore feature <span class="arrow">→</span></a>
                 </div>
               </div>
@@ -1359,9 +1435,10 @@
             <div class="slide-inner">
               <div class="slide-img-wrap">
                 <div style="position:relative;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.9rem;background:repeating-linear-gradient(45deg, rgba(83,83,82,0.07) 0 11px, rgba(83,83,82,0.02) 11px 22px);">
-                  <span style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.22em;color:var(--text);opacity:0.5;">[ outcome visual ]</span>
-                  <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:2.4rem;line-height:1;color:var(--text);opacity:0.78;">O2</span>
-                  <span style="font-family:'IBM Plex Mono',monospace;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--text);opacity:0.6;text-align:center;padding:0 1.5rem;">Lower Carbon, Lower Cost</span>
+                  <span class="outcome-kicker">[ efficiency engine ]</span>
+                  <span class="outcome-number">02</span>
+                  <span class="outcome-title">Resource Efficiency</span>
+                  <span class="outcome-desc">Idle · orphaned · over-provisioned workloads</span>
                   <a href="lower-carbon-lower-cost.html" class="outcome-btn" style="position:absolute;left:50%;bottom:13%;transform:translateX(-50%);">Explore feature <span class="arrow">→</span></a>
                 </div>
               </div>
@@ -1375,9 +1452,10 @@
             <div class="slide-inner">
               <div class="slide-img-wrap">
                 <div style="position:relative;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.9rem;background:repeating-linear-gradient(45deg, rgba(83,83,82,0.07) 0 11px, rgba(83,83,82,0.02) 11px 22px);">
-                  <span style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.22em;color:var(--text);opacity:0.5;">[ outcome visual ]</span>
-                  <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:2.4rem;line-height:1;color:var(--text);opacity:0.78;">O3</span>
-                  <span style="font-family:'IBM Plex Mono',monospace;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--text);opacity:0.6;text-align:center;padding:0 1.5rem;">Continuous Optimization</span>
+                  <span class="outcome-kicker">[ carbon intelligence ]</span>
+                  <span class="outcome-number">03</span>
+                  <span class="outcome-title">Carbon Footprint</span>
+                  <span class="outcome-desc">kWh usage · region intensity · CO₂ hotspots</span>
                   <a href="continuous-optimization.html" class="outcome-btn" style="position:absolute;left:50%;bottom:13%;transform:translateX(-50%);">Explore feature <span class="arrow">→</span></a>
                 </div>
               </div>
@@ -1391,9 +1469,10 @@
             <div class="slide-inner">
               <div class="slide-img-wrap">
                 <div style="position:relative;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.9rem;background:repeating-linear-gradient(45deg, rgba(83,83,82,0.07) 0 11px, rgba(83,83,82,0.02) 11px 22px);">
-                  <span style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.22em;color:var(--text);opacity:0.5;">[ outcome visual ]</span>
-                  <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:2.4rem;line-height:1;color:var(--text);opacity:0.78;">O4</span>
-                  <span style="font-family:'IBM Plex Mono',monospace;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--text);opacity:0.6;text-align:center;padding:0 1.5rem;">Construction-Ready Ops</span>
+                  <span class="outcome-kicker">[ ai recommendation ]</span>
+                  <span class="outcome-number">04</span>
+                  <span class="outcome-title">AI Recommendation</span>
+                  <span class="outcome-desc">Cost saved · carbon reduced · next actions</span>
                   <a href="construction-ready-ops.html" class="outcome-btn" style="position:absolute;left:50%;bottom:13%;transform:translateX(-50%);">Explore feature <span class="arrow">→</span></a>
                 </div>
               </div>

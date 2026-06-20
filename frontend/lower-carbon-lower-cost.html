@@ -110,6 +110,60 @@
       background: rgba(83, 83, 82, 0.08);
     }
 
+    .nav-foot {
+      margin-top: 5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      border-top: 1px solid var(--line);
+      padding-top: 2rem;
+    }
+
+    .nav-foot a {
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .foot-back {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+
+    .foot-back:hover { opacity: 1; }
+
+    .next-link {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.25rem;
+    }
+
+    .next-link .nl-lbl {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      opacity: 0.5;
+    }
+
+    .next-link .nl-name {
+      font-weight: 800;
+      font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      border-bottom: 2px solid var(--text);
+      padding-bottom: 0.15rem;
+      transition: opacity 0.2s;
+    }
+
+    .next-link:hover .nl-name { opacity: 0.6; }
+
     main { padding-top: 56px; }
 
     .hero {
@@ -545,7 +599,7 @@
   <header>
     <div class="header-inner">
       <a href="index.html" class="brand">
-        <strong>Track 02 - Hilti</strong>
+        <strong>Track 02 - SecEff</strong>
         <span>Resource Efficiency Engine</span>
       </a>
       <a class="back" href="index.html#works">&larr; Back to overview</a>
@@ -657,6 +711,14 @@
       </div>
       <p class="empty" id="emptyState">No resources match the current filters.</p>
     </section>
+
+    <div class="nav-foot">
+      <a href="index.html#works" class="foot-back">&larr; All outcomes</a>
+      <a href="continuous-optimization.html" class="next-link">
+        <span class="nl-lbl">Next feature</span>
+        <span class="nl-name">Continuous Optimization &rarr;</span>
+      </a>
+    </div>
   </main>
 
   <script>
