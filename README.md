@@ -95,9 +95,14 @@ ImagineHack/
     images2.jpg
     images3.jpg
     images4.jpg
+
+  legacy/
+    prototypes/
+      README.md
+      old Python and JSX prototype files
 ```
 
-Note: the active demo is served by `backend/server.js`. The root-level Python files are earlier prototypes and are not required for the normal demo run.
+Note: the active demo is served by `backend/server.js`. Older prototype scripts were moved into `legacy/prototypes/` so the project root only contains active entry points and documentation.
 
 ## Requirements
 
