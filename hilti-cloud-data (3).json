@@ -1,0 +1,651 @@
+{
+  "account": {
+    "id": "hilti-prod-7741",
+    "name": "Hilti",
+    "provider": "AWS",
+    "regions": [
+      "ap-southeast-1",
+      "eu-central-1",
+      "us-east-1",
+      "ap-south-1"
+    ],
+    "snapshotTime": "2026-06-20T09:00:00Z",
+    "resourceCount": 23
+  },
+  "regionCarbonIntensity_gPerKWh": {
+    "ap-southeast-1": 408,
+    "eu-central-1": 311,
+    "us-east-1": 367,
+    "ap-south-1": 632
+  },
+  "resources": [
+    {
+      "id": "i-0a91f3c7d22",
+      "name": "web-server-01",
+      "type": "vm",
+      "service": "EC2",
+      "region": "ap-southeast-1",
+      "status": "running",
+      "monthlyCostUsd": 45,
+      "instanceSize": "t3.medium",
+      "cpuUtilizationPct": 42,
+      "memoryUtilizationPct": 55,
+      "publicAccess": false,
+      "openPorts": [
+        {
+          "port": 443,
+          "source": "0.0.0.0/0"
+        }
+      ],
+      "encryptionAtRest": true,
+      "idleDays": 0,
+      "estimatedKwhMonth": 31,
+      "tags": {
+        "team": "web",
+        "env": "prod"
+      },
+      "regionFlexible": false,
+      "environment": "prod",
+      "carbonIntensity_gPerKWh": 408,
+      "runtimeHoursMonth": 730,
+      "powerWatts": 42.5,
+      "diskTotalGb": 50,
+      "diskUsedGb": 28
+    },
+    {
+      "id": "i-0b82e4d8f31",
+      "name": "web-server-02",
+      "type": "vm",
+      "service": "EC2",
+      "region": "eu-central-1",
+      "status": "running",
+      "monthlyCostUsd": 45,
+      "instanceSize": "t3.medium",
+      "cpuUtilizationPct": 47,
+      "memoryUtilizationPct": 60,
+      "publicAccess": false,
+      "openPorts": [
+        {
+          "port": 443,
+          "source": "0.0.0.0/0"
+        }
+      ],
+      "encryptionAtRest": true,
+      "idleDays": 0,
+      "estimatedKwhMonth": 32,
+      "tags": {
+        "team": "web",
+        "env": "prod"
+      },
+      "regionFlexible": false,
+      "environment": "prod",
+      "carbonIntensity_gPerKWh": 311,
+      "runtimeHoursMonth": 730,
+      "powerWatts": 43.8,
+      "diskTotalGb": 50,
+      "diskUsedGb": 31
+    },
+    {
+      "id": "i-04c7b1e9aa0",
+      "name": "old-project-vm",
+      "type": "vm",
+      "service": "EC2",
+      "region": "ap-southeast-1",
+      "status": "running",
+      "monthlyCostUsd": 80,
+      "instanceSize": "m5.xlarge",
+      "cpuUtilizationPct": 4,
+      "memoryUtilizationPct": 7,
+      "publicAccess": false,
+      "openPorts": [
+        {
+          "port": 443,
+          "source": "0.0.0.0/0"
+        }
+      ],
+      "encryptionAtRest": true,
+      "idleDays": 38,
+      "estimatedKwhMonth": 118,
+      "tags": {
+        "team": "project-orchard",
+        "env": "dev"
+      },
+      "regionFlexible": true,
+      "environment": "dev",
+      "carbonIntensity_gPerKWh": 408,
+      "runtimeHoursMonth": 730,
+      "powerWatts": 161.6,
+      "diskTotalGb": 200,
+      "diskUsedGb": 60
+    },
+    {
+      "id": "i-09b4a1f7d80",
+      "name": "analytics-cluster",
+      "type": "vm",
+      "service": "EC2",
+      "region": "ap-southeast-1",
+      "status": "running",
+      "monthlyCostUsd": 200,
+      "instanceSize": "m5.4xlarge",
+      "cpuUtilizationPct": 20,
+      "memoryUtilizationPct": 24,
+      "publicAccess": false,
+      "openPorts": [
+        {
+          "port": 443,
+          "source": "10.0.0.0/16"
+        }
+      ],
+      "encryptionAtRest": true,
+      "idleDays": 0,
+      "estimatedKwhMonth": 291,
+      "tags": {
+        "team": "data",
+        "env": "prod"
+      },
+      "regionFlexible": true,
+      "environment": "prod",
+      "carbonIntensity_gPerKWh": 408,
+      "runtimeHoursMonth": 730,
+      "powerWatts": 398.6,
+      "diskTotalGb": 500,
+      "diskUsedGb": 120
+    },
+    {
+      "id": "i-03e9c2a5f17",
+      "name": "staging-vm",
+      "type": "vm",
+      "service": "EC2",
+      "region": "us-east-1",
+      "status": "running",
+      "monthlyCostUsd": 70,
+      "instanceSize": "t3.large",
+      "cpuUtilizationPct": 8,
+      "memoryUtilizationPct": 14,
+      "publicAccess": false,
+      "openPorts": [
+        {
+          "port": 443,
+          "source": "10.0.0.0/16"
+        }
+      ],
+      "encryptionAtRest": true,
+      "idleDays": 0,
+      "runsOutsideWorkHours": true,
+      "estimatedKwhMonth": 96,
+      "tags": {
+        "team": "qa",
+        "env": "staging"
+      },
+      "regionFlexible": true,
+      "environment": "staging",
+      "carbonIntensity_gPerKWh": 367,
+      "runtimeHoursMonth": 730,
+      "powerWatts": 131.5,
+      "diskTotalGb": 100,
+      "diskUsedGb": 18
+    },
+    {
+      "id": "i-0f5d3c8e244",
+      "name": "admin-portal",
+      "type": "vm",
+      "service": "EC2",
+      "region": "eu-central-1",
+      "status": "running",
+      "monthlyCostUsd": 55,
+      "instanceSize": "t3.medium",
+      "cpuUtilizationPct": 30,
+      "memoryUtilizationPct": 40,
+      "publicAccess": false,
+      "openPorts": [
+        {
+          "port": 22,
+          "source": "0.0.0.0/0"
+        },
+        {
+          "port": 443,
+          "source": "0.0.0.0/0"
+        }
+      ],
+      "encryptionAtRest": true,
+      "idleDays": 0,
+      "estimatedKwhMonth": 34,
+      "tags": {
+        "team": "it",
+        "env": "prod"
+      },
+      "regionFlexible": false,
+      "environment": "prod",
+      "carbonIntensity_gPerKWh": 311,
+      "runtimeHoursMonth": 730,
+      "powerWatts": 46.6,
+      "diskTotalGb": 50,
+      "diskUsedGb": 22
+    },
+    {
+      "id": "i-07a2f8b6c11",
+      "name": "fleet-tracker-api",
+      "type": "vm",
+      "service": "EC2",
+      "region": "ap-south-1",
+      "status": "running",
+      "monthlyCostUsd": 60,
+      "instanceSize": "t3.small",
+      "cpuUtilizationPct": 51,
+      "memoryUtilizationPct": 58,
+      "publicAccess": false,
+      "openPorts": [
+        {
+          "port": 443,
+          "source": "0.0.0.0/0"
+        }
+      ],
+      "encryptionAtRest": true,
+      "idleDays": 0,
+      "estimatedKwhMonth": 39,
+      "tags": {
+        "team": "fleet",
+        "env": "prod"
+      },
+      "regionFlexible": false,
+      "environment": "prod",
+      "carbonIntensity_gPerKWh": 632,
+      "runtimeHoursMonth": 730,
+      "powerWatts": 53.4,
+      "diskTotalGb": 50,
+      "diskUsedGb": 26
+    },
+    {
+      "id": "i-0d6a9b3e552",
+      "name": "legacy-jenkins",
+      "type": "vm",
+      "service": "EC2",
+      "region": "us-east-1",
+      "status": "running",
+      "monthlyCostUsd": 65,
+      "instanceSize": "t3.large",
+      "cpuUtilizationPct": 6,
+      "memoryUtilizationPct": 11,
+      "publicAccess": false,
+      "openPorts": [
+        {
+          "port": 8080,
+          "source": "10.0.0.0/16"
+        }
+      ],
+      "encryptionAtRest": true,
+      "idleDays": 21,
+      "estimatedKwhMonth": 88,
+      "tags": {
+        "team": "platform",
+        "env": "dev"
+      },
+      "regionFlexible": true,
+      "environment": "dev",
+      "carbonIntensity_gPerKWh": 367,
+      "runtimeHoursMonth": 730,
+      "powerWatts": 120.5,
+      "diskTotalGb": 250,
+      "diskUsedGb": 30
+    },
+    {
+      "id": "db-fieldwire-eu1",
+      "name": "fieldwire-db",
+      "type": "database",
+      "service": "RDS",
+      "region": "eu-central-1",
+      "status": "running",
+      "monthlyCostUsd": 120,
+      "instanceSize": "db.r5.large",
+      "cpuUtilizationPct": 48,
+      "memoryUtilizationPct": 61,
+      "publicAccess": false,
+      "openPorts": [
+        {
+          "port": 5432,
+          "source": "10.0.0.0/16"
+        }
+      ],
+      "encryptionAtRest": true,
+      "idleDays": 0,
+      "estimatedKwhMonth": 72,
+      "tags": {
+        "team": "fieldwire",
+        "env": "prod"
+      },
+      "regionFlexible": false,
+      "environment": "prod",
+      "carbonIntensity_gPerKWh": 311,
+      "runtimeHoursMonth": 730,
+      "powerWatts": 98.6,
+      "diskTotalGb": 200,
+      "diskUsedGb": 140
+    },
+    {
+      "id": "db-customer-portal",
+      "name": "customer-portal-db",
+      "type": "database",
+      "service": "RDS",
+      "region": "eu-central-1",
+      "status": "running",
+      "monthlyCostUsd": 95,
+      "instanceSize": "db.m5.large",
+      "cpuUtilizationPct": 44,
+      "memoryUtilizationPct": 52,
+      "publicAccess": false,
+      "openPorts": [
+        {
+          "port": 3306,
+          "source": "10.0.0.0/16"
+        }
+      ],
+      "encryptionAtRest": false,
+      "idleDays": 0,
+      "estimatedKwhMonth": 58,
+      "tags": {
+        "team": "crm",
+        "env": "prod"
+      },
+      "regionFlexible": false,
+      "environment": "prod",
+      "carbonIntensity_gPerKWh": 311,
+      "runtimeHoursMonth": 730,
+      "powerWatts": 79.5,
+      "diskTotalGb": 200,
+      "diskUsedGb": 96
+    },
+    {
+      "id": "db-reporting-replica",
+      "name": "reporting-db-replica",
+      "type": "database",
+      "service": "RDS",
+      "region": "us-east-1",
+      "status": "running",
+      "monthlyCostUsd": 85,
+      "instanceSize": "db.m5.large",
+      "cpuUtilizationPct": 22,
+      "memoryUtilizationPct": 33,
+      "publicAccess": true,
+      "openPorts": [
+        {
+          "port": 5432,
+          "source": "0.0.0.0/0"
+        }
+      ],
+      "encryptionAtRest": true,
+      "idleDays": 0,
+      "estimatedKwhMonth": 54,
+      "tags": {
+        "team": "data",
+        "env": "prod"
+      },
+      "regionFlexible": true,
+      "environment": "prod",
+      "carbonIntensity_gPerKWh": 367,
+      "runtimeHoursMonth": 730,
+      "powerWatts": 74.0,
+      "diskTotalGb": 300,
+      "diskUsedGb": 88
+    },
+    {
+      "id": "s3-blueprints-store",
+      "name": "blueprints-storage",
+      "type": "object-storage",
+      "service": "S3",
+      "region": "us-east-1",
+      "status": "active",
+      "monthlyCostUsd": 30,
+      "publicAccess": true,
+      "objectCount": 18420,
+      "encryptionAtRest": true,
+      "storageClass": "STANDARD",
+      "accessFrequency": "frequent",
+      "estimatedKwhMonth": 6,
+      "tags": {
+        "team": "engineering",
+        "env": "prod"
+      },
+      "regionFlexible": false,
+      "environment": "prod",
+      "carbonIntensity_gPerKWh": 367,
+      "runtimeHoursMonth": 730,
+      "powerWatts": 8.2
+    },
+    {
+      "id": "s3-logs-archive",
+      "name": "logs-archive",
+      "type": "object-storage",
+      "service": "S3",
+      "region": "us-east-1",
+      "status": "active",
+      "monthlyCostUsd": 18,
+      "publicAccess": false,
+      "objectCount": 92500,
+      "encryptionAtRest": true,
+      "storageClass": "STANDARD",
+      "accessFrequency": "rare",
+      "lastAccessDays": 190,
+      "estimatedKwhMonth": 11,
+      "tags": {
+        "team": "it",
+        "env": "prod"
+      },
+      "regionFlexible": true,
+      "environment": "prod",
+      "carbonIntensity_gPerKWh": 367,
+      "runtimeHoursMonth": 730,
+      "powerWatts": 15.1
+    },
+    {
+      "id": "s3-marketing-assets",
+      "name": "marketing-assets",
+      "type": "object-storage",
+      "service": "S3",
+      "region": "eu-central-1",
+      "status": "active",
+      "monthlyCostUsd": 22,
+      "publicAccess": false,
+      "objectCount": 4100,
+      "encryptionAtRest": true,
+      "storageClass": "STANDARD",
+      "accessFrequency": "frequent",
+      "estimatedKwhMonth": 4,
+      "tags": {
+        "team": "marketing",
+        "env": "prod"
+      },
+      "regionFlexible": true,
+      "environment": "prod",
+      "carbonIntensity_gPerKWh": 311,
+      "runtimeHoursMonth": 730,
+      "powerWatts": 5.5
+    },
+    {
+      "id": "snap-backup-grp9",
+      "name": "backup-snapshots",
+      "type": "block-storage",
+      "service": "EBS",
+      "region": "us-east-1",
+      "status": "active",
+      "monthlyCostUsd": 25,
+      "publicAccess": false,
+      "snapshotCount": 312,
+      "snapshotAgeDaysMax": 420,
+      "duplicateSnapshotPct": 64,
+      "encryptionAtRest": true,
+      "estimatedKwhMonth": 14,
+      "tags": {
+        "team": "it",
+        "env": "prod"
+      },
+      "environment": "prod",
+      "carbonIntensity_gPerKWh": 367,
+      "runtimeHoursMonth": 730,
+      "powerWatts": 19.2,
+      "diskTotalGb": 620,
+      "diskUsedGb": 620
+    },
+    {
+      "id": "vol-0e1c7a9b4d",
+      "name": "orphaned-volume-01",
+      "type": "block-storage",
+      "service": "EBS",
+      "region": "ap-southeast-1",
+      "status": "available",
+      "monthlyCostUsd": 16,
+      "attached": false,
+      "sizeGb": 200,
+      "encryptionAtRest": true,
+      "lastAttachedDays": 95,
+      "estimatedKwhMonth": 5,
+      "tags": {
+        "team": "unknown",
+        "env": "unknown"
+      },
+      "environment": "unknown",
+      "carbonIntensity_gPerKWh": 408,
+      "runtimeHoursMonth": 730,
+      "powerWatts": 6.8,
+      "diskTotalGb": 200,
+      "diskUsedGb": 45
+    },
+    {
+      "id": "fn-invoice-generator",
+      "name": "invoice-generator-fn",
+      "type": "serverless",
+      "service": "Lambda",
+      "region": "eu-central-1",
+      "status": "active",
+      "monthlyCostUsd": 12,
+      "memoryMb": 512,
+      "avgDurationMs": 380,
+      "peakMemoryUsedMb": 410,
+      "invocationsMonth": 84000,
+      "estimatedKwhMonth": 0.58,
+      "tags": {
+        "team": "finance",
+        "env": "prod"
+      },
+      "regionFlexible": false,
+      "environment": "prod",
+      "carbonIntensity_gPerKWh": 311,
+      "runtimeHoursMonth": 8.87,
+      "powerWatts": 65.0
+    },
+    {
+      "id": "fn-image-resize",
+      "name": "image-resize-fn",
+      "type": "serverless",
+      "service": "Lambda",
+      "region": "ap-southeast-1",
+      "status": "active",
+      "monthlyCostUsd": 28,
+      "memoryMb": 3008,
+      "avgDurationMs": 120,
+      "peakMemoryUsedMb": 240,
+      "invocationsMonth": 60000,
+      "estimatedKwhMonth": 0.76,
+      "tags": {
+        "team": "web",
+        "env": "prod"
+      },
+      "regionFlexible": true,
+      "environment": "prod",
+      "carbonIntensity_gPerKWh": 408,
+      "runtimeHoursMonth": 2.0,
+      "powerWatts": 381.9
+    },
+    {
+      "id": "elb-main-alb",
+      "name": "main-alb",
+      "type": "load-balancer",
+      "service": "ELB",
+      "region": "ap-southeast-1",
+      "status": "active",
+      "monthlyCostUsd": 30,
+      "requestCountDaily": 1840000,
+      "targetCount": 6,
+      "estimatedKwhMonth": 18,
+      "tags": {
+        "team": "web",
+        "env": "prod"
+      },
+      "environment": "prod",
+      "carbonIntensity_gPerKWh": 408,
+      "runtimeHoursMonth": 730,
+      "powerWatts": 24.7
+    },
+    {
+      "id": "elb-old-api",
+      "name": "old-api-elb",
+      "type": "load-balancer",
+      "service": "ELB",
+      "region": "us-east-1",
+      "status": "active",
+      "monthlyCostUsd": 25,
+      "requestCountDaily": 3,
+      "targetCount": 1,
+      "estimatedKwhMonth": 12,
+      "tags": {
+        "team": "platform",
+        "env": "dev"
+      },
+      "environment": "dev",
+      "carbonIntensity_gPerKWh": 367,
+      "runtimeHoursMonth": 730,
+      "powerWatts": 16.4
+    },
+    {
+      "id": "eip-0c3f8a2d61",
+      "name": "eip-unused-01",
+      "type": "network",
+      "service": "ElasticIP",
+      "region": "ap-southeast-1",
+      "status": "allocated",
+      "monthlyCostUsd": 4,
+      "associated": false,
+      "allocatedDays": 120,
+      "tags": {
+        "team": "unknown",
+        "env": "unknown"
+      },
+      "environment": "unknown"
+    },
+    {
+      "id": "iam-deploybot",
+      "name": "iam-user-deploybot",
+      "type": "iam",
+      "service": "IAM",
+      "region": "global",
+      "status": "active",
+      "monthlyCostUsd": 0,
+      "accessKeyAgeDays": 540,
+      "mfaEnabled": false,
+      "adminAccess": false,
+      "lastUsedDays": 1,
+      "tags": {
+        "team": "platform",
+        "env": "prod"
+      },
+      "environment": "prod"
+    },
+    {
+      "id": "iam-contractor",
+      "name": "iam-user-contractor",
+      "type": "iam",
+      "service": "IAM",
+      "region": "global",
+      "status": "active",
+      "monthlyCostUsd": 0,
+      "accessKeyAgeDays": 210,
+      "mfaEnabled": false,
+      "adminAccess": true,
+      "lastUsedDays": 200,
+      "tags": {
+        "team": "external",
+        "env": "prod"
+      },
+      "environment": "prod"
+    }
+  ]
+}
