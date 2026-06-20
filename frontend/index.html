@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Track 02 · Hilti — Secure &amp; Energy-Efficient Cloud Platform</title>
+  <title>Track 02 · SecEff — Secure &amp; Energy-Efficient Cloud Platform</title>
   <meta name="description" content="A secure & energy-efficient cloud platform for Construction Tech — continuously monitoring cloud security vulnerabilities while identifying high-carbon and low-efficiency workloads." />
   <meta name="theme-color" content="#dcd8c0" />
 
@@ -18,10 +18,6 @@
 
   <!-- Three.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
-  <!-- Keen Slider -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/keen-slider@5.5.1/keen-slider.min.css" />
-  <script src="https://cdn.jsdelivr.net/npm/keen-slider@5.5.1/keen-slider.min.js"></script>
 
   <style>
     :root {
@@ -328,13 +324,29 @@
       top: 0;
       z-index: 5;
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
       padding: 0.55rem;
       border-bottom: 1px solid rgba(83,83,82,0.16);
       background: rgba(220,216,192,0.72);
       backdrop-filter: blur(8px);
     }
-    .cloud-add-btn {
+    .cloud-selection-tools {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      min-width: 0;
+    }
+    .cloud-selected-count {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(83,83,82,0.56);
+      white-space: nowrap;
+    }
+    .cloud-action-btn {
       width: 2rem;
       height: 2rem;
       border: 1px solid rgba(83,83,82,0.42);
@@ -349,12 +361,24 @@
       line-height: 1;
       transition: background 0.2s, color 0.2s, transform 0.2s;
     }
-    .cloud-add-btn:hover,
-    .cloud-add-btn[aria-expanded="true"] {
+    .cloud-action-btn:hover,
+    .cloud-action-btn[aria-expanded="true"] {
       background: var(--text);
       color: var(--bg);
     }
+    .cloud-action-btn:disabled {
+      opacity: 0.34;
+      pointer-events: none;
+    }
     .cloud-add-btn[aria-expanded="true"] { transform: rotate(45deg); }
+    .cloud-delete-btn {
+      width: auto;
+      min-width: 2.7rem;
+      padding: 0 0.55rem;
+      font-size: 0.58rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
     .cloud-add-form {
       display: none;
       grid-template-columns: minmax(150px, 1.35fr) minmax(130px, 1fr) minmax(110px, 0.75fr) auto;
@@ -393,7 +417,7 @@
     .cloud-platform-table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 560px;
+      min-width: 660px;
       background: rgba(220,216,192,0.46);
     }
     .cloud-platform-table th,
@@ -408,6 +432,49 @@
       background: rgba(83,83,82,0.045);
     }
     .cloud-platform-table tr:last-child td { border-bottom: none; }
+    .cloud-platform-table tr.is-selected td {
+      background: rgba(83,83,82,0.055);
+    }
+    .cloud-select-col {
+      width: 3.1rem;
+      text-align: center !important;
+    }
+    .cloud-row-select {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.25rem;
+      height: 1.25rem;
+      cursor: none;
+    }
+    .cloud-row-select input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .cloud-row-select span {
+      width: 0.92rem;
+      height: 0.92rem;
+      border: 1px solid rgba(83,83,82,0.46);
+      background: rgba(220,216,192,0.62);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.18s, border-color 0.18s;
+    }
+    .cloud-row-select span::after {
+      content: "";
+      width: 0.42rem;
+      height: 0.42rem;
+      background: var(--text);
+      opacity: 0;
+      transition: opacity 0.18s;
+    }
+    .cloud-row-select input:checked + span {
+      border-color: var(--text);
+      background: rgba(83,83,82,0.08);
+    }
+    .cloud-row-select input:checked + span::after { opacity: 1; }
     .cloud-platform-name {
       font-weight: 800;
       font-size: 0.95rem;
@@ -486,17 +553,20 @@
       height: 100vh;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      width: 100%; overflow: hidden; gap: 0.9rem;
+      width: 100%; overflow: hidden; gap: 0.72rem;
+      padding: 0 2rem;
     }
     .manifesto-line {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.24em;
+      flex-wrap: wrap;
+      gap: 0.12em 0.36em;
+      max-width: min(92vw, 1680px);
       font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 800; font-size: clamp(1.75rem, 2.55vw, 3rem);
+      font-weight: 800; font-size: clamp(1.45rem, 2.32vw, 2.72rem);
       text-transform: uppercase; letter-spacing: 0;
-      color: var(--text); white-space: nowrap;
+      color: var(--text); white-space: normal;
       line-height: 1.05; will-change: transform, opacity;
     }
     .manifesto-word {
@@ -507,6 +577,7 @@
       justify-content: center;
       padding: 0.03em 0.04em;
       color: var(--text);
+      white-space: nowrap;
       line-height: 1;
       overflow: visible;
       will-change: transform, opacity, color, background-color;
@@ -518,6 +589,7 @@
       --keyword-box-scale: 0.86;
       --keyword-box-pad-x: 0.22em;
       --keyword-box-pad-y: 0.18em;
+      margin-inline: 0.08em;
     }
     .manifesto-word.is-keyword::before {
       content: "";
@@ -544,7 +616,7 @@
       opacity: 0;
       overflow: hidden;
       background: rgba(65,64,62,0.18);
-      transform: translate(-50%, -50%) scale(0.045);
+      transform: none;
       transform-origin: center center;
       will-change: transform, opacity;
       pointer-events: none;
@@ -558,9 +630,12 @@
       height: 100%;
       object-fit: cover;
     }
+    .manifesto-video-stage > img.manifesto-video + .manifesto-video {
+      display: none !important;
+    }
     @media (max-width: 720px) {
-      .manifesto-line { font-size: clamp(1.05rem, 5vw, 1.8rem); }
-      .manifesto-content { height: 100vh; gap: 0.7rem; }
+      .manifesto-line { font-size: clamp(1rem, 5vw, 1.55rem); max-width: 94vw; }
+      .manifesto-content { height: 100vh; gap: 0.58rem; padding: 0 1rem; }
     }
 
     /* ─── Video Reel ─────────────────────────────────── */
@@ -639,28 +714,30 @@
     .outcome-btn:hover { background: var(--text); color: var(--bg); }
     .outcome-btn .arrow { transition: transform 0.3s; }
     .outcome-btn:hover .arrow { transform: translateX(3px); }
-    /* Prev/Next circular arrows */
-    .works-arrow {
-      position: absolute; top: 50%; transform: translateY(-50%);
-      z-index: 30; width: 3.25rem; height: 3.25rem; border-radius: 50%;
-      border: 1.5px solid var(--text); color: var(--text);
-      background: rgba(220,216,192,0.6); backdrop-filter: blur(8px);
-      display: flex; align-items: center; justify-content: center;
-      cursor: none; transition: background 0.3s, color 0.3s, transform 0.3s;
+    .keen-slider {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1rem;
+      height: auto;
+      min-height: 0;
+      overflow: visible;
+      cursor: default;
     }
-    .works-arrow:hover { background: var(--text); color: var(--bg); transform: translateY(-50%) scale(1.08); }
-    .works-arrow.prev { left: -1rem; }
-    .works-arrow.next { right: -1rem; }
-    .works-arrow svg { width: 1.1rem; height: 1.1rem; }
+    .keen-slider__slide {
+      min-width: 0;
+      max-width: none;
+      width: 100%;
+      min-height: clamp(320px, 35vw, 520px);
+      flex-shrink: 1;
+    }
+    @media (max-width: 1100px) {
+      .keen-slider { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .keen-slider__slide { min-height: 360px; }
+    }
     @media (max-width: 640px) {
-      .works-arrow { width: 2.75rem; height: 2.75rem; }
-      .works-arrow.prev { left: 0.25rem; }
-      .works-arrow.next { right: 0.25rem; }
+      .keen-slider { grid-template-columns: 1fr; }
+      .keen-slider__slide { min-height: 420px; }
     }
-    .keen-slider { height: 478.8px; cursor: grab; }
-    .keen-slider:active { cursor: grabbing; }
-    .keen-slider__slide { min-width: 740.4px; max-width: 740.4px; flex-shrink: 0; }
-    @media (max-width: 640px) { .keen-slider__slide { min-width: 85vw; } .keen-slider { height: 420px; } }
     .slide-inner {
       width: 100%; height: 100%;
       display: flex; flex-direction: column;
@@ -674,55 +751,16 @@
       width: 100%; height: 100%; object-fit: cover;
       transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s;
     }
-    .slide-inactive { opacity: 0.7; }
-    .slide-inactive .slide-img-wrap img { transform: scale(0.98); }
+    .slide-inactive { opacity: 1; }
+    .slide-inactive .slide-img-wrap img,
     .slide-active .slide-img-wrap img { transform: scale(1); }
     .slide-meta {
-      width: 100%; display: none;
+      width: 100%; display: flex; justify-content: space-between; gap: 1rem;
       font-family: 'IBM Plex Mono', monospace;
       font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em;
       color: var(--text); opacity: 0.6;
       padding-top: 0.5rem;
     }
-    .slide-active .slide-meta { display: flex; justify-content: space-between; }
-
-    /* Works project info below slider */
-    .works-info {
-      display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1.5rem;
-      position: relative;
-    }
-    .works-info-row {
-      display: flex; flex-direction: column; gap: 0.5rem;
-    }
-    .project-title-large {
-      font-weight: 800; font-size: clamp(3rem, 10vw, 9rem);
-      text-transform: uppercase; letter-spacing: -0.03em;
-      color: var(--text); line-height: 0.85;
-      cursor: pointer; text-decoration: none; display: inline-block;
-    }
-    .project-meta-grid {
-      display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto;
-      gap: 1rem 2rem; align-items: start; margin-top: 0.75rem;
-      font-size: 0.75rem;
-    }
-    @media (max-width: 900px) { .project-meta-grid { grid-template-columns: 1fr 1fr; } }
-    @media (max-width: 640px) { .project-meta-grid { grid-template-columns: 1fr; } }
-    .meta-label {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em;
-      color: var(--text); opacity: 0.5; margin-bottom: 0.25rem;
-    }
-    .meta-value { font-size: 0.8rem; color: var(--text); line-height: 1.5; }
-    .btn-view-project {
-      display: inline-block; text-decoration: none; cursor: none;
-      border: 1px solid var(--text); color: var(--text);
-      padding: 0.75rem 1.25rem;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;
-      transition: background 0.3s, color 0.3s; white-space: nowrap;
-      background: none;
-    }
-    .btn-view-project:hover { background: var(--text); color: var(--bg); }
 
     /* ─── Services ───────────────────────────────────── */
     .service-row {
@@ -1029,7 +1067,7 @@
   <header id="main-header">
     <div class="layout-container">
       <nav class="header-inner">
-        <a href="/" class="logo-link" aria-label="Hilti Track 02">
+        <a href="/" class="logo-link" aria-label="SecEff Track 02">
           <div class="logo-mark">
             <svg viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg" style="fill-rule:evenodd;width:100%;height:100%">
               <g id="left-strip">
@@ -1044,8 +1082,7 @@
             </svg>
           </div>
           <div class="logo-text">
-            <span>Track 02</span>
-            <span>Hilti</span>
+            <span>SecEff</span>
           </div>
         </a>
 
@@ -1053,7 +1090,7 @@
           <ul>
             <li><a href="#" class="active"><span class="mono">001/</span><span>Overview</span></a></li>
             <li><a href="#manifesto"><span class="mono">002/</span><span>Challenge</span></a></li>
-            <li><a href="#works"><span class="mono">003/</span><span>Outcomes</span></a></li>
+            <li><a href="#works"><span class="mono">003/</span><span>Features</span></a></li>
           </ul>
         </div>
 
@@ -1123,7 +1160,11 @@
 
         <div class="cloud-table-wrap">
           <div class="cloud-table-actions">
-            <button class="cloud-add-btn" id="cloud-add-toggle" type="button" aria-label="Add connected cloud platform" aria-expanded="false" aria-controls="cloud-add-form">+</button>
+            <div class="cloud-selection-tools" aria-label="Cloud row selection tools">
+              <button class="cloud-action-btn cloud-delete-btn" id="cloud-delete-selected" type="button" disabled aria-label="Delete selected cloud platforms">Del</button>
+              <span class="cloud-selected-count" id="cloud-selected-count">0 selected</span>
+            </div>
+            <button class="cloud-action-btn cloud-add-btn" id="cloud-add-toggle" type="button" aria-label="Add connected cloud platform" aria-expanded="false" aria-controls="cloud-add-form">+</button>
           </div>
           <form class="cloud-add-form" id="cloud-add-form" autocomplete="off">
             <input id="cloud-platform-input" name="platform" type="text" placeholder="Cloud platform" required />
@@ -1138,6 +1179,7 @@
           <table class="cloud-platform-table">
             <thead>
               <tr>
+                <th class="cloud-select-col">Select</th>
                 <th>Cloud Platform</th>
                 <th>Subsidiary</th>
                 <th>Status</th>
@@ -1184,80 +1226,79 @@
     <section class="manifesto section-gap" id="manifesto">
       <div class="manifesto-content" aria-label="Manifesto">
         <h2 class="manifesto-line" data-dir="ltr">
-          <span class="manifesto-word is-keyword">Securing</span>
-          <span class="manifesto-word is-keyword">Cloud</span>
-          <span class="manifesto-word is-keyword">Platforms</span>
+          <span class="manifesto-word">A</span>
+          <span class="manifesto-word">cloud</span>
+          <span class="manifesto-word">twin</span>
           <span class="manifesto-word">for</span>
-          <span class="manifesto-word">Construction</span>
+          <span class="manifesto-word">connected</span>
+          <span class="manifesto-word">construction</span>
+          <span class="manifesto-word">platforms</span>
         </h2>
         <h2 class="manifesto-line" data-dir="rtl">
-          <span class="manifesto-word">Where</span>
-          <span class="manifesto-word">efficiency</span>
-          <span class="manifesto-word">becomes</span>
-          <span class="manifesto-word">trust</span>
-          <span class="manifesto-word">and</span>
-          <span class="manifesto-word">safety</span>
+          <span class="manifesto-word">Turning</span>
+          <span class="manifesto-word">scan</span>
+          <span class="manifesto-word">data</span>
+          <span class="manifesto-word">into</span>
+          <span class="manifesto-word">clear</span>
+          <span class="manifesto-word">cloud</span>
+          <span class="manifesto-word">decisions</span>
         </h2>
         <h2 class="manifesto-line" data-dir="ltr">
-          <span class="manifesto-word">Monitoring</span>
-          <span class="manifesto-word">vulnerabilities</span>
-          <span class="manifesto-word is-keyword">Beyond</span>
-          <span class="manifesto-word is-keyword">the</span>
-          <span class="manifesto-word is-keyword">Surface</span>
+          <span class="manifesto-word">Strengthening</span>
+          <span class="manifesto-word is-keyword">Cloud Security</span>
+          <span class="manifesto-word">across</span>
+          <span class="manifesto-word">every</span>
+          <span class="manifesto-word">resource</span>
         </h2>
         <h2 class="manifesto-line" data-dir="rtl">
-          <span class="manifesto-word">Through</span>
-          <span class="manifesto-word">scanning</span>
-          <span class="manifesto-word">that</span>
-          <span class="manifesto-word">guards</span>
+          <span class="manifesto-word">Finding</span>
+          <span class="manifesto-word">public</span>
+          <span class="manifesto-word">access,</span>
+          <span class="manifesto-word">identity</span>
+          <span class="manifesto-word">risk,</span>
           <span class="manifesto-word">and</span>
+          <span class="manifesto-word">attack</span>
+          <span class="manifesto-word">paths</span>
+        </h2>
+        <h2 class="manifesto-line" data-dir="ltr">
+          <span class="manifesto-word">Improving</span>
+          <span class="manifesto-word is-keyword">Resource Efficiency</span>
+          <span class="manifesto-word">with</span>
+          <span class="manifesto-word">live</span>
+          <span class="manifesto-word">usage</span>
           <span class="manifesto-word">signals</span>
-          <span class="manifesto-word">that</span>
-          <span class="manifesto-word">matter</span>
-        </h2>
-        <h2 class="manifesto-line" data-dir="ltr">
-          <span class="manifesto-word">High</span>
-          <span class="manifesto-word">carbon,</span>
-          <span class="manifesto-word">wasteful</span>
-          <span class="manifesto-word">workloads,</span>
-          <span class="manifesto-word">and</span>
-          <span class="manifesto-word">hidden</span>
-          <span class="manifesto-word">inefficiency</span>
         </h2>
         <h2 class="manifesto-line" data-dir="rtl">
           <span class="manifesto-word">Reducing</span>
-          <span class="manifesto-word">footprint</span>
-          <span class="manifesto-word">where</span>
-          <span class="manifesto-word">security</span>
-          <span class="manifesto-word">meets</span>
-          <span class="manifesto-word">sustainability</span>
+          <span class="manifesto-word">idle</span>
+          <span class="manifesto-word">workloads,</span>
+          <span class="manifesto-word">waste,</span>
+          <span class="manifesto-word">and</span>
+          <span class="manifesto-word">unnecessary</span>
+          <span class="manifesto-word">cost</span>
         </h2>
         <h2 class="manifesto-line" data-dir="ltr">
-          <span class="manifesto-word">Building</span>
-          <span class="manifesto-word">operations</span>
-          <span class="manifesto-word">with</span>
-          <span class="manifesto-word">clarity</span>
+          <span class="manifesto-word">Tracking</span>
+          <span class="manifesto-word is-keyword">Carbon Footprint</span>
+          <span class="manifesto-word">by</span>
+          <span class="manifesto-word">region,</span>
+          <span class="manifesto-word">workload,</span>
           <span class="manifesto-word">and</span>
-          <span class="manifesto-word">trust</span>
+          <span class="manifesto-word">energy</span>
         </h2>
         <h2 class="manifesto-line" data-dir="rtl">
-          <span class="manifesto-word">Optimizing</span>
-          <span class="manifesto-word">systems</span>
-          <span class="manifesto-word">for</span>
-          <span class="manifesto-word">smarter</span>
-          <span class="manifesto-word">resource</span>
-          <span class="manifesto-word">efficiency</span>
-        </h2>
-        <h2 class="manifesto-line" data-dir="ltr">
-          <span class="manifesto-word is-keyword">Securing</span>
-          <span class="manifesto-word is-keyword">Systems</span>
-          <span class="manifesto-word">where</span>
+          <span class="manifesto-word">So</span>
           <span class="manifesto-word">every</span>
-          <span class="manifesto-word">workload</span>
-          <span class="manifesto-word">has</span>
-          <span class="manifesto-word">purpose</span>
+          <span class="manifesto-word">cloud</span>
+          <span class="manifesto-word">resource</span>
+          <span class="manifesto-word">becomes</span>
+          <span class="manifesto-word">safer,</span>
+          <span class="manifesto-word">leaner,</span>
+          <span class="manifesto-word">and</span>
+          <span class="manifesto-word">actionable</span>
         </h2>
         <div class="manifesto-video-stage" id="manifesto-video-wrap" aria-label="Track 02 Reel">
+          <img class="manifesto-video" src="../pic/front.png" alt="Secure energy-efficient cloud interface preview" />
           <div class="manifesto-video" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;background:repeating-linear-gradient(45deg, rgba(220,216,192,0.12) 0 14px, rgba(220,216,192,0.03) 14px 28px);">
             <span style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.22em;color:var(--bg);opacity:0.75;">[ track 02 reel ]</span>
             <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:clamp(1.4rem,3vw,2.6rem);text-align:center;line-height:1.05;color:var(--bg);opacity:0.9;padding:0 1.5rem;">SECURE · ENERGY-EFFICIENT CLOUD</span>
@@ -1283,7 +1324,7 @@
             </div>
           </div>
           <div class="reel-label">
-            <span style="font-family:'IBM Plex Mono',monospace">// Hilti Track 02 — Reel</span>
+            <span style="font-family:'IBM Plex Mono',monospace">// SecEff Track 02 — Reel</span>
           </div>
         </div>
       </div>
@@ -1292,13 +1333,11 @@
     <!-- ─── WORKS ─────────────────────────────────────── -->
     <div class="layout-container section-gap" id="works">
       <div class="works-header reveal-item">
-        <div class="section-title"><span>OUTCOMES</span></div>
-        <div class="works-count">04 Outcomes</div>
+        <div class="section-title"><span>Features</span></div>
+        <div class="works-count">04 Features</div>
       </div>
 
       <div class="keen-slider-wrap">
-        <button class="works-arrow prev" id="works-prev" aria-label="Previous outcome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
-        <button class="works-arrow next" id="works-next" aria-label="Next outcome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
         <div id="works-slider" class="keen-slider">
           <div class="keen-slider__slide slide-active">
             <div class="slide-inner">
@@ -1367,33 +1406,6 @@
         </div>
       </div>
 
-      <!-- Outcome info below slider -->
-      <div class="works-info" id="works-info">
-        <div class="works-info-row">
-          <a href="secure-lean-cloud.html" class="project-title-large" id="active-project-title">Secure &amp; Lean Cloud</a>
-        </div>
-        <div class="project-meta-grid">
-          <div>
-            <div class="meta-label">// 01 Description</div>
-            <div class="meta-value" id="active-project-desc">Stronger cloud security with lower energy use — safer, leaner cloud operations.</div>
-          </div>
-          <div>
-            <div class="meta-label">// 02 Capabilities</div>
-            <div class="meta-value" id="active-project-services">Real-time vulnerability monitoring, Energy baselining, Security posture</div>
-          </div>
-          <div>
-            <div class="meta-label">// 03 Theme</div>
-            <div class="meta-value" id="active-project-industry">Security &amp; Efficiency</div>
-          </div>
-          <div>
-            <div class="meta-label">// 04 Domain</div>
-            <div class="meta-value" id="active-project-location">Construction Tech</div>
-          </div>
-          <div>
-            <a href="secure-lean-cloud.html" class="btn-view-project" id="active-project-link">Learn more</a>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- ─── SERVICES ──────────────────────────────────── -->
@@ -1404,13 +1416,13 @@
         </div>
       </div>
 
-      <!-- Security -->
+      <!-- Cloud Security -->
       <div class="service-row">
         <div class="service-row-inner">
           <div class="service-row-top">
             <div class="service-row-left">
               <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" width="1em" height="1em"><path d="M12 5m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M5 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M19 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M6.5 17.5l5.5 -4.5l5.5 4.5"/><path d="M12 7l0 6"/></svg>
-              <span>Security Monitoring</span>
+              <span>Cloud Security</span>
             </div>
             <div class="service-row-right">
               <span class="service-number">001//</span>
@@ -1423,27 +1435,27 @@
               <span style="display:block;font-family:'IBM Plex Mono',monospace;font-size:1.2rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--bg)">//modules</span>
             </div>
             <div class="service-row-detail">
-              <div class="service-heading">Continuously monitor vulnerabilities across cloud environments</div>
-              <p class="service-description">Continuously scan fragmented cloud environments to surface vulnerabilities, track security posture in real time, and reduce the risk of attacks and data leaks.</p>
+              <div class="service-heading">Detect cloud risks before they become incidents</div>
+              <p class="service-description">Analyze connected cloud resources for public exposure, weak identity controls, open ports, and risky attack paths so teams can protect critical construction platforms.</p>
               <div class="service-tags">
-                <span class="service-tag">Vulnerability scanning</span>
-                <span class="service-tag">Real-time monitoring</span>
-                <span class="service-tag">Security posture</span>
-                <span class="service-tag">Threat detection</span>
-                <span class="service-tag">Compliance audit</span>
+                <span class="service-tag">Risk detection</span>
+                <span class="service-tag">Public access checks</span>
+                <span class="service-tag">Identity review</span>
+                <span class="service-tag">Attack paths</span>
+                <span class="service-tag">Findings table</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Energy -->
+      <!-- Resource Efficient -->
       <div class="service-row">
         <div class="service-row-inner">
           <div class="service-row-top">
             <div class="service-row-left">
               <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" width="1em" height="1em"><path d="M4 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"/><path d="M14 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"/><path d="M4 14m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"/><path d="M14 14m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"/></svg>
-              <span>Energy & Carbon</span>
+              <span>Resource Efficient</span>
             </div>
             <div class="service-row-right">
               <span class="service-number">002//</span>
@@ -1456,27 +1468,27 @@
               <span style="display:block;font-family:'IBM Plex Mono',monospace;font-size:1.2rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--bg)">//modules</span>
             </div>
             <div class="service-row-detail">
-              <div class="service-heading">Identify high-carbon and low-efficiency workloads</div>
-              <p class="service-description">Quantify the energy use and carbon footprint of cloud workloads, pinpoint high-carbon and inefficient resources, and build a clear basis for cutting emissions.</p>
+              <div class="service-heading">Find idle, oversized, and wasteful cloud resources</div>
+              <p class="service-description">Review utilization signals such as CPU, storage, request volume, and idle days to identify resources that can be resized, cleaned up, or optimized.</p>
               <div class="service-tags">
-                <span class="service-tag">Energy baselining</span>
-                <span class="service-tag">Carbon tracking</span>
-                <span class="service-tag">Workload analysis</span>
-                <span class="service-tag">Efficiency scoring</span>
-                <span class="service-tag">Cost accounting</span>
+                <span class="service-tag">Idle workload checks</span>
+                <span class="service-tag">Utilization review</span>
+                <span class="service-tag">Storage cleanup</span>
+                <span class="service-tag">Right sizing</span>
+                <span class="service-tag">Cost waste</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Optimization -->
+      <!-- Carbon Footprint -->
       <div class="service-row">
         <div class="service-row-inner">
           <div class="service-row-top">
             <div class="service-row-left">
               <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" width="1em" height="1em"><path d="M6 17.6l-2 -1.1v-2.5"/><path d="M4 10v-2.5l2 -1.1"/><path d="M10 4.1l2 -1.1l2 1.1"/><path d="M18 6.4l2 1.1v2.5"/><path d="M20 14v2.5l-2 1.12"/><path d="M14 19.9l-2 1.1l-2 -1.1"/><path d="M12 12l2 -1.1"/><path d="M18 8.6l2 -1.1"/><path d="M12 12l0 2.5"/><path d="M12 18.5l0 2.5"/><path d="M12 12l-2 -1.12"/><path d="M6 8.6l-2 -1.1"/></svg>
-              <span>Smart Optimization</span>
+              <span>Carbon Footprint</span>
             </div>
             <div class="service-row-right">
               <span class="service-number">003//</span>
@@ -1489,27 +1501,27 @@
               <span style="display:block;font-family:'IBM Plex Mono',monospace;font-size:1.2rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--bg)">//modules</span>
             </div>
             <div class="service-row-detail">
-              <div class="service-heading">Automated alerts and smart optimization recommendations</div>
-              <p class="service-description">Trigger automatic alerts on security risks or energy anomalies and deliver smart optimization recommendations that lower cost while continuously improving the system.</p>
+              <div class="service-heading">Measure cloud emissions by workload and region</div>
+              <p class="service-description">Connect cloud usage with regional carbon intensity to show which workloads create the highest footprint and where sustainability improvements matter most.</p>
               <div class="service-tags">
-                <span class="service-tag">Automated alerts</span>
-                <span class="service-tag">Recommendations</span>
-                <span class="service-tag">Cost optimization</span>
-                <span class="service-tag">Auto-remediation</span>
-                <span class="service-tag">Continuous improvement</span>
+                <span class="service-tag">Emission tracking</span>
+                <span class="service-tag">Regional intensity</span>
+                <span class="service-tag">Energy usage</span>
+                <span class="service-tag">High-carbon workloads</span>
+                <span class="service-tag">Sustainability view</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Workflow -->
+      <!-- AI Recommendation -->
       <div class="service-row">
         <div class="service-row-inner">
           <div class="service-row-top">
             <div class="service-row-left">
               <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" width="1em" height="1em"><path d="M7 8l-4 4l4 4"/><path d="M17 8l4 4l-4 4"/><path d="M14 4l-4 16"/></svg>
-              <span>Workflow Support</span>
+              <span>AI Recommendation</span>
             </div>
             <div class="service-row-right">
               <span class="service-number">004//</span>
@@ -1522,14 +1534,14 @@
               <span style="display:block;font-family:'IBM Plex Mono',monospace;font-size:1.2rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--bg)">//modules</span>
             </div>
             <div class="service-row-detail">
-              <div class="service-heading">Better support for construction site workflows</div>
-              <p class="service-description">Fit the real workflows of construction work, raising overall operational efficiency so security and energy savings truly serve on-site operations.</p>
+              <div class="service-heading">Turn findings into practical next actions</div>
+              <p class="service-description">Use AI-assisted recommendations to summarize risks, prioritize fixes, and suggest security, efficiency, and carbon reduction actions for each cloud resource.</p>
               <div class="service-tags">
-                <span class="service-tag">Workflow integration</span>
-                <span class="service-tag">Operational efficiency</span>
-                <span class="service-tag">On-site support</span>
-                <span class="service-tag">Resource scheduling</span>
-                <span class="service-tag">Team collaboration</span>
+                <span class="service-tag">Fix prioritization</span>
+                <span class="service-tag">AI summaries</span>
+                <span class="service-tag">Action plans</span>
+                <span class="service-tag">Remediation guidance</span>
+                <span class="service-tag">Decision support</span>
               </div>
             </div>
           </div>
@@ -1538,7 +1550,7 @@
     </div>
 
       <!-- ─── PRICING ───────────────────────────────────── -->
-    <div class="layout-container section-gap" id="pricing">
+    <div class="layout-container section-gap" id="pricing" hidden>
       <div class="pricing-header reveal-item">
         <div class="section-title" style="font-size:clamp(2.5rem,6vw,5rem)"><span>Why It Matters</span></div>
         <div class="pricing-subtitle">Three pillars of value</div>
@@ -1583,7 +1595,7 @@
     </div>
 
       <!-- ─── FAQ ───────────────────────────────────────── -->
-    <div class="layout-container section-gap" id="faq">
+    <div class="layout-container section-gap" id="faq" hidden>
       <div class="faq-header reveal-item">
         <div class="section-title" style="font-size:clamp(2rem,4vw,3.5rem)"><span>Common<br/>questions</span></div>
         <p class="faq-subtitle">Common questions about the Track 02 challenge — reach out if anything else comes up.</p>
@@ -1650,7 +1662,7 @@
     <div class="layout-container" id="collaborate">
       <div class="collaborate-inner">
         <div>
-          <div class="collaborate-title reveal-item">Join<br/>Track 02</div>
+          <div class="collaborate-title reveal-item">Join<br/>SecEff</div>
           <a href="/cdn-cgi/l/email-protection#deb6bbb2b2b19eaaacbfbdb5eeecf0babba8" class="collaborate-email-link reveal-item"><span class="__cf_email__" data-cfemail="d6beb3babab996a2a4b7b5bde6e4f8b2b3a0">[email&#160;protected]</span></a>
 
           <div class="collaborate-proposal reveal-item">
@@ -1687,7 +1699,7 @@
   <footer>
     <div class="layout-container">
       <div class="footer-inner">
-        <a href="/" class="footer-logo">Hilti · Track 02</a>
+        <a href="/" class="footer-logo">SecEff</a>
         <a href="/cdn-cgi/l/email-protection#c2aaa7aeaead82b6b0a3a1a9f2f0eca6a7b4" class="footer-email">Email Us</a>
       </div>
     </div>
@@ -1695,9 +1707,10 @@
 
   <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-  window.scrollTo(0, 0);
+  const shouldSkipPreloader = Boolean(location.hash && location.hash !== '#');
+  if (!shouldSkipPreloader) window.scrollTo(0, 0);
   window.addEventListener('pageshow', event => {
-    if (!location.hash || location.hash === '#') window.scrollTo(0, 0);
+    if (!shouldSkipPreloader) window.scrollTo(0, 0);
   });
   // ─── Cursor ──────────────────────────────────────────
   const dot = document.getElementById('cursor-dot');
@@ -1725,6 +1738,11 @@
   const pLoader = document.getElementById('preloader');
   const logoInner = document.getElementById('preloader-logo');
 
+  function finishPreloader() {
+    pLoader.style.display = 'none';
+    initAnimations();
+  }
+
   function tick() {
     if (pct < 100) {
       pct += Math.random() * 3 + 0.5;
@@ -1737,14 +1755,19 @@
       setTimeout(() => {
         pLoader.classList.add('hide');
         setTimeout(() => {
-          pLoader.style.display = 'none';
-          initAnimations();
+          finishPreloader();
         }, 900);
       }, 200);
     }
   }
 
-  window.addEventListener('load', () => setTimeout(tick, 300));
+  window.addEventListener('load', () => {
+    if (shouldSkipPreloader) {
+      finishPreloader();
+      return;
+    }
+    setTimeout(tick, 300);
+  });
 
   // ─── Three.js canvas particles ───────────────────────
   (function () {
@@ -1868,6 +1891,9 @@
     if (!toggle || !form || !list) return;
 
     const storageKey = 'connectedCloudPlatforms';
+    const deletedDefaultsKey = 'connectedCloudPlatformsDeleted';
+    const deleteSelectedBtn = document.getElementById('cloud-delete-selected');
+    const selectedCount = document.getElementById('cloud-selected-count');
     const platformInput = document.getElementById('cloud-platform-input');
     const subsidiaryInput = document.getElementById('cloud-subsidiary-input');
     const statusInput = document.getElementById('cloud-status-input');
@@ -1876,12 +1902,57 @@
       return `cloud-status-${String(status).toLowerCase()}`;
     }
 
+    function slug(value) {
+      return String(value || 'cloud')
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '') || 'cloud';
+    }
+
+    function getPlatformId(platform, prefix = 'saved') {
+      if (platform.id) return platform.id;
+      return `${prefix}-${slug(platform.platform)}-${slug(platform.subsidiary)}-${slug(platform.status)}`;
+    }
+
+    function getRowLabel(row) {
+      return row.querySelector('.cloud-platform-name')?.textContent?.trim() || 'cloud platform';
+    }
+
+    function createSelectCell(rowId, label) {
+      const cell = document.createElement('td');
+      const wrapper = document.createElement('label');
+      const checkbox = document.createElement('input');
+      const box = document.createElement('span');
+
+      cell.className = 'cloud-select-col';
+      wrapper.className = 'cloud-row-select';
+      checkbox.className = 'cloud-select-checkbox';
+      checkbox.type = 'checkbox';
+      checkbox.setAttribute('aria-label', `Select ${label}`);
+      checkbox.dataset.cloudId = rowId;
+      wrapper.append(checkbox, box);
+      cell.appendChild(wrapper);
+      return cell;
+    }
+
+    function prepareRow(row, options) {
+      const rowId = options.id;
+      const label = options.label || getRowLabel(row);
+      row.dataset.cloudId = rowId;
+      row.dataset.cloudSource = options.source;
+      if (!row.querySelector('.cloud-select-col')) {
+        row.prepend(createSelectCell(rowId, label));
+      }
+    }
+
     function createRow(platform) {
       const row = document.createElement('tr');
       const platformCell = document.createElement('td');
       const subsidiaryCell = document.createElement('td');
       const statusCell = document.createElement('td');
       const status = document.createElement('span');
+      const rowId = getPlatformId(platform);
 
       platformCell.className = 'cloud-platform-name';
       platformCell.textContent = platform.platform;
@@ -1890,7 +1961,9 @@
       status.className = `cloud-status ${statusClass(platform.status)}`;
       status.textContent = platform.status;
       statusCell.appendChild(status);
-      row.append(platformCell, subsidiaryCell, statusCell);
+      row.append(createSelectCell(rowId, platform.platform), platformCell, subsidiaryCell, statusCell);
+      row.dataset.cloudId = rowId;
+      row.dataset.cloudSource = 'saved';
       return row;
     }
 
@@ -1902,17 +1975,97 @@
       }
     }
 
+    function loadDeletedDefaults() {
+      try {
+        return new Set(JSON.parse(localStorage.getItem(deletedDefaultsKey) || '[]'));
+      } catch {
+        return new Set();
+      }
+    }
+
+    function saveDeletedDefaults(deletedDefaults) {
+      localStorage.setItem(deletedDefaultsKey, JSON.stringify(Array.from(deletedDefaults)));
+    }
+
+    function normalizeSavedPlatforms(platforms) {
+      return platforms
+        .filter(platform => platform && platform.platform && platform.subsidiary)
+        .map(platform => ({
+          ...platform,
+          id: getPlatformId(platform)
+        }));
+    }
+
     function savePlatform(platform) {
-      const platforms = loadSavedPlatforms();
+      const platforms = normalizeSavedPlatforms(loadSavedPlatforms());
       platforms.unshift(platform);
       localStorage.setItem(storageKey, JSON.stringify(platforms));
     }
 
     function addPlatformToList(platform) {
       list.prepend(createRow(platform));
+      updateDeleteState();
     }
 
-    loadSavedPlatforms().reverse().forEach(addPlatformToList);
+    function updateDeleteState() {
+      const selectedRows = Array.from(list.querySelectorAll('.cloud-select-checkbox:checked'));
+      if (deleteSelectedBtn) deleteSelectedBtn.disabled = selectedRows.length === 0;
+      if (selectedCount) selectedCount.textContent = `${selectedRows.length} selected`;
+      Array.from(list.querySelectorAll('tr')).forEach(row => {
+        const checkbox = row.querySelector('.cloud-select-checkbox');
+        row.classList.toggle('is-selected', Boolean(checkbox?.checked));
+      });
+    }
+
+    function initializeDefaultRows() {
+      const deletedDefaults = loadDeletedDefaults();
+      Array.from(list.querySelectorAll('tr')).forEach(row => {
+        const platform = row.querySelector('.cloud-platform-name')?.textContent?.trim() || '';
+        const subsidiary = row.querySelector('.cloud-subsidiary')?.textContent?.trim() || '';
+        const status = row.querySelector('.cloud-status')?.textContent?.trim() || '';
+        const id = getPlatformId({ platform, subsidiary, status }, 'default');
+        if (deletedDefaults.has(id)) {
+          row.remove();
+          return;
+        }
+        prepareRow(row, { id, source: 'default', label: platform });
+      });
+    }
+
+    function deleteSelectedPlatforms() {
+      const selectedRows = Array.from(list.querySelectorAll('.cloud-select-checkbox:checked'))
+        .map(checkbox => checkbox.closest('tr'))
+        .filter(Boolean);
+
+      if (selectedRows.length === 0) return;
+
+      const deletedDefaults = loadDeletedDefaults();
+      const deletedSavedIds = new Set();
+
+      selectedRows.forEach(row => {
+        const rowId = row.dataset.cloudId;
+        if (!rowId) return;
+        if (row.dataset.cloudSource === 'default') {
+          deletedDefaults.add(rowId);
+        } else {
+          deletedSavedIds.add(rowId);
+        }
+        row.remove();
+      });
+
+      if (deletedSavedIds.size > 0) {
+        const remainingPlatforms = normalizeSavedPlatforms(loadSavedPlatforms())
+          .filter(platform => !deletedSavedIds.has(getPlatformId(platform)));
+        localStorage.setItem(storageKey, JSON.stringify(remainingPlatforms));
+      }
+
+      saveDeletedDefaults(deletedDefaults);
+      updateDeleteState();
+    }
+
+    initializeDefaultRows();
+    normalizeSavedPlatforms(loadSavedPlatforms()).reverse().forEach(addPlatformToList);
+    updateDeleteState();
 
     toggle.addEventListener('click', () => {
       const isOpen = form.classList.toggle('is-open');
@@ -1923,6 +2076,7 @@
     form.addEventListener('submit', event => {
       event.preventDefault();
       const platform = {
+        id: `custom-${Date.now()}-${slug(platformInput.value)}`,
         platform: platformInput.value.trim(),
         subsidiary: subsidiaryInput.value.trim(),
         status: statusInput.value
@@ -1934,6 +2088,14 @@
       statusInput.value = 'Watch';
       platformInput.focus();
     });
+
+    list.addEventListener('change', event => {
+      if (event.target.classList.contains('cloud-select-checkbox')) {
+        updateDeleteState();
+      }
+    });
+
+    deleteSelectedBtn?.addEventListener('click', deleteSelectedPlatforms);
   })();
 
   (function initHeroNetwork() {
@@ -2370,6 +2532,8 @@
     });
     gsap.set(manifestoVideoWrap, {
       opacity: 0,
+      xPercent: -50,
+      yPercent: -50,
       scale: 0.045,
       transformOrigin: 'center center'
     });
@@ -2465,12 +2629,16 @@
     }, 2.56)
     .to(manifestoVideoWrap, {
       opacity: 1,
+      xPercent: -50,
+      yPercent: -50,
       scale: 0.045,
       duration: 0.01,
       ease: 'none'
     }, 2.8)
     .to(manifestoVideoWrap, {
       opacity: 1,
+      xPercent: -50,
+      yPercent: -50,
       scale: 1,
       duration: 0.76,
       ease: 'none'
@@ -2523,47 +2691,6 @@
       location: 'Construction Tech'
     }
   ];
-
-  window.addEventListener('load', () => {
-    if (typeof KeenSlider === 'undefined') return;
-    const slider = new KeenSlider('#works-slider', {
-      loop: false,
-      mode: 'free-snap',
-      spacing: 24,
-      slidesPerView: 1.3,
-      breakpoints: {
-        '(min-width: 640px)': { slidesPerView: 2.2 },
-        '(min-width: 1024px)': { slidesPerView: 3.2 },
-      },
-      slideChanged(s) {
-        const idx = s.details().relativeSlide;
-        updateActiveSlide(idx);
-      }
-    });
-
-    const prevBtn = document.getElementById('works-prev');
-    const nextBtn = document.getElementById('works-next');
-    if (prevBtn) prevBtn.addEventListener('click', () => slider.prev());
-    if (nextBtn) nextBtn.addEventListener('click', () => slider.next());
-
-    function updateActiveSlide(idx) {
-      document.querySelectorAll('.keen-slider__slide').forEach((sl, i) => {
-        sl.classList.toggle('slide-active', i === idx);
-        sl.classList.toggle('slide-inactive', i !== idx);
-      });
-      const p = projects[idx];
-      if (!p) return;
-      const activeTitle = document.getElementById('active-project-title');
-      const activeLink = document.getElementById('active-project-link');
-      activeTitle.textContent = p.title;
-      activeTitle.href = p.url;
-      activeLink.href = p.url;
-      document.getElementById('active-project-desc').textContent = p.desc;
-      document.getElementById('active-project-services').textContent = p.services;
-      document.getElementById('active-project-industry').innerHTML = p.industry;
-      document.getElementById('active-project-location').textContent = p.location;
-    }
-  });
 
   // ─── FAQ toggle ──────────────────────────────────────
   function toggleFaq(btn) {

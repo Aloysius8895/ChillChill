@@ -3,62 +3,823 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Secure & Lean Cloud — Track 02 · Hilti</title>
+  <title>Secure &amp; Lean Cloud &mdash; Track 02 &middot; Hilti</title>
   <meta name="theme-color" content="#dcd8c0" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://unpkg.com/vis-network/styles/vis-network.min.css" rel="stylesheet" />
   <style>
-    :root { --bg:#dcd8c0; --text:#535352; --border:rgba(83,83,82,0.2); --border-strong:rgba(83,83,82,0.4); }
-    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
-    html { scroll-behavior:smooth; }
-    body {
-      font-family:'Plus Jakarta Sans',sans-serif; color:var(--text); letter-spacing:-0.01em;
-      background:
-        linear-gradient(rgba(83,83,82,0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(83,83,82,0.05) 1px, transparent 1px),
-        var(--bg);
-      background-size:64px 64px,64px 64px,auto;
-      min-height:100vh;
+    :root {
+      --bg: #dcd8c0;
+      --text: #535352;
+      --muted: rgba(83, 83, 82, 0.68);
+      --soft: rgba(83, 83, 82, 0.08);
+      --panel: rgba(220, 216, 192, 0.62);
+      --panel-strong: rgba(220, 216, 192, 0.86);
+      --border: rgba(83, 83, 82, 0.2);
+      --border-strong: rgba(83, 83, 82, 0.4);
+      --critical: #8f3430;
+      --high: #a9632d;
+      --medium: #8a7837;
+      --low: #6d6b63;
+      --healthy: #4f6d58;
     }
-    .noise { position:fixed; inset:0; z-index:50; pointer-events:none; opacity:0.06;
-      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-size:150px 150px; }
-    .container { width:100%; max-width:1100px; margin:0 auto; padding:0 1.5rem; }
-    @media (min-width:768px){ .container { padding:0 3rem; } }
-    header { position:sticky; top:0; z-index:100; background:rgba(220,216,192,0.82); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); }
-    .header-inner { display:flex; align-items:center; justify-content:space-between; padding:1rem 0; }
-    .logo { display:flex; flex-direction:column; line-height:1.1; text-decoration:none; color:var(--text); font-weight:800; font-size:0.85rem; text-transform:uppercase; }
-    .logo span:last-child { opacity:0.55; }
-    .back { display:inline-flex; align-items:center; gap:0.5rem; text-decoration:none; color:var(--text);
-      font-family:'IBM Plex Mono',monospace; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em;
-      border:1px solid var(--border-strong); padding:0.55rem 1rem; transition:background 0.3s,color 0.3s; }
-    .back:hover { background:var(--text); color:var(--bg); }
-    main { padding:5rem 0 6rem; }
-    .eyebrow { font-family:'IBM Plex Mono',monospace; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.2em; opacity:0.55; }
-    .bignum { font-weight:800; font-size:clamp(4rem,16vw,12rem); line-height:0.85; letter-spacing:-0.04em; opacity:0.12; margin-top:0.5rem; margin-bottom:0.1em; }
-    .title { font-weight:800; font-size:clamp(2.6rem,7vw,5.5rem); line-height:0.92; letter-spacing:-0.03em; text-transform:uppercase; margin-top:-0.2em; }
-    .lead { font-size:clamp(1.05rem,2vw,1.4rem); line-height:1.5; max-width:680px; margin-top:1.75rem; }
-    .panel { margin-top:3.5rem; width:100%; aspect-ratio:21/9; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.8rem;
-      background:repeating-linear-gradient(45deg, rgba(83,83,82,0.07) 0 11px, rgba(83,83,82,0.02) 11px 22px); }
-    .panel .ph-lbl { font-family:'IBM Plex Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.22em; opacity:0.5; }
-    .panel .ph-big { font-weight:800; font-size:clamp(2rem,5vw,3.4rem); opacity:0.78; }
-    .cap { margin-top:4rem; display:grid; grid-template-columns:1fr 2fr; gap:2.5rem; border-top:1px solid var(--border); padding-top:2.5rem; }
-    @media (max-width:760px){ .cap { grid-template-columns:1fr; gap:1.25rem; } }
-    .cap-label { font-family:'IBM Plex Mono',monospace; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.15em; opacity:0.5; }
-    .cap-heading { font-weight:700; font-size:clamp(1.3rem,2.4vw,1.9rem); text-transform:uppercase; letter-spacing:-0.01em; margin-bottom:1rem; }
-    .cap-detail { font-size:1rem; line-height:1.7; max-width:620px; opacity:0.85; }
-    .tags { display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:1.5rem; }
-    .tag { font-family:'IBM Plex Mono',monospace; font-size:0.65rem; text-transform:uppercase; letter-spacing:0.08em;
-      border:1px solid var(--border-strong); padding:0.4rem 0.7rem; opacity:0.8; }
-    .nav-foot { margin-top:5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; border-top:1px solid var(--border); padding-top:2rem; }
-    .nav-foot a { text-decoration:none; color:var(--text); }
-    .foot-back { font-family:'IBM Plex Mono',monospace; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em; opacity:0.6; transition:opacity 0.2s; }
-    .foot-back:hover { opacity:1; }
-    .next-link { display:inline-flex; flex-direction:column; align-items:flex-end; gap:0.25rem; }
-    .next-link .nl-lbl { font-family:'IBM Plex Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.15em; opacity:0.5; }
-    .next-link .nl-name { font-weight:800; font-size:clamp(1.1rem,2.5vw,1.6rem); text-transform:uppercase; letter-spacing:-0.01em; border-bottom:2px solid var(--text); padding-bottom:0.15rem; transition:opacity 0.2s; }
-    .next-link:hover .nl-name { opacity:0.6; }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--text);
+      letter-spacing: 0;
+      background:
+        linear-gradient(rgba(83, 83, 82, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(83, 83, 82, 0.05) 1px, transparent 1px),
+        var(--bg);
+      background-size: 64px 64px, 64px 64px, auto;
+      min-height: 100vh;
+    }
+
+    .noise {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      pointer-events: none;
+      opacity: 0.06;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 150px 150px;
+    }
+
+    .container { width: 100%; max-width: 1180px; margin: 0 auto; padding: 0 1.5rem; }
+    @media (min-width: 768px) { .container { padding: 0 3rem; } }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(220, 216, 192, 0.82);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-inner { display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; gap: 1rem; }
+    .logo {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 800;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+    }
+    .logo span:last-child { opacity: 0.55; }
+    .back {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      color: var(--text);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      border: 1px solid var(--border-strong);
+      padding: 0.55rem 1rem;
+      transition: background 0.3s, color 0.3s;
+    }
+    .back:hover { background: var(--text); color: var(--bg); }
+
+    main { padding: 5rem 0 6rem; }
+    .eyebrow {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      opacity: 0.58;
+    }
+
+    .feature-hero { max-width: 920px; }
+    .title {
+      margin-top: 1.2rem;
+      font-weight: 800;
+      font-size: 4.6rem;
+      line-height: 0.96;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+    .lead {
+      max-width: 780px;
+      margin-top: 1.4rem;
+      font-size: 1.24rem;
+      line-height: 1.55;
+      color: var(--text);
+    }
+    .hero-copy {
+      max-width: 760px;
+      margin-top: 1rem;
+      font-size: 1rem;
+      line-height: 1.75;
+      color: var(--muted);
+    }
+
+    [hidden] { display: none !important; }
+
+    .backend-error {
+      margin-top: 1.5rem;
+      border: 1px solid rgba(143, 52, 48, 0.45);
+      background: rgba(143, 52, 48, 0.08);
+      color: var(--critical);
+      padding: 0.9rem 1rem;
+      line-height: 1.55;
+      font-size: 0.94rem;
+    }
+
+    .loading-text,
+    .empty-state {
+      color: var(--muted);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .cloud-section {
+      margin-top: 4.5rem;
+      border-top: 1px solid var(--border);
+      padding-top: 2.35rem;
+    }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(180px, 0.34fr) minmax(0, 1fr);
+      gap: 2rem;
+      align-items: start;
+      margin-bottom: 1.4rem;
+    }
+    .section-kicker {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+    }
+    .section-title {
+      font-size: 1.85rem;
+      line-height: 1.12;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+    .section-copy {
+      max-width: 760px;
+      margin-top: 0.65rem;
+      line-height: 1.65;
+      color: var(--muted);
+    }
+
+    .card {
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.02)),
+        var(--panel);
+      border: 1px solid var(--border);
+    }
+
+    .score-layout {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.95fr) minmax(0, 1.6fr);
+      gap: 1rem;
+    }
+    .score-card { padding: 1.45rem; min-height: 310px; display: flex; flex-direction: column; justify-content: space-between; }
+    .score-card.healthy { border-color: rgba(79, 109, 88, 0.44); }
+    .score-card.needs-attention { border-color: rgba(138, 120, 55, 0.44); }
+    .score-card.high-risk { border-color: rgba(143, 52, 48, 0.48); }
+    .score-label, .stat-label, .chart-label, .table-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+    }
+    .score-value { margin-top: 1.2rem; font-size: 4.75rem; line-height: 0.95; font-weight: 800; }
+    .score-value span { font-size: 1.1rem; font-family: 'IBM Plex Mono', monospace; color: var(--muted); }
+    .score-value .score-number { font-size: inherit; font-family: inherit; color: inherit; }
+    .status-badge {
+      display: inline-flex;
+      width: fit-content;
+      margin-top: 1rem;
+      border: 1px solid rgba(138, 120, 55, 0.45);
+      background: rgba(138, 120, 55, 0.12);
+      color: var(--medium);
+      padding: 0.42rem 0.65rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .status-badge.healthy { color: var(--healthy); border-color: rgba(79, 109, 88, 0.45); background: rgba(79, 109, 88, 0.09); }
+    .status-badge.needs-attention { color: var(--medium); border-color: rgba(138, 120, 55, 0.45); background: rgba(138, 120, 55, 0.12); }
+    .status-badge.high-risk { color: var(--critical); border-color: rgba(143, 52, 48, 0.45); background: rgba(143, 52, 48, 0.09); }
+    .score-note { margin-top: 1.2rem; line-height: 1.6; color: var(--muted); font-size: 0.94rem; }
+    .score-scale {
+      margin-top: 1.35rem;
+      border-top: 1px solid var(--border);
+      padding-top: 1rem;
+      display: grid;
+      gap: 0.45rem;
+    }
+    .scale-row { display: flex; justify-content: space-between; gap: 1rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--muted); }
+    .scale-row strong { color: var(--text); }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+    }
+    .stat-card { min-height: 145px; padding: 1.1rem; display: flex; flex-direction: column; justify-content: space-between; }
+    .stat-value { font-size: 2.15rem; font-weight: 800; line-height: 1; }
+    .stat-detail { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); }
+    .stat-card.critical { border-color: rgba(143, 52, 48, 0.4); }
+    .stat-card.high { border-color: rgba(169, 99, 45, 0.38); }
+    .stat-card.medium { border-color: rgba(138, 120, 55, 0.38); }
+
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1rem;
+    }
+    .category-card { padding: 1.15rem; min-height: 220px; }
+    .category-count { font-size: 2.6rem; font-weight: 800; line-height: 1; margin-bottom: 1.1rem; }
+    .category-card h3 { font-size: 1rem; text-transform: uppercase; margin-bottom: 0.7rem; }
+    .category-card p { line-height: 1.55; color: var(--muted); font-size: 0.92rem; }
+
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .chart-card { padding: 1rem; min-height: 210px; }
+    .chart-shell {
+      position: relative;
+      min-height: 185px;
+      margin-top: 0.8rem;
+    }
+    .chart-shell canvas {
+      width: 100% !important;
+      height: 185px !important;
+    }
+    .bar-list { margin-top: 1rem; display: grid; gap: 0.72rem; }
+    .bar-row { display: grid; grid-template-columns: 92px 1fr 28px; align-items: center; gap: 0.75rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--muted); }
+    .bar-track { height: 8px; background: rgba(83, 83, 82, 0.08); border: 1px solid rgba(83, 83, 82, 0.12); }
+    .bar-fill { display: block; height: 100%; background: var(--text); opacity: 0.72; }
+    .bar-fill.critical { background: var(--critical); }
+    .bar-fill.high { background: var(--high); }
+    .bar-fill.medium { background: var(--medium); }
+    .risk-list { margin-top: 1rem; display: grid; gap: 0.6rem; }
+    .risk-item { display: flex; justify-content: space-between; gap: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.55rem; font-size: 0.86rem; }
+    .risk-item span:last-child { font-family: 'IBM Plex Mono', monospace; color: var(--muted); }
+    .risk-resource {
+      display: grid;
+      gap: 0.12rem;
+      min-width: 0;
+    }
+    .risk-resource strong {
+      overflow-wrap: anywhere;
+    }
+    .risk-resource small {
+      color: var(--muted);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .findings-toolbar { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem; }
+    .filter-field {
+      display: grid;
+      gap: 0.35rem;
+      min-width: 210px;
+    }
+    .filter-field label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+    }
+    select {
+      width: 100%;
+      border: 1px solid var(--border-strong);
+      background: rgba(220, 216, 192, 0.58);
+      color: var(--text);
+      padding: 0.7rem 0.8rem;
+      font: inherit;
+      border-radius: 0;
+    }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--border); background: rgba(220, 216, 192, 0.42); }
+    table { width: 100%; min-width: 980px; border-collapse: collapse; }
+    th, td { padding: 0.95rem 1rem; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+    th {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    td { font-size: 0.88rem; line-height: 1.45; }
+    tr:last-child td { border-bottom: 0; }
+    .severity {
+      display: inline-flex;
+      min-width: 78px;
+      justify-content: center;
+      border: 1px solid var(--border-strong);
+      padding: 0.32rem 0.5rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.66rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .severity.critical { color: var(--critical); border-color: rgba(143, 52, 48, 0.45); background: rgba(143, 52, 48, 0.08); }
+    .severity.high { color: var(--high); border-color: rgba(169, 99, 45, 0.42); background: rgba(169, 99, 45, 0.08); }
+    .severity.medium { color: var(--medium); border-color: rgba(138, 120, 55, 0.42); background: rgba(138, 120, 55, 0.08); }
+    .severity.low { color: var(--low); border-color: rgba(109, 107, 99, 0.38); background: rgba(109, 107, 99, 0.07); }
+    .severity.healthy { color: var(--healthy); border-color: rgba(79, 109, 88, 0.38); background: rgba(79, 109, 88, 0.08); }
+    .details-button {
+      border: 1px solid var(--border-strong);
+      background: rgba(220, 216, 192, 0.45);
+      color: var(--text);
+      padding: 0.42rem 0.6rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.64rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+    }
+    .details-button:hover { background: var(--text); color: var(--bg); }
+    .finding-delete-button {
+      border: 1px solid rgba(143, 52, 48, 0.45);
+      background: rgba(143, 52, 48, 0.08);
+      color: var(--critical);
+      padding: 0.42rem 0.6rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .finding-delete-button:hover {
+      background: var(--critical);
+      color: var(--bg);
+    }
+    .finding-row { cursor: pointer; }
+    .finding-row:hover td { background: rgba(83, 83, 82, 0.04); }
+    .finding-detail-row td { background: rgba(255, 255, 255, 0.08); }
+    .finding-detail {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      padding: 0.45rem 0;
+    }
+    .finding-detail h4 {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.66rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 0.45rem;
+      color: var(--muted);
+    }
+    .finding-detail p {
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 0.84rem;
+    }
+
+    .graph-board { padding: 1rem; background: rgba(220, 216, 192, 0.42); border: 1px solid var(--border); }
+    .graph-summary {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .graph-stat {
+      min-height: 110px;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .graph-stat strong {
+      font-size: 2.2rem;
+      line-height: 1;
+    }
+    .graph-visual-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.75fr);
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    #security-graph-network {
+      width: 100%;
+      height: 520px;
+      border: 1px solid rgba(83, 83, 82, 0.28);
+      border-radius: 0;
+      background:
+        linear-gradient(rgba(83, 83, 82, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(83, 83, 82, 0.045) 1px, transparent 1px),
+        rgba(220, 216, 192, 0.48);
+      background-size: 32px 32px, 32px 32px, auto;
+      overflow: hidden;
+    }
+    #security-graph-network .vis-navigation .vis-button {
+      width: 34px !important;
+      height: 34px !important;
+      border: 1px solid rgba(83, 83, 82, 0.42) !important;
+      border-radius: 0 !important;
+      background: rgba(220, 216, 192, 0.78) !important;
+      background-image: none !important;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
+      color: var(--text) !important;
+      cursor: pointer;
+      transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
+    }
+    #security-graph-network .vis-navigation .vis-button::after {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.78rem;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+    #security-graph-network .vis-navigation .vis-button:hover {
+      background: var(--text) !important;
+      border-color: var(--text) !important;
+      color: var(--bg) !important;
+      transform: translateY(-1px);
+    }
+    #security-graph-network .vis-navigation .vis-button:active {
+      transform: translateY(0);
+    }
+    #security-graph-network .vis-navigation .vis-up::after { content: "^"; }
+    #security-graph-network .vis-navigation .vis-down::after { content: "v"; }
+    #security-graph-network .vis-navigation .vis-left::after { content: "<"; }
+    #security-graph-network .vis-navigation .vis-right::after { content: ">"; }
+    #security-graph-network .vis-navigation .vis-zoomIn::after { content: "+"; }
+    #security-graph-network .vis-navigation .vis-zoomOut::after { content: "-"; }
+    #security-graph-network .vis-navigation .vis-zoomExtends::after {
+      content: "FIT";
+      font-size: 0.52rem;
+      letter-spacing: 0.08em;
+    }
+    #security-graph-network .vis-tooltip {
+      border: 1px solid rgba(83, 83, 82, 0.36) !important;
+      border-radius: 0 !important;
+      background: rgba(220, 216, 192, 0.94) !important;
+      color: var(--text) !important;
+      box-shadow: none !important;
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 0.68rem !important;
+      line-height: 1.45 !important;
+    }
+    .graph-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      padding: 1rem;
+      text-align: center;
+    }
+    #graph-node-detail {
+      min-height: 520px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.08);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .node-detail-content { min-height: 0; }
+    .node-detail-title {
+      font-size: 1.15rem;
+      line-height: 1.25;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+      overflow-wrap: anywhere;
+    }
+    .detail-grid {
+      display: grid;
+      gap: 0.6rem;
+      margin-top: 1rem;
+    }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+      font-size: 0.86rem;
+    }
+    .detail-row span:first-child {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.64rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+    .detail-row span:last-child {
+      text-align: right;
+      overflow-wrap: anywhere;
+    }
+    .connected-list,
+    .critical-path-list {
+      display: grid;
+      gap: 0.55rem;
+      margin-top: 0.8rem;
+    }
+    .connected-list li,
+    .critical-path-list li {
+      list-style: none;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.55rem;
+      line-height: 1.45;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+    .shape-legend {
+      margin-top: auto;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+    .shape-legend-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.65rem 0.8rem;
+      margin-top: 0.8rem;
+    }
+    .shape-legend-item {
+      display: grid;
+      grid-template-columns: 1.35rem minmax(0, 1fr);
+      gap: 0.55rem;
+      align-items: center;
+      min-width: 0;
+    }
+    .shape-mark {
+      position: relative;
+      width: 1.05rem;
+      height: 1.05rem;
+      border: 1.5px solid rgba(83, 83, 82, 0.58);
+      background: rgba(220, 216, 192, 0.5);
+      justify-self: center;
+      flex: 0 0 auto;
+    }
+    .shape-mark-diamond { transform: rotate(45deg); width: 0.85rem; height: 0.85rem; }
+    .shape-mark-triangle {
+      width: 0;
+      height: 0;
+      border-left: 0.62rem solid transparent;
+      border-right: 0.62rem solid transparent;
+      border-bottom: 1.06rem solid rgba(83, 83, 82, 0.58);
+      background: transparent;
+    }
+    .shape-mark-triangle::after {
+      content: "";
+      position: absolute;
+      left: -0.48rem;
+      top: 0.23rem;
+      border-left: 0.48rem solid transparent;
+      border-right: 0.48rem solid transparent;
+      border-bottom: 0.78rem solid rgba(220, 216, 192, 0.74);
+    }
+    .shape-mark-cylinder {
+      width: 1.15rem;
+      height: 1.2rem;
+      border-radius: 50% / 18%;
+    }
+    .shape-mark-cylinder::before {
+      content: "";
+      position: absolute;
+      left: -1px;
+      right: -1px;
+      top: -1px;
+      height: 0.38rem;
+      border: 1.5px solid rgba(83, 83, 82, 0.58);
+      border-bottom: 1px solid rgba(83, 83, 82, 0.34);
+      border-radius: 50%;
+      background: rgba(220, 216, 192, 0.72);
+    }
+    .shape-mark-ellipse {
+      width: 1.25rem;
+      height: 0.82rem;
+      border-radius: 999px;
+    }
+    .shape-mark-star {
+      width: 1.15rem;
+      height: 1.15rem;
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 56%, 79% 91%, 50% 70%, 21% 91%, 32% 56%, 2% 35%, 39% 35%);
+      border: none;
+      background: rgba(143, 52, 48, 0.74);
+    }
+    .shape-legend-text {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.64rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+    .graph-data-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.9fr);
+      gap: 1rem;
+    }
+    .graph-list-card {
+      padding: 1rem;
+      min-height: 260px;
+      border: 1px solid rgba(83, 83, 82, 0.14);
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .relationship-list,
+    .node-risk-list {
+      display: grid;
+      gap: 0.65rem;
+      margin-top: 1rem;
+    }
+    .relationship-item,
+    .node-risk-item {
+      display: grid;
+      gap: 0.3rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.65rem;
+    }
+    .relationship-title,
+    .node-risk-title {
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+    .relationship-type,
+    .node-risk-meta {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.66rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+    .high-risk-paths {
+      margin-top: 1rem;
+      padding: 1rem;
+      border: 1px solid rgba(143, 52, 48, 0.26);
+      background: rgba(143, 52, 48, 0.055);
+    }
+    .graph-legend-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      width: 100%;
+    }
+    .legend-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      align-items: flex-start;
+    }
+    .legend-label {
+      width: 100%;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.64rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+    .graph-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem; }
+    .graph-chain {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 124px minmax(0, 1fr);
+      align-items: center;
+      gap: 0.55rem;
+      min-height: 76px;
+      padding: 0.7rem;
+      border: 1px solid rgba(83, 83, 82, 0.14);
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .node {
+      min-height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      border: 1px solid var(--border-strong);
+      padding: 0.55rem;
+      font-weight: 700;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+    }
+    .node.risk { border-color: rgba(143, 52, 48, 0.48); background: rgba(143, 52, 48, 0.08); color: var(--critical); }
+    .node.watch { border-color: rgba(169, 99, 45, 0.45); background: rgba(169, 99, 45, 0.07); color: var(--high); }
+    .edge-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      min-height: 34px;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .edge-label::after { content: "->"; color: var(--text); }
+    .graph-note {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--border);
+      padding-top: 1rem;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+    .legend { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+    .legend span {
+      border: 1px solid var(--border);
+      padding: 0.32rem 0.55rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .nav-foot {
+      margin-top: 5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      border-top: 1px solid var(--border);
+      padding-top: 2rem;
+    }
+    .nav-foot a { text-decoration: none; color: var(--text); }
+    .foot-back {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+    .foot-back:hover { opacity: 1; }
+    .next-link { display: inline-flex; flex-direction: column; align-items: flex-end; gap: 0.25rem; }
+    .next-link .nl-lbl {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      opacity: 0.5;
+    }
+    .next-link .nl-name {
+      font-weight: 800;
+      font-size: 1.45rem;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      border-bottom: 2px solid var(--text);
+      padding-bottom: 0.15rem;
+      transition: opacity 0.2s;
+    }
+    .next-link:hover .nl-name { opacity: 0.6; }
+
+    @media (max-width: 980px) {
+      .title { font-size: 3.4rem; }
+      .score-layout, .section-head { grid-template-columns: 1fr; }
+      .category-grid, .chart-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .graph-visual-layout { grid-template-columns: 1fr; }
+      #graph-node-detail { min-height: auto; }
+      .graph-data-grid { grid-template-columns: 1fr; }
+      .graph-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 680px) {
+      main { padding: 3.5rem 0 4.5rem; }
+      .title { font-size: 2.6rem; }
+      .lead { font-size: 1.05rem; }
+      .cloud-section { margin-top: 3.25rem; }
+      .stat-grid, .category-grid, .chart-grid { grid-template-columns: 1fr; }
+      .graph-summary, .graph-legend-grid { grid-template-columns: 1fr; }
+      #security-graph-network { height: 430px; }
+      .graph-chain { grid-template-columns: 1fr; }
+      .edge-label::after { content: "down"; font-size: 0.58rem; }
+      .next-link { align-items: flex-start; }
+    }
   </style>
 </head>
 <body>
@@ -67,47 +828,1210 @@
     <div class="container">
       <div class="header-inner">
         <a href="index.html" class="logo"><span>Track 02</span><span>Hilti</span></a>
-        <a href="index.html#works" class="back">← Back to overview</a>
+        <a href="index.html#works" class="back">&larr; Back to overview</a>
       </div>
     </div>
   </header>
+
   <main>
     <div class="container">
-      <div class="eyebrow">Feature 01 // Track 02 · Hilti</div>
-      <div class="bignum">01</div>
-      <h1 class="title">Secure & Lean Cloud</h1>
-      <p class="lead">Stronger cloud security with lower energy use — safer, leaner cloud operations.</p>
-
-      <div class="panel">
-        <span class="ph-lbl">[ feature visual ]</span>
-        <span class="ph-big">Security & Efficiency</span>
-      </div>
-
-      <section class="cap">
-        <div>
-          <div class="cap-label">// Capability</div>
+      <section class="feature-hero" aria-labelledby="page-title">
+        <div class="eyebrow">Feature 01 // Track 02 &middot; Hilti</div>
+        <h1 id="page-title" class="title">Secure &amp; Lean Cloud</h1>
+        <p class="lead">Classify cloud security risks, calculate security posture, review findings, and visualize risky resource relationships.</p>
+        <p class="hero-copy">This feature analyzes cloud resources, identifies misconfigurations, identity risks, vulnerabilities, and resource waste, then presents the results through dashboards, findings, and a security graph.</p>
+        <div id="backend-error-message" class="backend-error" hidden>
+          Unable to connect to Cloud Security backend. Please start the backend at http://localhost:5000.
         </div>
-        <div>
-          <h2 class="cap-heading">Security Monitoring</h2>
-          <p class="cap-detail">Continuously scan fragmented cloud environments to surface vulnerabilities, track security posture in real time, and reduce the risk of attacks and data leaks.</p>
-          <div class="tags">
-          <span class="tag">Vulnerability scanning</span>
-          <span class="tag">Real-time monitoring</span>
-          <span class="tag">Security posture</span>
-          <span class="tag">Threat detection</span>
-          <span class="tag">Compliance audit</span>
+      </section>
+
+      <section class="cloud-section" aria-labelledby="score-title">
+        <div class="section-head">
+          <div class="section-kicker">// 01 Posture</div>
+          <div>
+            <h2 id="score-title" class="section-title">Security Posture Score</h2>
+            <p class="section-copy">A static overview of the cloud estate risk posture for the demo. Backend-powered values will replace these placeholders in the next step.</p>
+          </div>
+        </div>
+
+        <div class="score-layout">
+          <div id="score-card" class="card score-card">
+            <div>
+              <div class="score-label">Security Score</div>
+              <div class="score-value"><span id="security-score-value" class="score-number">--</span> <span>/ 100</span></div>
+              <div id="health-status-value" class="status-badge">Loading security summary...</div>
+            </div>
+            <div>
+              <p class="score-note">Score is calculated by deducting points based on finding severity and risky attack paths.</p>
+              <div class="score-scale" aria-label="Score scale">
+                <div class="scale-row"><strong>80 - 100</strong><span>Healthy</span></div>
+                <div class="scale-row"><strong>60 - 79</strong><span>Needs Attention</span></div>
+                <div class="scale-row"><strong>0 - 59</strong><span>High Risk</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-grid" aria-label="Finding counts">
+            <div class="card stat-card">
+              <div class="stat-label">Total Findings</div>
+              <div id="total-findings-value" class="stat-value">--</div>
+              <div class="stat-detail">Open issues</div>
+            </div>
+            <div class="card stat-card critical">
+              <div class="stat-label">Critical Findings</div>
+              <div id="critical-findings-value" class="stat-value">--</div>
+              <div class="stat-detail">Immediate action</div>
+            </div>
+            <div class="card stat-card high">
+              <div class="stat-label">High Findings</div>
+              <div id="high-findings-value" class="stat-value">--</div>
+              <div class="stat-detail">Priority queue</div>
+            </div>
+            <div class="card stat-card medium">
+              <div class="stat-label">Medium Findings</div>
+              <div id="medium-findings-value" class="stat-value">--</div>
+              <div class="stat-detail">Review soon</div>
+            </div>
+            <div class="card stat-card">
+              <div class="stat-label">Low Findings</div>
+              <div id="low-findings-value" class="stat-value">--</div>
+              <div class="stat-detail">Monitor</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="cloud-section" aria-labelledby="dashboard-title">
+        <div class="section-head">
+          <div class="section-kicker">// 02 Classify</div>
+          <div>
+            <h2 id="dashboard-title" class="section-title">Security Classification Dashboard</h2>
+            <p class="section-copy">Risk findings are grouped into practical categories so teams can quickly see where the cloud estate needs attention.</p>
+          </div>
+        </div>
+
+        <div class="category-grid">
+          <article class="card category-card">
+            <div id="misconfigurations-count" class="category-count">--</div>
+            <h3>Misconfigurations</h3>
+            <p>Open ports, public storage access, disabled encryption, missing logging.</p>
+          </article>
+          <article class="card category-card">
+            <div id="identity-risks-count" class="category-count">--</div>
+            <h3>Identity Risks</h3>
+            <p>Over-privileged IAM roles, wildcard permissions, sensitive data access.</p>
+          </article>
+          <article class="card category-card">
+            <div id="vulnerabilities-count" class="category-count">--</div>
+            <h3>Vulnerabilities</h3>
+            <p>Critical and high CVEs in containers, hosts, and workloads.</p>
+          </article>
+          <article class="card category-card">
+            <div id="resource-waste-count" class="category-count">--</div>
+            <h3>Resource Waste</h3>
+            <p>Idle compute, underutilized databases, unnecessary resources.</p>
+          </article>
+        </div>
+
+        <div class="chart-grid" aria-label="Backend dashboard charts">
+          <div class="card chart-card">
+            <div class="chart-label">Findings by Category</div>
+            <div class="chart-shell">
+              <canvas id="category-chart" aria-label="Findings by category chart"></canvas>
+              <p id="category-chart-loading" class="loading-text">Loading dashboard...</p>
+            </div>
+          </div>
+          <div class="card chart-card">
+            <div class="chart-label">Findings by Severity</div>
+            <div class="chart-shell">
+              <canvas id="severity-chart" aria-label="Findings by severity chart"></canvas>
+              <p id="severity-chart-loading" class="loading-text">Loading dashboard...</p>
+            </div>
+          </div>
+          <div class="card chart-card">
+            <div class="chart-label">Top Risky Resources</div>
+            <div id="top-risky-resources-list" class="risk-list">
+              <p class="loading-text">Loading dashboard...</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="cloud-section" aria-labelledby="findings-title">
+        <div class="section-head">
+          <div class="section-kicker">// 03 Findings</div>
+          <div>
+            <h2 id="findings-title" class="section-title">Findings</h2>
+            <p class="section-copy">Review backend-powered findings, expand remediation detail, and remove findings from the local demo list when needed.</p>
+          </div>
+        </div>
+
+        <div class="findings-toolbar" aria-label="Static finding filters">
+          <div class="filter-field">
+            <label for="category-filter">Category</label>
+            <select id="category-filter" name="category-filter">
+              <option>All Categories</option>
+              <option>Misconfigurations</option>
+              <option>Identity Risks</option>
+              <option>Vulnerabilities</option>
+              <option>Resource Waste</option>
+            </select>
+          </div>
+          <div class="filter-field">
+            <label for="severity-filter">Severity</label>
+            <select id="severity-filter" name="severity-filter">
+              <option>All Severities</option>
+              <option>Critical</option>
+              <option>High</option>
+              <option>Medium</option>
+              <option>Low</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Severity</th>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Sub-category</th>
+                <th>Resource</th>
+                <th>Owner</th>
+                <th>Region</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="findings-table-body">
+              <tr>
+                <td colspan="9" class="loading-text">Loading findings...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="cloud-section" aria-labelledby="graph-title">
+        <div class="section-head">
+          <div class="section-kicker">// 04 Graph</div>
+          <div>
+            <h2 id="graph-title" class="section-title">Security Graph</h2>
+            <p class="section-copy">Explore backend-powered cloud relationships, high-risk resources, and attack paths across the resource graph.</p>
+          </div>
+        </div>
+
+        <div class="graph-board">
+          <div class="graph-summary" aria-label="Security graph totals">
+            <div class="graph-stat">
+              <span class="stat-label">Total Nodes</span>
+              <strong id="graph-node-count">--</strong>
+            </div>
+            <div class="graph-stat">
+              <span class="stat-label">Total Edges</span>
+              <strong id="graph-edge-count">--</strong>
+            </div>
+          </div>
+
+          <div class="graph-visual-layout">
+            <div id="security-graph-network" aria-label="Interactive security resource graph">
+              <p class="loading-text graph-loading">Loading security graph...</p>
+            </div>
+            <aside id="graph-node-detail" aria-live="polite">
+              <div class="node-detail-content">
+                <p class="empty-state">Select a resource node to view details.</p>
+              </div>
+              <div class="shape-legend" aria-label="Graph shape legend">
+                <div class="chart-label">Shape Legend</div>
+                <div class="shape-legend-grid">
+                  <div class="shape-legend-item"><span class="shape-mark shape-mark-diamond"></span><span class="shape-legend-text">Public Internet</span></div>
+                  <div class="shape-legend-item"><span class="shape-mark shape-mark-triangle"></span><span class="shape-legend-text">Load Balancer</span></div>
+                  <div class="shape-legend-item"><span class="shape-mark"></span><span class="shape-legend-text">Compute / Storage</span></div>
+                  <div class="shape-legend-item"><span class="shape-mark shape-mark-cylinder"></span><span class="shape-legend-text">Database</span></div>
+                  <div class="shape-legend-item"><span class="shape-mark shape-mark-ellipse"></span><span class="shape-legend-text">IAM Role</span></div>
+                  <div class="shape-legend-item"><span class="shape-mark shape-mark-star"></span><span class="shape-legend-text">Sensitive Data</span></div>
+                </div>
+              </div>
+            </aside>
+          </div>
+
+          <div class="graph-data-grid">
+            <div class="graph-list-card">
+              <div class="chart-label">Important Relationships</div>
+              <div id="graph-relationships-list" class="relationship-list">
+                <p class="loading-text">Loading graph...</p>
+              </div>
+            </div>
+            <div class="graph-list-card">
+              <div class="chart-label">High Risk Nodes</div>
+              <div id="high-risk-nodes-list" class="node-risk-list">
+                <p class="loading-text">Loading graph...</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="high-risk-paths">
+            <div class="chart-label">High-Risk Relationship Paths</div>
+            <ul id="high-risk-paths-list" class="critical-path-list">
+              <li class="loading-text">Loading security graph...</li>
+            </ul>
+          </div>
+
+          <div class="graph-note">
+            <p>Click any resource node to inspect its owner, region, finding count, and connected relationships.</p>
+            <div class="graph-legend-grid" aria-label="Security graph legend">
+              <div class="legend-group">
+                <div class="legend-label">Risk Level</div>
+                <span>Critical</span>
+                <span>High</span>
+                <span>Medium</span>
+                <span>Low</span>
+                <span>Healthy</span>
+              </div>
+              <div class="legend-group">
+                <div class="legend-label">Relationship Types</div>
+                <span>exposed_to = public exposure</span>
+                <span>routes_to = traffic route</span>
+                <span>connects_to = network connection</span>
+                <span>can_access = permission access</span>
+                <span>contains_sensitive_data = sensitive data</span>
+                <span>runs_on = workload placement</span>
+                <span>assumes_role = identity</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       <div class="nav-foot">
-        <a href="index.html#works" class="foot-back">← All outcomes</a>
+        <a href="index.html#works" class="foot-back">&larr; All outcomes</a>
         <a href="lower-carbon-lower-cost.html" class="next-link">
           <span class="nl-lbl">Next feature</span>
-          <span class="nl-name">Lower Carbon, Lower Cost →</span>
+          <span class="nl-name">Lower Carbon, Lower Cost &rarr;</span>
         </a>
       </div>
     </div>
   </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+  <script>
+    const API_BASE_URL = "http://localhost:5000/api/security";
+
+    let allFindings = [];
+    let deletedFindingIds = new Set();
+    let expandedFindingId = null;
+    let categoryChartInstance = null;
+    let severityChartInstance = null;
+    let securityGraphNetwork = null;
+    let currentGraphData = { nodes: [], edges: [] };
+    const deletedFindingsStorageKey = "cloudSecurityDeletedFindings";
+
+    const severityOrder = ["Critical", "High", "Medium", "Low", "Healthy"];
+    const categoryNames = ["Misconfigurations", "Identity Risks", "Vulnerabilities", "Resource Waste"];
+    const severityNames = ["Critical", "High", "Medium", "Low"];
+
+    function getElement(id) {
+      return document.getElementById(id);
+    }
+
+    function setText(id, value) {
+      const element = getElement(id);
+      if (element) element.textContent = value;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function normalizeClassName(value) {
+      return String(value || "unknown")
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "");
+    }
+
+    function getSeverityClass(severity) {
+      const normalized = normalizeClassName(severity);
+      if (["critical", "high", "medium", "low", "healthy"].includes(normalized)) {
+        return normalized;
+      }
+      return "low";
+    }
+
+    function getStatusClass(healthStatus, score) {
+      if (healthStatus) return normalizeClassName(healthStatus);
+      if (Number(score) >= 80) return "healthy";
+      if (Number(score) >= 60) return "needs-attention";
+      return "high-risk";
+    }
+
+    function setBackendErrorVisible(isVisible) {
+      const message = getElement("backend-error-message");
+      if (message) message.hidden = !isVisible;
+    }
+
+    async function fetchSecurityJson(endpoint) {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`);
+      if (!response.ok) {
+        throw new Error(`Request failed: ${response.status} ${response.statusText}`);
+      }
+      return response.json();
+    }
+
+    function updateSecuritySummary(summary) {
+      const score = Number(summary.securityScore ?? 0);
+      const healthStatus = summary.healthStatus || (score >= 80 ? "Healthy" : score >= 60 ? "Needs Attention" : "High Risk");
+      const statusClass = getStatusClass(healthStatus, score);
+      const scoreCard = getElement("score-card");
+      const healthBadge = getElement("health-status-value");
+
+      setText("security-score-value", score);
+      setText("health-status-value", healthStatus);
+      setText("total-findings-value", summary.totalFindings ?? 0);
+      setText("critical-findings-value", summary.criticalFindings ?? 0);
+      setText("high-findings-value", summary.highFindings ?? 0);
+      setText("medium-findings-value", summary.mediumFindings ?? 0);
+      setText("low-findings-value", summary.lowFindings ?? 0);
+
+      if (scoreCard) {
+        scoreCard.classList.remove("healthy", "needs-attention", "high-risk");
+        scoreCard.classList.add(statusClass);
+      }
+
+      if (healthBadge) {
+        healthBadge.classList.remove("healthy", "needs-attention", "high-risk");
+        healthBadge.classList.add(statusClass);
+      }
+    }
+
+    function setSummaryFallback() {
+      setText("security-score-value", "--");
+      setText("health-status-value", "Unavailable");
+      setText("total-findings-value", "--");
+      setText("critical-findings-value", "--");
+      setText("high-findings-value", "--");
+      setText("medium-findings-value", "--");
+      setText("low-findings-value", "--");
+    }
+
+    async function loadSecuritySummary() {
+      try {
+        const summary = await fetchSecurityJson("/summary");
+        updateSecuritySummary(summary);
+        return true;
+      } catch (error) {
+        console.error(error);
+        setSummaryFallback();
+        return false;
+      }
+    }
+
+    function getCountByName(items, name) {
+      const match = Array.isArray(items)
+        ? items.find(item => item && item.name === name)
+        : null;
+      return Number(match?.value ?? 0);
+    }
+
+    function updateCategoryCards(dashboardData) {
+      setText("misconfigurations-count", getCountByName(dashboardData.findingsByCategory, "Misconfigurations"));
+      setText("identity-risks-count", getCountByName(dashboardData.findingsByCategory, "Identity Risks"));
+      setText("vulnerabilities-count", getCountByName(dashboardData.findingsByCategory, "Vulnerabilities"));
+      setText("resource-waste-count", getCountByName(dashboardData.findingsByCategory, "Resource Waste"));
+    }
+
+    function getChartOptions() {
+      const textColor = "#535352";
+      const gridColor = "rgba(83, 83, 82, 0.12)";
+
+      return {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: "rgba(83, 83, 82, 0.92)",
+            titleColor: "#dcd8c0",
+            bodyColor: "#dcd8c0",
+            displayColors: false
+          }
+        },
+        scales: {
+          x: {
+            ticks: { color: textColor, font: { family: "IBM Plex Mono", size: 10 } },
+            grid: { color: gridColor }
+          },
+          y: {
+            beginAtZero: true,
+            ticks: { color: textColor, precision: 0, font: { family: "IBM Plex Mono", size: 10 } },
+            grid: { color: gridColor }
+          }
+        }
+      };
+    }
+
+    function renderDashboardCharts(dashboardData) {
+      const categoryLoading = getElement("category-chart-loading");
+      const severityLoading = getElement("severity-chart-loading");
+      const categoryCanvas = getElement("category-chart");
+      const severityCanvas = getElement("severity-chart");
+
+      if (!window.Chart) {
+        if (categoryLoading) categoryLoading.textContent = "Chart.js unavailable. Dashboard data loaded.";
+        if (severityLoading) severityLoading.textContent = "Chart.js unavailable. Dashboard data loaded.";
+        return;
+      }
+
+      if (categoryLoading) categoryLoading.hidden = true;
+      if (severityLoading) severityLoading.hidden = true;
+
+      if (categoryChartInstance) categoryChartInstance.destroy();
+      if (severityChartInstance) severityChartInstance.destroy();
+
+      const categoryValues = categoryNames.map(name => getCountByName(dashboardData.findingsByCategory, name));
+      const severityValues = severityNames.map(name => getCountByName(dashboardData.findingsBySeverity, name));
+
+      if (categoryCanvas) {
+        categoryChartInstance = new Chart(categoryCanvas, {
+          type: "bar",
+          data: {
+            labels: categoryNames,
+            datasets: [{
+              data: categoryValues,
+              backgroundColor: ["#535352", "#a9632d", "#8f3430", "#8a7837"],
+              borderColor: "rgba(83, 83, 82, 0.42)",
+              borderWidth: 1
+            }]
+          },
+          options: getChartOptions()
+        });
+      }
+
+      if (severityCanvas) {
+        severityChartInstance = new Chart(severityCanvas, {
+          type: "bar",
+          data: {
+            labels: severityNames,
+            datasets: [{
+              data: severityValues,
+              backgroundColor: ["#8f3430", "#a9632d", "#8a7837", "#6d6b63"],
+              borderColor: "rgba(83, 83, 82, 0.42)",
+              borderWidth: 1
+            }]
+          },
+          options: getChartOptions()
+        });
+      }
+    }
+
+    function renderTopRiskyResources(resources) {
+      const list = getElement("top-risky-resources-list");
+      if (!list) return;
+
+      if (!Array.isArray(resources) || resources.length === 0) {
+        list.innerHTML = '<p class="empty-state">No risky resources detected.</p>';
+        return;
+      }
+
+      list.innerHTML = resources.slice(0, 5).map(resource => {
+        const severity = resource.highestSeverity || "Healthy";
+        return `
+          <div class="risk-item">
+            <span class="risk-resource">
+              <strong>${escapeHtml(resource.resourceName || resource.resourceId || "Unknown resource")}</strong>
+              <small>${escapeHtml(resource.resourceType || "Unknown type")} / ${escapeHtml(resource.findingCount ?? 0)} findings</small>
+            </span>
+            <span class="severity ${getSeverityClass(severity)}">${escapeHtml(severity)}</span>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function setDashboardFallback() {
+      setText("misconfigurations-count", 0);
+      setText("identity-risks-count", 0);
+      setText("vulnerabilities-count", 0);
+      setText("resource-waste-count", 0);
+      const categoryLoading = getElement("category-chart-loading");
+      const severityLoading = getElement("severity-chart-loading");
+      if (categoryLoading) categoryLoading.textContent = "Dashboard unavailable.";
+      if (severityLoading) severityLoading.textContent = "Dashboard unavailable.";
+      renderTopRiskyResources([]);
+    }
+
+    async function loadDashboardData() {
+      try {
+        const dashboardData = await fetchSecurityJson("/dashboard");
+        updateCategoryCards(dashboardData);
+        renderDashboardCharts(dashboardData);
+        renderTopRiskyResources(dashboardData.topRiskyResources);
+        return true;
+      } catch (error) {
+        console.error(error);
+        setDashboardFallback();
+        return false;
+      }
+    }
+
+    function findingMatchesFilters(finding, category, severity) {
+      const categoryMatch = category === "All Categories" || finding.category === category;
+      const severityMatch = severity === "All Severities" || finding.severity === severity;
+      return categoryMatch && severityMatch && !isFindingDeleted(finding.id);
+    }
+
+    function loadDeletedFindings() {
+      try {
+        const storedDeletedFindings = JSON.parse(localStorage.getItem(deletedFindingsStorageKey) || "[]");
+        deletedFindingIds = new Set(Array.isArray(storedDeletedFindings) ? storedDeletedFindings : []);
+      } catch (error) {
+        console.error(error);
+        deletedFindingIds = new Set();
+      }
+    }
+
+    function saveDeletedFindings() {
+      localStorage.setItem(deletedFindingsStorageKey, JSON.stringify(Array.from(deletedFindingIds)));
+    }
+
+    function isFindingDeleted(findingId) {
+      return deletedFindingIds.has(findingId);
+    }
+
+    function renderFindingAction(finding) {
+      return `
+        <button
+          class="finding-delete-button"
+          type="button"
+          data-delete-finding="${escapeHtml(finding.id)}"
+          aria-label="Delete ${escapeHtml(finding.title || "finding")}"
+        >Delete</button>
+      `;
+    }
+
+    function renderFindingDetail(finding) {
+      return `
+        <tr class="finding-detail-row">
+          <td colspan="9">
+            <div class="finding-detail">
+              <div>
+                <h4>Description</h4>
+                <p>${escapeHtml(finding.description || "No description provided.")}</p>
+              </div>
+              <div>
+                <h4>Risk</h4>
+                <p>${escapeHtml(finding.risk || "No risk summary provided.")}</p>
+              </div>
+              <div>
+                <h4>Remediation</h4>
+                <p>${escapeHtml(finding.remediation || "No remediation provided.")}</p>
+              </div>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+
+    function renderFindingsTable() {
+      const tableBody = getElement("findings-table-body");
+      const categoryFilter = getElement("category-filter");
+      const severityFilter = getElement("severity-filter");
+      if (!tableBody) return;
+
+      const selectedCategory = categoryFilter?.value || "All Categories";
+      const selectedSeverity = severityFilter?.value || "All Severities";
+      const filteredFindings = allFindings.filter(finding => findingMatchesFilters(finding, selectedCategory, selectedSeverity));
+
+      if (filteredFindings.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="9" class="empty-state">No findings match the selected filters.</td></tr>';
+        return;
+      }
+
+      tableBody.innerHTML = filteredFindings.map(finding => {
+        const resourceLabel = finding.resourceName || finding.resourceId || "Unknown resource";
+        const isExpanded = expandedFindingId === finding.id;
+        return `
+          <tr class="finding-row" data-finding-id="${escapeHtml(finding.id)}">
+            <td><span class="severity ${getSeverityClass(finding.severity)}">${escapeHtml(finding.severity || "Unknown")}</span></td>
+            <td>
+              ${escapeHtml(finding.title || "Untitled finding")}
+              <br />
+              <button class="details-button" type="button" data-finding-id="${escapeHtml(finding.id)}">${isExpanded ? "Hide" : "Details"}</button>
+            </td>
+            <td>${escapeHtml(finding.category || "Unknown")}</td>
+            <td>${escapeHtml(finding.subCategory || "Unknown")}</td>
+            <td>${escapeHtml(resourceLabel)}</td>
+            <td>${escapeHtml(finding.owner || "unknown")}</td>
+            <td>${escapeHtml(finding.region || "unknown")}</td>
+            <td>${escapeHtml(finding.status || "Open")}</td>
+            <td>${renderFindingAction(finding)}</td>
+          </tr>
+          ${isExpanded ? renderFindingDetail(finding) : ""}
+        `;
+      }).join("");
+    }
+
+    function setFindingsFallback() {
+      const tableBody = getElement("findings-table-body");
+      if (tableBody) {
+        tableBody.innerHTML = '<tr><td colspan="9" class="empty-state">Unable to load findings.</td></tr>';
+      }
+    }
+
+    async function loadFindings() {
+      try {
+        const findings = await fetchSecurityJson("/findings");
+        allFindings = Array.isArray(findings) ? findings : [];
+        renderFindingsTable();
+        return true;
+      } catch (error) {
+        console.error(error);
+        allFindings = [];
+        setFindingsFallback();
+        return false;
+      }
+    }
+
+    function getNodeLabelById(nodeId, nodes) {
+      const node = Array.isArray(nodes) ? nodes.find(item => item.id === nodeId) : null;
+      return node?.label || nodeId;
+    }
+
+    function getNodeById(nodeId, nodes) {
+      return Array.isArray(nodes) ? nodes.find(item => item.id === nodeId) : null;
+    }
+
+    function normalizeType(value) {
+      return String(value || "").trim().toLowerCase();
+    }
+
+    function getResourceShape(type) {
+      const normalizedType = normalizeType(type);
+
+      if (normalizedType.includes("public internet")) return "diamond";
+      if (normalizedType.includes("load balancer")) return "triangle";
+      if (normalizedType.includes("ec2")) return "box";
+      if (normalizedType.includes("rds") || normalizedType.includes("database")) return "database";
+      if (normalizedType.includes("s3") || normalizedType.includes("storage")) return "box";
+      if (normalizedType.includes("iam") || normalizedType === "role" || normalizedType.includes(" role")) return "ellipse";
+      if (normalizedType.includes("container")) return "box";
+      if (normalizedType.includes("host")) return "box";
+      if (normalizedType.includes("sensitive data")) return "star";
+
+      return "box";
+    }
+
+    function getNodeRiskStyle(riskLevel) {
+      const normalizedRisk = normalizeClassName(riskLevel);
+      const styles = {
+        critical: {
+          background: "#ded6bf",
+          border: "#8f3430",
+          highlight: { background: "#d8c9ae", border: "#8f3430" },
+          borderWidth: 4
+        },
+        high: {
+          background: "#ded7c2",
+          border: "#a9632d",
+          highlight: { background: "#d8c9ad", border: "#a9632d" },
+          borderWidth: 3
+        },
+        medium: {
+          background: "#ded9c8",
+          border: "#8a7837",
+          highlight: { background: "#d5ceb9", border: "#8a7837" },
+          borderWidth: 2
+        },
+        low: {
+          background: "#dbd7c6",
+          border: "#6d6b63",
+          highlight: { background: "#d2cdbb", border: "#6d6b63" },
+          borderWidth: 1
+        },
+        healthy: {
+          background: "#dcd8c0",
+          border: "rgba(83, 83, 82, 0.42)",
+          highlight: { background: "#d3cfb9", border: "#535352" },
+          borderWidth: 1
+        }
+      };
+
+      return styles[normalizedRisk] || styles.healthy;
+    }
+
+    function formatNodeLabel(node) {
+      const label = node.label || node.id || "Unknown resource";
+      const riskLevel = node.riskLevel || "Healthy";
+      const findingCount = Number(node.findingCount || 0);
+
+      if (findingCount > 0) {
+        return `${label}\n${riskLevel} // ${findingCount} findings`;
+      }
+
+      return `${label}\n${riskLevel}`;
+    }
+
+    function buildNodeTitle(node) {
+      return [
+        node.label || node.id || "Unknown resource",
+        `Type: ${node.type || "Unknown"}`,
+        `Risk: ${node.riskLevel || "Healthy"}`,
+        `Findings: ${node.findingCount ?? 0}`,
+        `Owner: ${node.owner || "unknown"}`,
+        `Region: ${node.region || "unknown"}`,
+        `Environment: ${node.environment || "unknown"}`
+      ].map(escapeHtml).join("<br>");
+    }
+
+    function getEdgeStyle(type) {
+      const edgeType = String(type || "").toLowerCase();
+      const base = {
+        color: { color: "rgba(83, 83, 82, 0.42)", highlight: "#535352", hover: "#535352" },
+        width: 1.15,
+        dashes: false
+      };
+
+      if (edgeType === "exposed_to") {
+        return {
+          color: { color: "rgba(143, 52, 48, 0.86)", highlight: "#8f3430", hover: "#8f3430" },
+          width: 2.7,
+          dashes: false
+        };
+      }
+
+      if (edgeType === "can_access") {
+        return {
+          color: { color: "rgba(169, 99, 45, 0.82)", highlight: "#a9632d", hover: "#a9632d" },
+          width: 2.1,
+          dashes: false
+        };
+      }
+
+      if (edgeType === "contains_sensitive_data" || edgeType === "accesses_sensitive_data") {
+        return {
+          color: { color: "rgba(143, 52, 48, 0.86)", highlight: "#8f3430", hover: "#8f3430" },
+          width: 2.45,
+          dashes: [8, 4]
+        };
+      }
+
+      if (edgeType === "protects") {
+        return {
+          color: { color: "rgba(83, 83, 82, 0.48)", highlight: "#535352", hover: "#535352" },
+          width: 1.2,
+          dashes: [5, 5]
+        };
+      }
+
+      return base;
+    }
+
+    function renderRelationships(edges, nodes) {
+      const list = getElement("graph-relationships-list");
+      if (!list) return;
+
+      if (!Array.isArray(edges) || edges.length === 0) {
+        list.innerHTML = '<p class="empty-state">No relationships detected.</p>';
+        return;
+      }
+
+      list.innerHTML = edges.slice(0, 12).map(edge => `
+        <div class="relationship-item">
+          <div class="relationship-title">${escapeHtml(getNodeLabelById(edge.source, nodes))} &rarr; ${escapeHtml(getNodeLabelById(edge.target, nodes))}</div>
+          <div class="relationship-type">${escapeHtml(edge.type || edge.label || "related")}</div>
+        </div>
+      `).join("");
+    }
+
+    function resetGraphNodeDetail() {
+      const detail = document.querySelector("#graph-node-detail .node-detail-content");
+      if (detail) {
+        detail.innerHTML = '<p class="empty-state">Select a resource node to view details.</p>';
+      }
+    }
+
+    function renderGraphNodeDetail(nodeId, graphData) {
+      const detail = document.querySelector("#graph-node-detail .node-detail-content");
+      if (!detail) return;
+
+      const nodes = Array.isArray(graphData.nodes) ? graphData.nodes : [];
+      const edges = Array.isArray(graphData.edges) ? graphData.edges : [];
+      const node = getNodeById(nodeId, nodes);
+
+      if (!node) {
+        resetGraphNodeDetail();
+        return;
+      }
+
+      const connectedEdges = edges.filter(edge => edge.source === node.id || edge.target === node.id);
+      const connectedItems = connectedEdges.length
+        ? connectedEdges.map(edge => {
+          const isOutgoing = edge.source === node.id;
+          const otherNodeId = isOutgoing ? edge.target : edge.source;
+          const direction = isOutgoing ? "->" : "<-";
+          return `<li>${escapeHtml(edge.type || edge.label || "related")} ${direction} ${escapeHtml(getNodeLabelById(otherNodeId, nodes))}</li>`;
+        }).join("")
+        : '<li>No connected relationships.</li>';
+
+      detail.innerHTML = `
+        <h3 class="node-detail-title">${escapeHtml(node.label || node.id || "Unknown resource")}</h3>
+        <span class="severity ${getSeverityClass(node.riskLevel)}">${escapeHtml(node.riskLevel || "Healthy")}</span>
+        <div class="detail-grid">
+          <div class="detail-row"><span>Resource ID</span><span>${escapeHtml(node.id || "unknown")}</span></div>
+          <div class="detail-row"><span>Type</span><span>${escapeHtml(node.type || "Unknown")}</span></div>
+          <div class="detail-row"><span>Finding Count</span><span>${escapeHtml(node.findingCount ?? 0)}</span></div>
+          <div class="detail-row"><span>Owner</span><span>${escapeHtml(node.owner || "unknown")}</span></div>
+          <div class="detail-row"><span>Region</span><span>${escapeHtml(node.region || "unknown")}</span></div>
+          <div class="detail-row"><span>Environment</span><span>${escapeHtml(node.environment || "unknown")}</span></div>
+        </div>
+        <div class="detail-grid">
+          <div class="chart-label">Connected Relationships</div>
+          <ul class="connected-list">${connectedItems}</ul>
+        </div>
+      `;
+    }
+
+    function renderHighRiskNodes(nodes) {
+      const list = getElement("high-risk-nodes-list");
+      if (!list) return;
+
+      const highRiskNodes = Array.isArray(nodes)
+        ? nodes.filter(node => ["Critical", "High"].includes(node.riskLevel))
+        : [];
+
+      if (highRiskNodes.length === 0) {
+        list.innerHTML = '<p class="empty-state">No high-risk nodes detected.</p>';
+        return;
+      }
+
+      list.innerHTML = highRiskNodes.map(node => `
+        <div class="node-risk-item">
+          <div class="node-risk-title">${escapeHtml(node.label || node.id)}</div>
+          <div class="node-risk-meta">
+            ${escapeHtml(node.type || "Unknown")} / ${escapeHtml(node.riskLevel)} / ${escapeHtml(node.findingCount ?? 0)} findings
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function isType(node, keywords) {
+      const nodeType = normalizeType(node?.type);
+      return keywords.some(keyword => nodeType.includes(keyword));
+    }
+
+    function isRiskyNode(node) {
+      return ["Critical", "High"].includes(node?.riskLevel) || Number(node?.findingCount || 0) > 0;
+    }
+
+    function renderHighRiskPaths(graphData) {
+      const list = getElement("high-risk-paths-list");
+      if (!list) return;
+
+      const nodes = Array.isArray(graphData.nodes) ? graphData.nodes : [];
+      const edges = Array.isArray(graphData.edges) ? graphData.edges : [];
+      const paths = [];
+
+      edges
+        .filter(edge => edge.type === "exposed_to")
+        .forEach(exposedEdge => {
+          const internetNode = getNodeById(exposedEdge.source, nodes);
+          const loadBalancerNode = getNodeById(exposedEdge.target, nodes);
+          if (!isType(internetNode, ["public internet"]) || !isType(loadBalancerNode, ["load balancer"])) return;
+
+          edges
+            .filter(edge => edge.type === "routes_to" && edge.source === loadBalancerNode.id)
+            .forEach(routeEdge => {
+              const computeNode = getNodeById(routeEdge.target, nodes);
+              if (!isType(computeNode, ["ec2"])) return;
+
+              edges
+                .filter(edge => edge.type === "connects_to" && edge.source === computeNode.id)
+                .forEach(databaseEdge => {
+                  const databaseNode = getNodeById(databaseEdge.target, nodes);
+                  if (!isType(databaseNode, ["database", "rds"])) return;
+                  paths.push(`Critical Path: ${getNodeLabelById(internetNode.id, nodes)} -> ${getNodeLabelById(loadBalancerNode.id, nodes)} -> ${getNodeLabelById(computeNode.id, nodes)} -> ${getNodeLabelById(databaseNode.id, nodes)}`);
+                });
+            });
+        });
+
+      edges
+        .filter(edge => edge.type === "can_access")
+        .forEach(accessEdge => {
+          const iamNode = getNodeById(accessEdge.source, nodes);
+          const storageNode = getNodeById(accessEdge.target, nodes);
+          if (!isType(iamNode, ["iam", "role"]) || !isType(storageNode, ["s3", "storage"])) return;
+
+          edges
+            .filter(edge => edge.type === "contains_sensitive_data" && edge.source === storageNode.id)
+            .forEach(dataEdge => {
+              const dataNode = getNodeById(dataEdge.target, nodes);
+              if (!isType(dataNode, ["sensitive data"])) return;
+              paths.push(`Critical Path: ${getNodeLabelById(iamNode.id, nodes)} -> ${getNodeLabelById(storageNode.id, nodes)} -> ${getNodeLabelById(dataNode.id, nodes)}`);
+            });
+        });
+
+      edges
+        .filter(edge => edge.type === "runs_on")
+        .forEach(runEdge => {
+          const containerNode = getNodeById(runEdge.source, nodes);
+          const hostNode = getNodeById(runEdge.target, nodes);
+          if (!isType(containerNode, ["container"]) || !isType(hostNode, ["host"])) return;
+          if (!isRiskyNode(containerNode) && !isRiskyNode(hostNode)) return;
+          paths.push(`Critical Path: ${getNodeLabelById(containerNode.id, nodes)} -> ${getNodeLabelById(hostNode.id, nodes)} with vulnerability risk`);
+        });
+
+      const uniquePaths = Array.from(new Set(paths));
+      list.innerHTML = uniquePaths.length
+        ? uniquePaths.map(path => `<li>${escapeHtml(path)}</li>`).join("")
+        : '<li>No critical relationship path detected.</li>';
+    }
+
+    function renderSecurityGraph(graphData) {
+      const container = getElement("security-graph-network");
+      if (!container) return;
+
+      const nodes = Array.isArray(graphData.nodes) ? graphData.nodes : [];
+      const edges = Array.isArray(graphData.edges) ? graphData.edges : [];
+
+      if (securityGraphNetwork) {
+        securityGraphNetwork.destroy();
+        securityGraphNetwork = null;
+      }
+
+      if (nodes.length === 0) {
+        container.innerHTML = '<p class="empty-state graph-loading">No graph data available.</p>';
+        resetGraphNodeDetail();
+        return;
+      }
+
+      if (!window.vis || !window.vis.Network) {
+        container.innerHTML = '<p class="empty-state graph-loading">Interactive graph library failed to load. Showing relationship list instead.</p>';
+        resetGraphNodeDetail();
+        return;
+      }
+
+      const visNodes = nodes.map(node => {
+        const riskStyle = getNodeRiskStyle(node.riskLevel);
+        return {
+          id: node.id,
+          label: formatNodeLabel(node),
+          title: buildNodeTitle(node),
+          shape: getResourceShape(node.type),
+          color: {
+            background: riskStyle.background,
+            border: riskStyle.border,
+            highlight: riskStyle.highlight,
+            hover: riskStyle.highlight
+          },
+          borderWidth: riskStyle.borderWidth,
+          borderWidthSelected: Math.max(riskStyle.borderWidth + 1, 3),
+          shapeProperties: {
+            borderRadius: 0
+          },
+          shadow: Number(node.findingCount || 0) > 0
+            ? { enabled: true, color: "rgba(83, 83, 82, 0.14)", size: 10, x: 0, y: 3 }
+            : false,
+          font: {
+            color: "#535352",
+            size: 11,
+            face: "IBM Plex Mono, monospace",
+            multi: true,
+            vadjust: 0
+          },
+          margin: 10,
+          data: node
+        };
+      });
+
+      const visEdges = edges.map(edge => {
+        const edgeStyle = getEdgeStyle(edge.type);
+        return {
+          id: edge.id,
+          from: edge.source,
+          to: edge.target,
+          label: edge.type || edge.label || "related",
+          arrows: "to",
+          title: escapeHtml(edge.label || edge.type || "related"),
+          font: {
+            color: "#535352",
+            size: 9,
+            face: "IBM Plex Mono, monospace",
+            align: "middle",
+            strokeWidth: 3,
+            strokeColor: "rgba(220, 216, 192, 0.86)"
+          },
+          color: edgeStyle.color,
+          width: edgeStyle.width,
+          dashes: edgeStyle.dashes,
+          smooth: { type: "dynamic" },
+          data: edge
+        };
+      });
+
+      const options = {
+        layout: {
+          improvedLayout: true
+        },
+        physics: {
+          enabled: true,
+          stabilization: true,
+          barnesHut: {
+            gravitationalConstant: -4200,
+            springLength: 165,
+            springConstant: 0.035
+          }
+        },
+        interaction: {
+          hover: true,
+          tooltipDelay: 150,
+          navigationButtons: true,
+          keyboard: true
+        },
+        nodes: {
+          margin: 10,
+          widthConstraint: {
+            maximum: 180
+          },
+          font: {
+            size: 11,
+            face: "IBM Plex Mono, monospace"
+          }
+        },
+        edges: {
+          smooth: {
+            type: "dynamic"
+          },
+          arrows: {
+            to: {
+              enabled: true,
+              scaleFactor: 0.8
+            }
+          },
+          font: {
+            size: 11,
+            align: "middle"
+          }
+        }
+      };
+
+      securityGraphNetwork = new vis.Network(
+        container,
+        {
+          nodes: new vis.DataSet(visNodes),
+          edges: new vis.DataSet(visEdges)
+        },
+        options
+      );
+
+      securityGraphNetwork.on("click", params => {
+        if (params.nodes && params.nodes.length > 0) {
+          renderGraphNodeDetail(params.nodes[0], graphData);
+        } else {
+          resetGraphNodeDetail();
+        }
+      });
+    }
+
+    function setGraphFallback() {
+      setText("graph-node-count", "--");
+      setText("graph-edge-count", "--");
+      const relationships = getElement("graph-relationships-list");
+      const nodes = getElement("high-risk-nodes-list");
+      const paths = getElement("high-risk-paths-list");
+      const network = getElement("security-graph-network");
+      if (relationships) relationships.innerHTML = '<p class="empty-state">Unable to load graph.</p>';
+      if (nodes) nodes.innerHTML = '<p class="empty-state">Unable to load graph.</p>';
+      if (paths) paths.innerHTML = '<li>Unable to load graph.</li>';
+      if (network) network.innerHTML = '<p class="empty-state graph-loading">Unable to load graph.</p>';
+      if (securityGraphNetwork) {
+        securityGraphNetwork.destroy();
+        securityGraphNetwork = null;
+      }
+      resetGraphNodeDetail();
+    }
+
+    async function loadGraphData() {
+      try {
+        const graphData = await fetchSecurityJson("/graph");
+        const nodes = Array.isArray(graphData.nodes) ? graphData.nodes : [];
+        const edges = Array.isArray(graphData.edges) ? graphData.edges : [];
+        currentGraphData = { nodes, edges };
+        setText("graph-node-count", nodes.length);
+        setText("graph-edge-count", edges.length);
+        renderRelationships(edges, nodes);
+        renderHighRiskNodes(nodes);
+        renderHighRiskPaths(currentGraphData);
+        renderSecurityGraph(currentGraphData);
+        return true;
+      } catch (error) {
+        console.error(error);
+        currentGraphData = { nodes: [], edges: [] };
+        setGraphFallback();
+        return false;
+      }
+    }
+
+    async function initializeCloudSecurityPage() {
+      setBackendErrorVisible(false);
+
+      const results = await Promise.all([
+        loadSecuritySummary(),
+        loadDashboardData(),
+        loadFindings(),
+        loadGraphData()
+      ]);
+
+      setBackendErrorVisible(results.every(result => result === false));
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      loadDeletedFindings();
+
+      getElement("category-filter")?.addEventListener("change", () => {
+        expandedFindingId = null;
+        renderFindingsTable();
+      });
+
+      getElement("severity-filter")?.addEventListener("change", () => {
+        expandedFindingId = null;
+        renderFindingsTable();
+      });
+
+      getElement("findings-table-body")?.addEventListener("click", event => {
+        const deleteButton = event.target.closest(".finding-delete-button");
+        if (deleteButton) {
+          event.stopPropagation();
+          const findingId = deleteButton.dataset.deleteFinding;
+          if (!findingId) return;
+
+          const confirmed = window.confirm("Delete this finding from the list? This only removes it from this browser view.");
+          if (!confirmed) return;
+
+          deletedFindingIds.add(findingId);
+          if (expandedFindingId === findingId) expandedFindingId = null;
+          saveDeletedFindings();
+          renderFindingsTable();
+          return;
+        }
+
+        const row = event.target.closest(".finding-row");
+        const button = event.target.closest(".details-button");
+        const findingId = button?.dataset.findingId || row?.dataset.findingId;
+        if (!findingId) return;
+
+        expandedFindingId = expandedFindingId === findingId ? null : findingId;
+        renderFindingsTable();
+      });
+
+      initializeCloudSecurityPage();
+    });
+  </script>
 </body>
 </html>
