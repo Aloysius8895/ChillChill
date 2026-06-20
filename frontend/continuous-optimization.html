@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carbon Intelligence Engine — Track 02 · Hilti</title>
+  <meta name="theme-color" content="#dcd8c0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <style>
+    :root { --bg:#dcd8c0; --text:#535352; --border:rgba(83,83,82,0.2); --border-strong:rgba(83,83,82,0.4); }
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; }
+    body {
+      font-family:'Plus Jakarta Sans',sans-serif; color:var(--text); letter-spacing:-0.01em; font-size:18px;
+      background:
+        linear-gradient(rgba(83,83,82,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(83,83,82,0.05) 1px, transparent 1px),
+        var(--bg);
+      background-size:64px 64px,64px 64px,auto;
+      min-height:100vh;
+    }
+    .noise { position:fixed; inset:0; z-index:50; pointer-events:none; opacity:0.06;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size:150px 150px; }
+    .container { width:100%; max-width:1600px; margin:0 auto; padding:0 1.5rem; }
+    @media (min-width:768px){ .container { padding:0 2rem; } }
+
+    /* Header */
+    header { position:sticky; top:0; z-index:100; background:rgba(220,216,192,0.82); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); }
+    .header-inner { display:flex; align-items:center; justify-content:space-between; padding:1rem 0; }
+    .logo { display:flex; flex-direction:column; line-height:1.1; text-decoration:none; color:var(--text); font-weight:800; font-size:1.1rem; text-transform:uppercase; }
+    .logo span:last-child { opacity:0.55; }
+    .back { display:inline-flex; align-items:center; gap:0.5rem; text-decoration:none; color:var(--text);
+      font-family:'IBM Plex Mono',monospace; font-size:0.95rem; text-transform:uppercase; letter-spacing:0.1em;
+      border:1px solid var(--border-strong); padding:0.55rem 1rem; transition:background 0.3s,color 0.3s; }
+    .back:hover { background:var(--text); color:var(--bg); }
+
+    main { padding:5rem 0 6rem; }
+    .eyebrow { font-family:'IBM Plex Mono',monospace; font-size:1.1rem; text-transform:uppercase; letter-spacing:0.2em; opacity:0.7; }
+    .bignum { font-weight:800; font-size:clamp(4rem,16vw,12rem); line-height:0.85; letter-spacing:-0.04em; opacity:0.12; margin-top:0.5rem; margin-bottom:0.1em; }
+    .title { font-weight:800; font-size:clamp(2.6rem,7vw,5.5rem); line-height:0.92; letter-spacing:-0.03em; text-transform:uppercase; margin-top:-0.2em; }
+    .lead { font-size:clamp(1.4rem,2vw,1.8rem); line-height:1.6; max-width:780px; margin-top:1.75rem; opacity:0.9; }
+
+    /* Section headers */
+    .section-header { margin-top:4rem; padding-bottom:1rem; border-bottom:1px solid var(--border-strong); }
+    .section-eyebrow { font-family:'IBM Plex Mono',monospace; font-size:1.05rem; text-transform:uppercase; letter-spacing:0.2em; opacity:0.6; margin-bottom:0.35rem; }
+    .section-title { font-weight:800; font-size:clamp(2.2rem,3.5vw,3.5rem); text-transform:uppercase; letter-spacing:-0.02em; }
+    .section-caption { font-size:1.2rem; opacity:0.75; margin-top:0.5rem; }
+
+    /* ── SECTION 1: Score cards ── */
+    .score-grid { margin-top:2rem; display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--border-strong); border:1px solid var(--border-strong); }
+    @media(max-width:700px){ .score-grid { grid-template-columns:repeat(2,1fr); } }
+    @media(max-width:400px){ .score-grid { grid-template-columns:1fr; } }
+    .score-card { background:var(--bg); padding:1.5rem 1.25rem; }
+    .sc-label { font-family:'IBM Plex Mono',monospace; font-size:1rem; text-transform:uppercase; letter-spacing:0.15em; opacity:0.65; margin-bottom:0.6rem; }
+    .sc-value { font-weight:800; font-size:2.8rem; line-height:1; letter-spacing:-0.03em; }
+    .sc-sub { font-size:1.1rem; opacity:0.7; margin-top:0.4rem; }
+
+    /* ── SECTIONS 2 & 3: 2×2 chart grid ── */
+    .charts-2x2 { margin-top:1rem; display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:0.6rem; height:calc(100vh - 180px); }
+    @media(max-width:580px){ .charts-2x2 { grid-template-columns:1fr; } }
+    .chart-box { border:1px solid var(--border-strong); padding:0.35rem 0.6rem 0.4rem; display:flex; flex-direction:column; }
+    .chart-box-title { font-family:'IBM Plex Mono',monospace; font-size:1.15rem; text-transform:uppercase; letter-spacing:0.12em; opacity:0.7; margin-bottom:0.4rem; }
+    .chart-wrap { position:relative; flex:1; height:100%; min-height:0; }
+    .chart-wrap canvas { position:absolute; inset:0; }
+    .legend-panel { border:1px solid var(--border-strong); padding:0.35rem 0.6rem; display:flex; flex-direction:column; justify-content:center; gap:0.25rem; }
+    .legend-panel-title { font-family:'IBM Plex Mono',monospace; font-size:0.54rem; text-transform:uppercase; letter-spacing:0.12em; opacity:0.5; margin-bottom:0.15rem; }
+    .legend-row { display:flex; flex-direction:column; gap:0.35rem; }
+    .legend-item { display:flex; align-items:center; gap:0.4rem; font-family:'IBM Plex Mono',monospace; font-size:0.82rem; text-transform:uppercase; letter-spacing:0.06em; opacity:0.85; }
+    .legend-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+
+    /* ── SECTION 4: Action items ── */
+    .action-list { margin-top:2rem; display:flex; flex-direction:column; gap:0.75rem; }
+    .action-card { border:1px solid var(--border-strong); overflow:hidden; }
+    .action-trigger { width:100%; background:none; border:none; cursor:pointer; padding:1rem 1.25rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; text-align:left; color:var(--text); font-family:inherit; }
+    .action-trigger:hover { background:rgba(83,83,82,0.05); }
+    .action-left { display:flex; align-items:center; gap:0.9rem; }
+    .priority-badge { font-family:'IBM Plex Mono',monospace; font-size:0.58rem; text-transform:uppercase; letter-spacing:0.1em; padding:0.25rem 0.55rem; border:1px solid; white-space:nowrap; }
+    .p-critical { border-color:#b00; color:#b00; }
+    .p-high     { border-color:#c55000; color:#c55000; }
+    .p-medium   { border-color:#8a6800; color:#8a6800; }
+    .action-name { font-weight:700; font-size:1.35rem; }
+    .action-saving { font-family:'IBM Plex Mono',monospace; font-size:1.1rem; opacity:0.7; white-space:nowrap; }
+    .chevron { font-size:0.75rem; opacity:0.4; transition:transform 0.2s; flex-shrink:0; }
+    .action-card.open .chevron { transform:rotate(180deg); }
+    .action-body { display:none; padding:0 1.25rem 1.25rem; border-top:1px solid var(--border); }
+    .action-card.open .action-body { display:block; }
+    .action-meta { display:grid; grid-template-columns:auto 1fr; gap:0.3rem 1rem; margin-top:0.9rem; font-size:0.85rem; }
+    .meta-label { font-family:'IBM Plex Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.1em; opacity:0.5; padding-top:0.15rem; }
+    .action-rec { margin-top:0.9rem; background:rgba(83,83,82,0.06); border-left:3px solid var(--border-strong); padding:0.75rem 1rem; font-size:0.88rem; line-height:1.6; }
+
+    /* ── SECTION 5: Opportunities table ── */
+    .opp-section { margin-top:2rem; overflow-x:auto; }
+    .opp-table { width:100%; border-collapse:collapse; min-width:680px; }
+    .opp-table th { font-family:'IBM Plex Mono',monospace; font-size:0.6rem; text-transform:uppercase; letter-spacing:0.12em; opacity:0.5; text-align:left; padding:0.5rem 0.75rem; border-bottom:1px solid var(--border-strong); white-space:nowrap; }
+    .opp-table td { font-size:0.86rem; padding:0.85rem 0.75rem; border-bottom:1px solid var(--border); vertical-align:top; }
+    .opp-table tr:last-child td { border-bottom:none; }
+    .opp-name { font-weight:700; display:block; }
+    .opp-id   { font-family:'IBM Plex Mono',monospace; font-size:0.68rem; opacity:0.45; }
+    .opp-rec  { font-size:0.8rem; opacity:0.7; margin-top:0.2rem; }
+    .saving-val { font-weight:700; color:#1a6b1a; }
+    .tbl-badge { display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:0.58rem; text-transform:uppercase; letter-spacing:0.08em; padding:0.2rem 0.5rem; border:1px solid; }
+
+    /* ── Capability / footer ── */
+    .cap { margin-top:4rem; display:grid; grid-template-columns:1fr 2fr; gap:2.5rem; border-top:1px solid var(--border); padding-top:2.5rem; }
+    @media (max-width:760px){ .cap { grid-template-columns:1fr; gap:1.25rem; } }
+    .cap-label { font-family:'IBM Plex Mono',monospace; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.15em; opacity:0.5; }
+    .cap-heading { font-weight:700; font-size:clamp(1.3rem,2.4vw,1.9rem); text-transform:uppercase; letter-spacing:-0.01em; margin-bottom:1rem; }
+    .cap-detail { font-size:1rem; line-height:1.7; max-width:620px; opacity:0.85; }
+    .tags { display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:1.5rem; }
+    .tag { font-family:'IBM Plex Mono',monospace; font-size:0.65rem; text-transform:uppercase; letter-spacing:0.08em; border:1px solid var(--border-strong); padding:0.4rem 0.7rem; opacity:0.8; }
+    .nav-foot { margin-top:5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; border-top:1px solid var(--border); padding-top:2rem; }
+    .nav-foot a { text-decoration:none; color:var(--text); }
+    .foot-back { font-family:'IBM Plex Mono',monospace; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em; opacity:0.6; transition:opacity 0.2s; }
+    .foot-back:hover { opacity:1; }
+    .next-link { display:inline-flex; flex-direction:column; align-items:flex-end; gap:0.25rem; }
+    .next-link .nl-lbl { font-family:'IBM Plex Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.15em; opacity:0.5; }
+    .next-link .nl-name { font-weight:800; font-size:clamp(1.1rem,2.5vw,1.6rem); text-transform:uppercase; letter-spacing:-0.01em; border-bottom:2px solid var(--text); padding-bottom:0.15rem; transition:opacity 0.2s; }
+    .next-link:hover .nl-name { opacity:0.6; }
+  </style>
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <header>
+    <div class="container">
+      <div class="header-inner">
+        <a href="index.html" class="logo"><span>Track 02</span><span>Hilti</span></a>
+        <a href="index.html#works" class="back">← Back to overview</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="eyebrow">Feature 03 // Track 02 · Hilti</div>
+      <div class="bignum">03</div>
+      <h1 class="title">Carbon Intelligence Engine</h1>
+      <p class="lead">AI-powered carbon intelligence that monitors, scores, and optimizes your cloud footprint in real time.</p>
+
+      <!-- ═══════════════════════════════════════════════════════
+           SECTION 1 — Hero Score Cards
+      ════════════════════════════════════════════════════════ -->
+      <div class="section-header" style="margin-top:3.5rem;">
+        <div class="section-eyebrow">// Section 01</div>
+        <div class="section-title">Sustainability Score Cards</div>
+        <div class="section-caption">Carbon governance summary across all monitored cloud assets.</div>
+      </div>
+
+      <div class="score-grid">
+        <div class="score-card">
+          <div class="sc-label">Sustainability Score</div>
+          <div class="sc-value" id="sc-score">—</div>
+          <div class="sc-sub" id="sc-rating">—</div>
+        </div>
+        <div class="score-card">
+          <div class="sc-label">Account Rating</div>
+          <div class="sc-value" id="sc-rating-val">—</div>
+          <div class="sc-sub">Overall posture</div>
+        </div>
+        <div class="score-card">
+          <div class="sc-label">Total Account Energy</div>
+          <div class="sc-value" id="sc-energy">—</div>
+          <div class="sc-sub">kWh / month</div>
+        </div>
+        <div class="score-card">
+          <div class="sc-label">Total Carbon Footprint</div>
+          <div class="sc-value" id="sc-carbon">—</div>
+          <div class="sc-sub">kg CO₂ / month</div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════
+           SECTIONS 2 & 3 — All Charts (2×2 grid)
+      ════════════════════════════════════════════════════════ -->
+      <div style="margin-top:2.5rem; padding-bottom:0.5rem; border-bottom:1px solid var(--border-strong);">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.18em;opacity:0.5;">// Section 02 — Infrastructure &amp; Hotspot Charts</span>
+      </div>
+
+      <div class="charts-2x2">
+        <!-- Row 1 -->
+        <div class="chart-box">
+          <div class="chart-box-title">Chart 1 — Energy Usage (kWh)</div>
+          <div class="chart-wrap"><canvas id="chartEnergy"></canvas></div>
+        </div>
+        <div class="chart-box">
+          <div class="chart-box-title">Chart 2 — Carbon Emissions (kg CO₂)</div>
+          <div class="chart-wrap"><canvas id="chartCarbon"></canvas></div>
+        </div>
+        <!-- Row 2 — full width -->
+        <div class="chart-box" style="grid-column:1 / -1;">
+          <div class="chart-box-title">Chart 3 — Top 5 Carbon Hotspots</div>
+          <div class="chart-wrap"><canvas id="chartHotspot"></canvas></div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:0.75rem;opacity:0.55;margin-top:0.5rem;">
+            Category shown below each bar · Critical &gt;100 kg · High 50–100 kg · Medium 20–50 kg · Low &lt;20 kg
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════
+           SECTION 3 — Carbon Reduction Action Items
+      ════════════════════════════════════════════════════════ -->
+      <div class="section-header">
+        <div class="section-eyebrow">// Section 03</div>
+        <div class="section-title">Carbon Reduction Action Items</div>
+        <div class="section-caption">Prescriptive mitigation task logs compiled by your optimization engine.</div>
+      </div>
+
+      <div class="action-list" id="action-list"></div>
+
+    </div>
+  </main>
+
+  <script src="optimization_data.js"></script>
+  <script>
+    const d = OPTIMIZATION_DATA;
+
+    // ── Chart defaults to match page aesthetic ──────────────────────────────
+    Chart.defaults.font.family = "'IBM Plex Mono', monospace";
+    Chart.defaults.font.size   = 16;
+    Chart.defaults.color       = "rgba(83,83,82,0.65)";
+
+    const CHART_OPTS = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: "rgba(83,83,82,0.08)" }, ticks: { maxRotation: 30 } },
+        y: { grid: { color: "rgba(83,83,82,0.08)" }, beginAtZero: true },
+      },
+    };
+
+    // ── Section 1: Score cards ──────────────────────────────────────────────
+    document.getElementById("sc-score").textContent     = d.score.carbon_score + " / 100";
+    document.getElementById("sc-rating").textContent    = "Score rating";
+    document.getElementById("sc-rating-val").textContent = d.score.rating;
+    document.getElementById("sc-energy").textContent    = d.total_monthly_energy;
+    document.getElementById("sc-carbon").textContent    = d.score.total_carbon_emissions;
+
+    // ── Section 2: Baseline charts ─────────────────────────────────────────
+    const names6  = d.first_6.map(r => r.name);
+    const energy6 = d.first_6.map(r => r.energy_kwh_month);
+    const carbon6 = d.first_6.map(r => r.carbon_kg_month);
+
+    new Chart(document.getElementById("chartEnergy"), {
+      type: "bar",
+      data: {
+        labels: names6,
+        datasets: [{ data: energy6, backgroundColor: "#535352", borderRadius: 2 }],
+      },
+      options: { ...CHART_OPTS, plugins: { ...CHART_OPTS.plugins, tooltip: { callbacks: { label: ctx => ctx.parsed.y + " kWh" } } } },
+    });
+
+    new Chart(document.getElementById("chartCarbon"), {
+      type: "bar",
+      data: {
+        labels: names6,
+        datasets: [{ data: carbon6, backgroundColor: "#535352", borderRadius: 2 }],
+      },
+      options: { ...CHART_OPTS, plugins: { ...CHART_OPTS.plugins, tooltip: { callbacks: { label: ctx => ctx.parsed.y + " kg CO₂" } } } },
+    });
+
+    // ── Section 3: Hotspot chart ───────────────────────────────────────────
+    const hsNames  = d.top_5_hotspots.map(r => [r.name, r.hotspot_level]);
+    const hsCarbon = d.top_5_hotspots.map(r => r.carbon_kg_month);
+
+    new Chart(document.getElementById("chartHotspot"), {
+      type: "bar",
+      data: {
+        labels: hsNames,
+        datasets: [{
+          data: hsCarbon,
+          backgroundColor: "#535352",
+          borderRadius: 2,
+          label: "Carbon (kg)",
+        }],
+      },
+      options: {
+        ...CHART_OPTS,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => `${ctx.parsed.y} kg CO₂`,
+            },
+          },
+        },
+      },
+    });
+
+    // ── Section 4: Action items ────────────────────────────────────────────
+    const PRIORITY_LABEL = {
+      Critical: { cls: "p-critical", label: "🚨 Critical Priority" },
+      High:     { cls: "p-high",     label: "⚠️ High Priority"     },
+      Medium:   { cls: "p-medium",   label: "⚡ Medium Priority"   },
+    };
+
+    const actionList = document.getElementById("action-list");
+    d.action_items.forEach((item, i) => {
+      const p = PRIORITY_LABEL[item.priority] || { cls: "p-medium", label: item.priority };
+      const card = document.createElement("div");
+      card.className = "action-card";
+      card.innerHTML = `
+        <button class="action-trigger" onclick="toggleCard(this)">
+          <div class="action-left">
+            <span class="priority-badge ${p.cls}">${p.label}</span>
+            <span class="action-name">${item.name}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:1rem;">
+            <span class="action-saving">Savings: ${item.estimated_carbon_saving_kg} kg CO₂</span>
+            <span class="chevron">▼</span>
+          </div>
+        </button>
+        <div class="action-body">
+          <div class="action-meta">
+            <span class="meta-label">Asset ID</span><span>${item.id}</span>
+            <span class="meta-label">Issue Category</span><span>${item.opportunity_type}</span>
+          </div>
+          <div class="action-rec"><strong>Recommended Action Plan:</strong> ${item.recommendation}</div>
+        </div>`;
+      actionList.appendChild(card);
+    });
+
+    function toggleCard(btn) {
+      btn.closest(".action-card").classList.toggle("open");
+    }
+
+    // ── Section 5: Opportunities table ────────────────────────────────────
+    const BADGE_CLS = { Critical: "p-critical", High: "p-high", Medium: "p-medium", Low: "" };
+    const tbody = document.getElementById("opp-body");
+    tbody.innerHTML = d.top_opportunities.map(r => `
+      <tr>
+        <td><span class="opp-name">${r.name}</span><span class="opp-id">${r.id}</span></td>
+        <td>${r.region}</td>
+        <td>${r.carbon_kg_month} kg</td>
+        <td>${r.opportunity_type}<br><span class="opp-rec">${r.recommendation}</span></td>
+        <td class="saving-val">− ${r.estimated_carbon_saving_kg} kg</td>
+        <td><span class="tbl-badge ${BADGE_CLS[r.priority] || ''}">${r.priority}</span></td>
+      </tr>`).join("");
+  </script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lower Carbon, Lower Cost — Track 02 · Hilti</title>
+  <meta name="theme-color" content="#dcd8c0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root { --bg:#dcd8c0; --text:#535352; --border:rgba(83,83,82,0.2); --border-strong:rgba(83,83,82,0.4); }
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; }
+    body {
+      font-family:'Plus Jakarta Sans',sans-serif; color:var(--text); letter-spacing:-0.01em;
+      background:
+        linear-gradient(rgba(83,83,82,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(83,83,82,0.05) 1px, transparent 1px),
+        var(--bg);
+      background-size:64px 64px,64px 64px,auto;
+      min-height:100vh;
+    }
+    .noise { position:fixed; inset:0; z-index:50; pointer-events:none; opacity:0.06;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size:150px 150px; }
+    .container { width:100%; max-width:1100px; margin:0 auto; padding:0 1.5rem; }
+    @media (min-width:768px){ .container { padding:0 3rem; } }
+    header { position:sticky; top:0; z-index:100; background:rgba(220,216,192,0.82); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); }
+    .header-inner { display:flex; align-items:center; justify-content:space-between; padding:1rem 0; }
+    .logo { display:flex; flex-direction:column; line-height:1.1; text-decoration:none; color:var(--text); font-weight:800; font-size:0.85rem; text-transform:uppercase; }
+    .logo span:last-child { opacity:0.55; }
+    .back { display:inline-flex; align-items:center; gap:0.5rem; text-decoration:none; color:var(--text);
+      font-family:'IBM Plex Mono',monospace; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em;
+      border:1px solid var(--border-strong); padding:0.55rem 1rem; transition:background 0.3s,color 0.3s; }
+    .back:hover { background:var(--text); color:var(--bg); }
+    main { padding:5rem 0 6rem; }
+    .eyebrow { font-family:'IBM Plex Mono',monospace; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.2em; opacity:0.55; }
+    .bignum { font-weight:800; font-size:clamp(4rem,16vw,12rem); line-height:0.85; letter-spacing:-0.04em; opacity:0.12; margin-top:0.5rem; margin-bottom:0.1em; }
+    .title { font-weight:800; font-size:clamp(2.6rem,7vw,5.5rem); line-height:0.92; letter-spacing:-0.03em; text-transform:uppercase; margin-top:-0.2em; }
+    .lead { font-size:clamp(1.05rem,2vw,1.4rem); line-height:1.5; max-width:680px; margin-top:1.75rem; }
+    .panel { margin-top:3.5rem; width:100%; aspect-ratio:21/9; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.8rem;
+      background:repeating-linear-gradient(45deg, rgba(83,83,82,0.07) 0 11px, rgba(83,83,82,0.02) 11px 22px); }
+    .panel .ph-lbl { font-family:'IBM Plex Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.22em; opacity:0.5; }
+    .panel .ph-big { font-weight:800; font-size:clamp(2rem,5vw,3.4rem); opacity:0.78; }
+    .cap { margin-top:4rem; display:grid; grid-template-columns:1fr 2fr; gap:2.5rem; border-top:1px solid var(--border); padding-top:2.5rem; }
+    @media (max-width:760px){ .cap { grid-template-columns:1fr; gap:1.25rem; } }
+    .cap-label { font-family:'IBM Plex Mono',monospace; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.15em; opacity:0.5; }
+    .cap-heading { font-weight:700; font-size:clamp(1.3rem,2.4vw,1.9rem); text-transform:uppercase; letter-spacing:-0.01em; margin-bottom:1rem; }
+    .cap-detail { font-size:1rem; line-height:1.7; max-width:620px; opacity:0.85; }
+    .tags { display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:1.5rem; }
+    .tag { font-family:'IBM Plex Mono',monospace; font-size:0.65rem; text-transform:uppercase; letter-spacing:0.08em;
+      border:1px solid var(--border-strong); padding:0.4rem 0.7rem; opacity:0.8; }
+    .nav-foot { margin-top:5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; border-top:1px solid var(--border); padding-top:2rem; }
+    .nav-foot a { text-decoration:none; color:var(--text); }
+    .foot-back { font-family:'IBM Plex Mono',monospace; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em; opacity:0.6; transition:opacity 0.2s; }
+    .foot-back:hover { opacity:1; }
+    .next-link { display:inline-flex; flex-direction:column; align-items:flex-end; gap:0.25rem; }
+    .next-link .nl-lbl { font-family:'IBM Plex Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.15em; opacity:0.5; }
+    .next-link .nl-name { font-weight:800; font-size:clamp(1.1rem,2.5vw,1.6rem); text-transform:uppercase; letter-spacing:-0.01em; border-bottom:2px solid var(--text); padding-bottom:0.15rem; transition:opacity 0.2s; }
+    .next-link:hover .nl-name { opacity:0.6; }
+  </style>
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <header>
+    <div class="container">
+      <div class="header-inner">
+        <a href="index.html" class="logo"><span>Track 02</span><span>Hilti</span></a>
+        <a href="index.html#works" class="back">← Back to overview</a>
+      </div>
+    </div>
+  </header>
+  <main>
+    <div class="container">
+      <div class="eyebrow">Feature 02 // Track 02 · Hilti</div>
+      <div class="bignum">02</div>
+      <h1 class="title">Lower Carbon, Lower Cost</h1>
+      <p class="lead">Cut carbon with automated alerts and smart optimization — reducing emissions and cost together.</p>
+
+      <div class="panel">
+        <span class="ph-lbl">[ feature visual ]</span>
+        <span class="ph-big">Carbon & Cost</span>
+      </div>
+
+      <section class="cap">
+        <div>
+          <div class="cap-label">// Capability</div>
+        </div>
+        <div>
+          <h2 class="cap-heading">Energy & Carbon</h2>
+          <p class="cap-detail">Quantify the energy use and carbon footprint of cloud workloads, pinpoint high-carbon and inefficient resources, and build a clear basis for cutting emissions.</p>
+          <div class="tags">
+          <span class="tag">Energy baselining</span>
+          <span class="tag">Carbon tracking</span>
+          <span class="tag">Workload analysis</span>
+          <span class="tag">Efficiency scoring</span>
+          <span class="tag">Cost accounting</span>
+          </div>
+        </div>
+      </section>
+
+      <div class="nav-foot">
+        <a href="index.html#works" class="foot-back">← All outcomes</a>
+        <a href="continuous-optimization.html" class="next-link">
+          <span class="nl-lbl">Next feature</span>
+          <span class="nl-name">Continuous Optimization →</span>
+        </a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
