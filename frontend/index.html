@@ -1,0 +1,2249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Track 02 · Hilti — Secure &amp; Energy-Efficient Cloud Platform</title>
+  <meta name="description" content="A secure & energy-efficient cloud platform for Construction Tech — continuously monitoring cloud security vulnerabilities while identifying high-carbon and low-efficiency workloads." />
+  <meta name="theme-color" content="#dcd8c0" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;0,700;1,400&family=Newsreader:ital,wght@0,400;0,600;1,400;1,600&family=Plus+Jakarta+Sans:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
+
+  <!-- GSAP + ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <!-- Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- Keen Slider -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/keen-slider@5.5.1/keen-slider.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/keen-slider@5.5.1/keen-slider.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #dcd8c0;
+      --text: #535352;
+      --text-dim: rgba(83,83,82,0.5);
+      --border: rgba(83,83,82,0.2);
+      --border-strong: rgba(83,83,82,0.4);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      cursor: none;
+      letter-spacing: -0.01em;
+    }
+
+    /* ─── Custom Cursor ─────────────────────────────── */
+    #cursor-dot {
+      position: fixed; top: 0; left: 0; width: 8px; height: 8px;
+      background: var(--text); border-radius: 50%;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.08s linear, width 0.2s, height 0.2s;
+      mix-blend-mode: difference;
+    }
+    #cursor-ring {
+      position: fixed; top: 0; left: 0; width: 36px; height: 36px;
+      border: 1px solid var(--border-strong); border-radius: 50%;
+      pointer-events: none; z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: transform 0.18s ease-out, width 0.25s, height 0.25s, opacity 0.2s;
+    }
+    body:has(a:hover) #cursor-dot, body:has(button:hover) #cursor-dot { width: 20px; height: 20px; }
+    body:has(a:hover) #cursor-ring, body:has(button:hover) #cursor-ring { width: 50px; height: 50px; border-color: var(--text); }
+
+    /* ─── Noise overlay ─────────────────────────────── */
+    .noise-layer {
+      position: fixed; inset: 0; z-index: 1000; pointer-events: none;
+      opacity: 0.06;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-size: 150px 150px;
+    }
+
+    /* ─── Preloader ─────────────────────────────────── */
+    #preloader {
+      position: fixed; inset: 0; z-index: 9000;
+      background: var(--bg);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 2rem;
+      clip-path: inset(0 0 0 0);
+      transition: clip-path 0.9s cubic-bezier(0.77, 0, 0.175, 1);
+    }
+    #preloader.hide { clip-path: inset(0 0 100% 0); }
+    .preloader-logo-wrap { width: 60px; height: 60px; overflow: hidden; }
+    .preloader-logo-inner { display: flex; flex-direction: column; transition: transform 0.6s cubic-bezier(0.77,0,0.175,1); }
+    .preloader-logo-inner svg { width: 60px; height: 60px; flex-shrink: 0; }
+    .preloader-text { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text); opacity: 0.5; }
+    .preloader-counter {
+      position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+      font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: var(--text);
+    }
+    .preloader-copy {
+      position: absolute; bottom: 2rem; left: 2rem; right: 2rem;
+      display: flex; justify-content: space-between;
+      font-size: 0.75rem; color: var(--text); opacity: 0.5; line-height: 1.6;
+      max-width: 700px;
+    }
+    .preloader-copy p { max-width: 280px; }
+
+    /* ─── Canvas (Three.js) ─────────────────────────── */
+    #three-canvas {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.12;
+    }
+
+    /* ─── Layout ─────────────────────────────────────── */
+    .layout-container { width: 100%; max-width: 1680px; margin: 0 auto; padding: 0 1.25rem; }
+    @media (min-width: 768px) { .layout-container { padding: 0 2rem; } }
+    .section-gap { margin-bottom: 5rem; }
+    @media (min-width: 768px) { .section-gap { margin-bottom: 8rem; } }
+
+    /* ─── Header ────────────────────────────────────── */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+    }
+    .header-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.25rem 0; position: relative;
+    }
+    .logo-link {
+      display: flex; align-items: center; gap: 0.75rem;
+      text-decoration: none; color: var(--text);
+      font-weight: 800; font-size: 1rem; text-transform: uppercase;
+      letter-spacing: -0.01em; line-height: 1;
+    }
+    .logo-mark { width: 2.5rem; height: 2.5rem; flex-shrink: 0; }
+    .logo-text { display: flex; flex-direction: column; line-height: 1.1; }
+    .nav-center {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center;
+      border: 1px solid var(--border-strong);
+      padding: 0.5rem 1rem;
+      backdrop-filter: blur(12px);
+      background: rgba(220, 216, 192, 0.7);
+    }
+    .nav-center ul { display: flex; gap: 2rem; list-style: none; }
+    .nav-center a {
+      text-decoration: none; color: var(--text);
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;
+      font-weight: 700; opacity: 0.5; transition: opacity 0.2s;
+      display: flex; gap: 0.1rem;
+    }
+    .nav-center a.active, .nav-center a:hover { opacity: 1; }
+    .nav-center a .mono { font-family: 'IBM Plex Mono', monospace; }
+    .nav-right {
+      display: flex; align-items: center; gap: 1rem;
+      border: 1px solid var(--border-strong);
+      padding: 0.5rem 1rem;
+      backdrop-filter: blur(12px);
+      background: rgba(220, 216, 192, 0.7);
+    }
+    .nav-right a {
+      text-decoration: none; color: var(--text);
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;
+      font-weight: 600; opacity: 0.6; transition: opacity 0.2s;
+    }
+    .nav-right a:hover { opacity: 1; }
+    .nav-divider { width: 1px; height: 1rem; background: var(--border-strong); }
+    .btn-mute {
+      background: none; border: none; cursor: none; color: var(--text);
+      opacity: 0.6; display: flex; align-items: center; transition: opacity 0.2s;
+    }
+    .btn-mute:hover { opacity: 1; }
+    @media (max-width: 640px) { .nav-center, .nav-right { display: none; } }
+
+    /* ─── Hero ───────────────────────────────────────── */
+    #hero {
+      position: relative; width: 100%; min-height: 100vh;
+      overflow: hidden; color: var(--text);
+      isolation: isolate;
+      background:
+        linear-gradient(rgba(83,83,82,0.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(83,83,82,0.055) 1px, transparent 1px),
+        var(--bg);
+      background-size: 64px 64px, 64px 64px, auto;
+    }
+    #hero::before {
+      content: "";
+      position: absolute; inset: 0;
+      z-index: 0; pointer-events: none;
+      background:
+        linear-gradient(rgba(255,255,255,0.14), rgba(255,255,255,0.02)),
+        repeating-linear-gradient(0deg, transparent 0 31px, rgba(83,83,82,0.025) 31px 32px);
+      mix-blend-mode: multiply;
+    }
+    #hero::after {
+      content: "";
+      position: absolute; inset: 0;
+      z-index: 1; pointer-events: none;
+      opacity: 0.1;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+      background-size: 180px 180px;
+    }
+    .hero-canvas {
+      position: absolute; inset: 0; z-index: 6;
+      pointer-events: none;
+    }
+    .floating-word {
+      position: absolute;
+      font-family: 'Newsreader', serif; font-style: italic;
+      font-size: clamp(1rem, 1.65vw, 1.55rem); color: var(--text);
+      opacity: 0.82; cursor: pointer; user-select: none; z-index: 14;
+      line-height: 1;
+      will-change: transform;
+      transition: opacity 0.18s ease;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.18);
+    }
+    .floating-word::after {
+      content: "";
+      position: absolute; left: 50%; top: 50%;
+      width: 7px; height: 7px;
+      background: rgba(83,83,82,0.28);
+      transform: translate(-50%, -50%) scale(0);
+      opacity: 0;
+      transition: transform 0.18s ease, opacity 0.18s ease;
+    }
+    .floating-word:hover { opacity: 1; }
+    .floating-word.is-connected::after {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+    .hero-wordmark {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 20; opacity: 1; cursor: pointer;
+      width: min(72vw, 1040px);
+      text-align: center;
+      overflow: visible;
+      contain: layout;
+    }
+    .hero-title {
+      position: relative;
+      display: inline-block;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(4.2rem, 11.5vw, 11.2rem);
+      font-weight: 800;
+      line-height: 0.8;
+      letter-spacing: 0;
+      color: var(--text);
+      text-transform: uppercase;
+      user-select: none;
+      transform: translateZ(0);
+    }
+    .hero-title-letter {
+      display: inline-block;
+      transform: translate3d(0, 0, 0) rotate(0deg) scaleY(1);
+      transform-origin: 50% 72%;
+      transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: transform;
+    }
+    .hero-title.is-waving .hero-title-letter {
+      transition-duration: 130ms;
+    }
+    .hero-title::before,
+    .hero-title::after {
+      content: attr(data-text);
+      position: absolute;
+      inset: 0;
+      color: inherit;
+      pointer-events: none;
+      opacity: 0;
+      clip-path: circle(var(--glitch-radius, 0px) at var(--glitch-x, 50%) var(--glitch-y, 50%));
+      filter: blur(0.3px);
+    }
+    .hero-title.glitching::before {
+      opacity: 0.7;
+      animation: synapser-glitch-a 180ms steps(2, end) both;
+    }
+    .hero-title.glitching::after {
+      opacity: 0.55;
+      animation: synapser-glitch-b 180ms steps(2, end) both;
+    }
+    .hero-title.glitching {
+      animation: synapser-text-flicker 180ms steps(2, end) both;
+    }
+    .hero-title-slice {
+      position: absolute;
+      left: 0;
+      top: var(--slice-top, 0px);
+      width: 100%;
+      height: var(--slice-height, 12px);
+      overflow: hidden;
+      color: inherit;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(var(--slice-shift, 0px));
+    }
+    .hero-title-slice span {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+    }
+    .hero-title.glitching .hero-title-slice {
+      opacity: 0.7;
+      animation: synapser-slice-fade 180ms steps(2, end) both;
+    }
+    .hero-scroll {
+      position: absolute; bottom: 2.5rem; width: 100%; text-align: center;
+      z-index: 20; opacity: 0;
+    }
+    .hero-scroll span {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.2em;
+      color: var(--text); opacity: 0.5;
+    }
+    @keyframes synapser-glitch-a {
+      0% { transform: translate(0, 0); }
+      25% { transform: translate(10px, -2px); }
+      50% { transform: translate(-8px, 2px); }
+      75% { transform: translate(4px, 0); }
+      100% { transform: translate(0, 0); }
+    }
+    @keyframes synapser-glitch-b {
+      0% { transform: translate(0, 0); }
+      20% { transform: translate(-7px, 1px); }
+      45% { transform: translate(9px, -1px); }
+      70% { transform: translate(-4px, 2px); }
+      100% { transform: translate(0, 0); }
+    }
+    @keyframes synapser-text-flicker {
+      0%, 100% { filter: none; }
+      30% { filter: blur(0.6px); }
+      60% { filter: blur(0.2px); }
+    }
+    @keyframes synapser-slice-fade {
+      0% { opacity: 0; }
+      20%, 78% { opacity: 0.7; }
+      100% { opacity: 0; }
+    }
+    @media (max-width: 720px) {
+      #hero { min-height: 86vh; }
+      .hero-wordmark { width: 94vw; }
+      .hero-title { font-size: clamp(3.35rem, 15vw, 5.8rem); }
+      .floating-word { font-size: 1rem; }
+      .floating-word:nth-of-type(n+11) { display: none; }
+    }
+
+    /* ─── Manifesto ──────────────────────────────────── */
+    .manifesto {
+      min-height: 100vh; overflow: visible;
+      display: block;
+      padding: 0;
+      position: relative;
+    }
+    .manifesto-content {
+      position: relative;
+      height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      width: 100%; overflow: hidden; gap: 0.9rem;
+    }
+    .manifesto-line {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.24em;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800; font-size: clamp(1.75rem, 2.55vw, 3rem);
+      text-transform: uppercase; letter-spacing: 0;
+      color: var(--text); white-space: nowrap;
+      line-height: 1.05; will-change: transform, opacity;
+    }
+    .manifesto-word {
+      position: relative;
+      z-index: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.03em 0.04em;
+      color: var(--text);
+      line-height: 1;
+      overflow: visible;
+      will-change: transform, opacity, color, background-color;
+    }
+    .manifesto-word.is-keyword {
+      z-index: 3;
+      --keyword-box-opacity: 0;
+      --keyword-box-fill: rgba(83, 83, 82, 0.16);
+      --keyword-box-scale: 0.86;
+      --keyword-box-pad-x: 0.22em;
+      --keyword-box-pad-y: 0.18em;
+    }
+    .manifesto-word.is-keyword::before {
+      content: "";
+      position: absolute;
+      inset: calc(-1 * var(--keyword-box-pad-y)) calc(-1 * var(--keyword-box-pad-x));
+      z-index: -1;
+      opacity: var(--keyword-box-opacity);
+      background: var(--keyword-box-fill);
+      transform: scale(var(--keyword-box-scale));
+      transform-origin: center;
+    }
+    .manifesto-word.is-keyword.is-block {
+      overflow: hidden;
+      color: transparent;
+      background: #41403e;
+    }
+    .manifesto-video-stage {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      z-index: 1;
+      width: min(82vw, 1120px);
+      aspect-ratio: 16 / 9;
+      opacity: 0;
+      overflow: hidden;
+      background: rgba(65,64,62,0.18);
+      transform: translate(-50%, -50%) scale(0.045);
+      transform-origin: center center;
+      will-change: transform, opacity;
+      pointer-events: none;
+    }
+    .manifesto-video-stage.is-playing {
+      pointer-events: auto;
+    }
+    .manifesto-video {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    @media (max-width: 720px) {
+      .manifesto-line { font-size: clamp(1.05rem, 5vw, 1.8rem); }
+      .manifesto-content { height: 100vh; gap: 0.7rem; }
+    }
+
+    /* ─── Video Reel ─────────────────────────────────── */
+    .reel-section {
+      position: relative; overflow: hidden;
+      margin-bottom: 5rem;
+    }
+    .reel-inner {
+      position: relative; width: 100%; aspect-ratio: 16/9;
+      overflow: hidden; cursor: pointer;
+      transform-origin: center center;
+    }
+    .reel-poster {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reel-video {
+      display: block;
+      background: rgba(83,83,82,0.18);
+    }
+    .reel-inner:hover .reel-poster { transform: scale(1.03); }
+    .reel-overlay {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(83,83,82,0.1);
+      transition: opacity 0.35s ease;
+    }
+    .reel-inner.is-playing .reel-overlay { opacity: 0; pointer-events: none; }
+    .play-btn {
+      width: 5rem; height: 5rem; border-radius: 50%;
+      border: 1.5px solid var(--text);
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(220,216,192,0.4);
+      backdrop-filter: blur(8px);
+      transition: transform 0.3s, background 0.3s;
+    }
+    .reel-inner:hover .play-btn { transform: scale(1.1); background: rgba(220,216,192,0.7); }
+    .reel-label {
+      position: absolute; bottom: 1.5rem; left: 1.5rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em;
+      color: var(--bg); opacity: 0.8;
+    }
+
+    /* ─── Works ──────────────────────────────────────── */
+    #works { position: relative; }
+    .works-header {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-bottom: 2rem;
+    }
+    .section-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800; font-size: clamp(2.5rem, 8vw, 7rem);
+      text-transform: uppercase; letter-spacing: -0.02em;
+      color: var(--text); overflow: hidden;
+    }
+    .section-title span { display: block; }
+    .works-count {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--text); opacity: 0.5;
+    }
+    .keen-slider-wrap { position: relative; }
+    /* Outcome explore button (lower-middle of each panel) */
+    .outcome-btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      text-decoration: none; cursor: none;
+      border: 1px solid var(--text); color: var(--text);
+      background: rgba(220,216,192,0.4);
+      backdrop-filter: blur(4px);
+      padding: 0.7rem 1.25rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em;
+      transition: background 0.3s, color 0.3s;
+    }
+    .outcome-btn:hover { background: var(--text); color: var(--bg); }
+    .outcome-btn .arrow { transition: transform 0.3s; }
+    .outcome-btn:hover .arrow { transform: translateX(3px); }
+    /* Prev/Next circular arrows */
+    .works-arrow {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      z-index: 30; width: 3.25rem; height: 3.25rem; border-radius: 50%;
+      border: 1.5px solid var(--text); color: var(--text);
+      background: rgba(220,216,192,0.6); backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      cursor: none; transition: background 0.3s, color 0.3s, transform 0.3s;
+    }
+    .works-arrow:hover { background: var(--text); color: var(--bg); transform: translateY(-50%) scale(1.08); }
+    .works-arrow.prev { left: -1rem; }
+    .works-arrow.next { right: -1rem; }
+    .works-arrow svg { width: 1.1rem; height: 1.1rem; }
+    @media (max-width: 640px) {
+      .works-arrow { width: 2.75rem; height: 2.75rem; }
+      .works-arrow.prev { left: 0.25rem; }
+      .works-arrow.next { right: 0.25rem; }
+    }
+    .keen-slider { height: 478.8px; cursor: grab; }
+    .keen-slider:active { cursor: grabbing; }
+    .keen-slider__slide { min-width: 740.4px; max-width: 740.4px; flex-shrink: 0; }
+    @media (max-width: 640px) { .keen-slider__slide { min-width: 85vw; } .keen-slider { height: 420px; } }
+    .slide-inner {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      align-items: flex-end; justify-content: flex-start;
+    }
+    .slide-img-wrap {
+      width: 100%; flex: 1;
+      overflow: hidden; position: relative;
+    }
+    .slide-img-wrap img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s;
+    }
+    .slide-inactive { opacity: 0.7; }
+    .slide-inactive .slide-img-wrap img { transform: scale(0.98); }
+    .slide-active .slide-img-wrap img { transform: scale(1); }
+    .slide-meta {
+      width: 100%; display: none;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--text); opacity: 0.6;
+      padding-top: 0.5rem;
+    }
+    .slide-active .slide-meta { display: flex; justify-content: space-between; }
+
+    /* Works project info below slider */
+    .works-info {
+      display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1.5rem;
+      position: relative;
+    }
+    .works-info-row {
+      display: flex; flex-direction: column; gap: 0.5rem;
+    }
+    .project-title-large {
+      font-weight: 800; font-size: clamp(3rem, 10vw, 9rem);
+      text-transform: uppercase; letter-spacing: -0.03em;
+      color: var(--text); line-height: 0.85;
+      cursor: pointer; text-decoration: none; display: inline-block;
+    }
+    .project-meta-grid {
+      display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto;
+      gap: 1rem 2rem; align-items: start; margin-top: 0.75rem;
+      font-size: 0.75rem;
+    }
+    @media (max-width: 900px) { .project-meta-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 640px) { .project-meta-grid { grid-template-columns: 1fr; } }
+    .meta-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--text); opacity: 0.5; margin-bottom: 0.25rem;
+    }
+    .meta-value { font-size: 0.8rem; color: var(--text); line-height: 1.5; }
+    .btn-view-project {
+      display: inline-block; text-decoration: none; cursor: none;
+      border: 1px solid var(--text); color: var(--text);
+      padding: 0.75rem 1.25rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;
+      transition: background 0.3s, color 0.3s; white-space: nowrap;
+      background: none;
+    }
+    .btn-view-project:hover { background: var(--text); color: var(--bg); }
+
+    /* ─── Services ───────────────────────────────────── */
+    .service-row {
+      border-bottom: 2px solid var(--border);
+      overflow: hidden;
+    }
+    .service-row-inner {
+      width: 100%; padding: 0.75rem 1.5rem;
+      color: var(--text); cursor: none;
+      display: flex; flex-direction: column; justify-content: space-between;
+      transition: background 0.3s, color 0.3s;
+      min-height: 4rem;
+    }
+    @media (min-width: 768px) { .service-row-inner { padding: 0.75rem 2rem; } }
+    .service-row:hover .service-row-inner { background: var(--text); color: var(--bg); }
+    .service-row-top {
+      display: flex; justify-content: space-between; align-items: center;
+      height: 100%; max-height: 2.5rem;
+    }
+    .service-row-left {
+      display: flex; align-items: center; gap: 1rem;
+      font-weight: 700; font-size: clamp(1rem, 2vw, 1.5rem);
+      text-transform: uppercase; letter-spacing: -0.01em;
+    }
+    .service-row-left svg { flex-shrink: 0; }
+    .service-row-right { display: flex; align-items: center; gap: 1rem; }
+    .service-number {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: clamp(0.75rem, 1.5vw, 1.25rem);
+      font-weight: 700; text-transform: uppercase;
+      opacity: 1; transition: opacity 0.15s;
+    }
+    .service-row:hover .service-number { opacity: 0; }
+    .service-explore {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: clamp(0.75rem, 1.5vw, 1.25rem);
+      font-weight: 700; text-transform: uppercase;
+      text-decoration: none; color: var(--bg);
+      opacity: 0; display: none; transition: opacity 0.15s;
+    }
+    .service-row:hover .service-explore { opacity: 1; display: block; }
+    .service-row-body {
+      display: flex; flex-direction: column;
+      gap: 1rem; opacity: 0;
+      transition: opacity 0.15s ease 0.1s;
+      padding-top: 1rem; overflow: hidden;
+      max-height: 0;
+    }
+    @media (min-width: 640px) { .service-row-body { flex-direction: row; gap: 2rem; } }
+    .service-row:hover .service-row-body { opacity: 1; max-height: 200px; }
+    .service-row-num-big {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: clamp(2.5rem, 6vw, 5rem); text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--bg); font-weight: 700;
+    }
+    .service-row-detail { flex: 1; }
+    .service-heading {
+      font-weight: 700; text-transform: uppercase; letter-spacing: -0.01em;
+      margin-bottom: 0.5rem; font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+      color: var(--bg);
+    }
+    .service-description { font-size: 0.9rem; line-height: 1.6; color: var(--bg); opacity: 0.9; margin-bottom: 0.75rem; }
+    .service-tags {
+      display: flex; flex-wrap: wrap; gap: 0.25rem 1rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem; text-transform: uppercase; color: rgba(220,216,192,0.7);
+    }
+    .service-tag::after { content: ' /'; opacity: 0.4; }
+    .service-tag:last-child::after { content: ''; }
+
+    /* ─── Pricing ────────────────────────────────────── */
+    .pricing-header { margin-bottom: 3rem; }
+    .pricing-subtitle {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em;
+      color: var(--text); opacity: 0.5; margin-top: 0.5rem;
+    }
+    .pricing-desc { margin-top: 1rem; max-width: 500px; font-size: 0.9rem; line-height: 1.6; opacity: 0.7; }
+    .pricing-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 2px; border: 1px solid var(--border);
+    }
+    @media (max-width: 768px) { .pricing-grid { grid-template-columns: 1fr; } }
+    .pricing-card {
+      border: 1px solid var(--border);
+      padding: 2.5rem 2rem;
+      display: flex; flex-direction: column; gap: 1.5rem;
+      transition: background 0.3s;
+    }
+    .pricing-card:hover { background: rgba(83,83,82,0.04); }
+    .pricing-tier {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.15em;
+      color: var(--text); opacity: 0.5;
+    }
+    .pricing-name {
+      font-weight: 800; font-size: 1.5rem; text-transform: uppercase;
+      letter-spacing: -0.02em; line-height: 1.1;
+    }
+    .pricing-name-desc { font-size: 0.85rem; line-height: 1.6; opacity: 0.7; margin-top: 0.5rem; }
+    .pricing-cta {
+      margin-top: auto; display: flex; flex-direction: column; gap: 0.75rem;
+    }
+    .btn-primary {
+      display: block; text-align: center; text-decoration: none; cursor: none;
+      background: var(--text); color: var(--bg);
+      padding: 0.85rem 1.5rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em;
+      font-weight: 700; border: none;
+      transition: opacity 0.2s;
+    }
+    .btn-primary:hover { opacity: 0.8; }
+    .btn-secondary {
+      display: block; text-align: center; text-decoration: none; cursor: none;
+      background: transparent; color: var(--text);
+      padding: 0.85rem 1.5rem; border: 1px solid var(--border);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em;
+      font-weight: 700;
+      transition: background 0.3s, color 0.3s;
+    }
+    .btn-secondary:hover { background: var(--text); color: var(--bg); }
+
+    /* ─── FAQ ────────────────────────────────────────── */
+    .faq-header { margin-bottom: 2.5rem; }
+    .faq-subtitle {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--text); opacity: 0.5; margin-top: 0.5rem; max-width: 400px;
+    }
+    .faq-body { display: flex; flex-direction: column; gap: 0; }
+    .faq-item { border-top: 1px solid var(--border); }
+    .faq-item:last-child { border-bottom: 1px solid var(--border); }
+    .faq-question {
+      width: 100%; padding: 1.5rem 0;
+      display: flex; justify-content: space-between; align-items: center;
+      cursor: none; background: none; border: none; text-align: left;
+      color: var(--text); font-family: inherit;
+      font-size: clamp(0.9rem, 1.5vw, 1.1rem); font-weight: 600;
+      transition: opacity 0.2s;
+    }
+    .faq-question:hover { opacity: 0.7; }
+    .faq-icon {
+      flex-shrink: 0; width: 1.25rem; height: 1.25rem;
+      border: 1px solid var(--border); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.3s, background 0.3s;
+      margin-left: 1.5rem;
+    }
+    .faq-item.open .faq-icon { transform: rotate(45deg); background: var(--text); }
+    .faq-item.open .faq-icon svg { color: var(--bg); }
+    .faq-answer {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), padding 0.3s;
+      font-size: 0.9rem; line-height: 1.7; opacity: 0.75;
+    }
+    .faq-item.open .faq-answer { max-height: 300px; padding-bottom: 1.5rem; }
+    .faq-pricing-cta {
+      margin-top: 2.5rem; padding: 2rem;
+      border: 1px solid var(--border);
+      display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between;
+    }
+    .faq-pricing-question {
+      font-weight: 600; font-size: 1rem;
+    }
+    .faq-cta-btns { display: flex; gap: 0.75rem; }
+
+    /* ─── Collaborate ────────────────────────────────── */
+    #collaborate {
+      padding: 6rem 0; border-top: 1px solid var(--border);
+    }
+    .collaborate-inner {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 4rem; align-items: start;
+    }
+    @media (max-width: 768px) { .collaborate-inner { grid-template-columns: 1fr; gap: 3rem; } }
+    .collaborate-title {
+      font-weight: 800; font-size: clamp(3rem, 8vw, 7rem);
+      text-transform: uppercase; letter-spacing: -0.03em; line-height: 0.9;
+    }
+    .collaborate-email-link {
+      display: block; text-decoration: none; color: var(--text);
+      font-weight: 800; font-size: clamp(1.5rem, 3vw, 2.5rem);
+      letter-spacing: -0.02em; text-transform: uppercase;
+      border-bottom: 2px solid var(--text); padding-bottom: 0.25rem;
+      transition: opacity 0.2s; margin-top: 2rem;
+    }
+    .collaborate-email-link:hover { opacity: 0.6; }
+    .collaborate-meta {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 2rem; margin-top: 3rem;
+    }
+    @media (max-width: 640px) { .collaborate-meta { grid-template-columns: 1fr; } }
+    .meta-group { display: flex; flex-direction: column; gap: 0.5rem; }
+    .meta-group .meta-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.4; }
+    .meta-group .meta-value { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .social-links { display: flex; gap: 1.5rem; margin-top: 1rem; }
+    .social-links a {
+      text-decoration: none; color: var(--text);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em;
+      opacity: 0.5; transition: opacity 0.2s;
+    }
+    .social-links a:hover { opacity: 1; }
+    .collaborate-proposal {
+      margin-top: 2rem;
+    }
+
+    /* ─── Footer ─────────────────────────────────────── */
+    footer {
+      position: fixed; bottom: 0.5rem; left: 0; right: 0; z-index: 400;
+      pointer-events: none;
+    }
+    .footer-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 0; pointer-events: auto;
+    }
+    .footer-logo {
+      text-decoration: none; color: var(--text);
+      font-weight: 800; font-size: 0.85rem; text-transform: uppercase;
+      letter-spacing: -0.01em;
+    }
+    .footer-email {
+      text-decoration: none; color: var(--text);
+      font-weight: 800; text-transform: uppercase; letter-spacing: -0.01em;
+      font-size: 0.85rem; transition: opacity 0.2s;
+    }
+    .footer-email:hover { opacity: 0.6; }
+
+    /* ─── Scroll reveal ──────────────────────────────── */
+    .reveal-item { opacity: 0; transform: translateY(30px); }
+
+    /* ─── Scrollbar ──────────────────────────────────── */
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--text); }
+
+    /* ─── Scroll progress bar ────────────────────────── */
+    #scroll-progress {
+      position: fixed; top: 0; right: 0;
+      width: 3px; height: 10%;
+      background: var(--text); z-index: 9999;
+      pointer-events: none; opacity: 0;
+      transform-origin: top center;
+      transition: opacity 0.3s;
+    }
+
+    /* ─── Mobile bottom padding ──────────────────────── */
+    main { padding-bottom: 5rem; }
+  </style>
+</head>
+<body>
+  <!-- Noise overlay -->
+  <div class="noise-layer" aria-hidden="true"></div>
+
+  <!-- Three.js Canvas -->
+  <canvas id="three-canvas" aria-hidden="true"></canvas>
+
+  <!-- Scroll progress -->
+  <div id="scroll-progress" aria-hidden="true"></div>
+
+  <!-- Custom Cursor -->
+  <div id="cursor-dot" aria-hidden="true"></div>
+  <div id="cursor-ring" aria-hidden="true"></div>
+
+  <!-- Preloader -->
+  <div id="preloader" role="status" aria-label="Loading">
+    <div class="preloader-logo-wrap">
+      <div class="preloader-logo-inner" id="preloader-logo">
+        <svg viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg" style="fill-rule:evenodd">
+          <g id="left-strip">
+            <path d="M450,540c-3,0 90,-270.25 90,-270.25l-540,0l0,270.25l450,0Z" style="fill:#535352"/>
+            <path d="M450,1080.5c-3,0 90,-270.25 90,-270.25l-540,0l0,270.25l450,0Z" style="fill:#535352"/>
+          </g>
+          <g id="right-strip">
+            <path d="M630,-0.5c3,0 -90,270.25 -90,270.25l540,0l0,-270.25l-450,-0Z" style="fill:#535352"/>
+            <path d="M630,540c3,0 -90,270.25 -90,270.25l540,0l0,-270.25l-450,-0Z" style="fill:#535352"/>
+            <path d="M630,1080.5c3,0 -90,270.25 -90,270.25l540,0l0,-270.25l-450,0Z" style="fill:#535352"/>
+          </g>
+        </svg>
+        <svg viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg" style="fill-rule:evenodd">
+          <g id="left-strip">
+            <path d="M450,540c-3,0 90,-270.25 90,-270.25l-540,0l0,270.25l450,0Z" style="fill:#535352"/>
+            <path d="M450,1080.5c-3,0 90,-270.25 90,-270.25l-540,0l0,270.25l450,0Z" style="fill:#535352"/>
+          </g>
+          <g id="right-strip">
+            <path d="M630,-0.5c3,0 -90,270.25 -90,270.25l540,0l0,-270.25l-450,-0Z" style="fill:#535352"/>
+            <path d="M630,540c3,0 -90,270.25 -90,270.25l540,0l0,-270.25l-450,-0Z" style="fill:#535352"/>
+            <path d="M630,1080.5c3,0 -90,270.25 -90,270.25l540,0l0,-270.25l-450,0Z" style="fill:#535352"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+    <div class="preloader-text">Loading</div>
+    <div class="preloader-copy">
+      <p>A secure, energy-efficient cloud platform for construction tech — guarding energy and security across fragmented standards.</p>
+      <p>Continuously monitoring vulnerabilities and surfacing high-carbon, inefficient workloads.</p>
+    </div>
+    <div class="preloader-counter"><span id="preloader-num">00</span>%</div>
+  </div>
+
+  <!-- Header -->
+  <header id="main-header">
+    <div class="layout-container">
+      <nav class="header-inner">
+        <a href="/" class="logo-link" aria-label="Hilti Track 02">
+          <div class="logo-mark">
+            <svg viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg" style="fill-rule:evenodd;width:100%;height:100%">
+              <g id="left-strip">
+                <path d="M450,540c-3,0 90,-270.25 90,-270.25l-540,0l0,270.25l450,0Z" style="fill:currentColor"/>
+                <path d="M450,1080.5c-3,0 90,-270.25 90,-270.25l-540,0l0,270.25l450,0Z" style="fill:currentColor"/>
+              </g>
+              <g id="right-strip">
+                <path d="M630,-0.5c3,0 -90,270.25 -90,270.25l540,0l0,-270.25l-450,-0Z" style="fill:currentColor"/>
+                <path d="M630,540c3,0 -90,270.25 -90,270.25l540,0l0,-270.25l-450,-0Z" style="fill:currentColor"/>
+                <path d="M630,1080.5c3,0 -90,270.25 -90,270.25l540,0l0,-270.25l-450,0Z" style="fill:currentColor"/>
+              </g>
+            </svg>
+          </div>
+          <div class="logo-text">
+            <span>Track 02</span>
+            <span>Hilti</span>
+          </div>
+        </a>
+
+        <div class="nav-center">
+          <ul>
+            <li><a href="#" class="active"><span class="mono">001/</span><span>Overview</span></a></li>
+            <li><a href="#manifesto"><span class="mono">002/</span><span>Challenge</span></a></li>
+            <li><a href="#works"><span class="mono">003/</span><span>Outcomes</span></a></li>
+          </ul>
+        </div>
+
+        <div class="nav-right">
+          <a href="/en">EN</a>
+          <div class="nav-divider"></div>
+          <button class="btn-mute" aria-label="Unmute">
+            <svg width="18" height="18" viewBox="0 0 256 256" fill="currentColor"><path d="M53.92,34.62A8,8,0,1,0,42.08,45.38L73.55,80H32A16,16,0,0,0,16,96v64a16,16,0,0,0,16,16H77.25l69.84,54.31A8,8,0,0,0,160,224V175.09l42.08,46.29a8,8,0,1,0,11.84-10.76ZM32,96H72v64H32ZM144,207.64,88,164.09V95.89l56,61.6Zm42-63.77a24,24,0,0,0,0-31.72,8,8,0,1,1,12-10.57,40,40,0,0,1,0,52.88,8,8,0,0,1-12-10.59Zm-80.16-76a8,8,0,0,1,1.4-11.23l39.85-31A8,8,0,0,1,160,32v74.83a8,8,0,0,1-16,0V48.36l-26.94,21A8,8,0,0,1,105.84,67.91ZM248,128a79.9,79.9,0,0,1-20.37,53.34,8,8,0,0,1-11.92-10.67,64,64,0,0,0,0-85.33,8,8,0,1,1,11.92-10.67A79.83,79.83,0,0,1,248,128Z"/></svg>
+          </button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+
+    <!-- ─── HERO ─────────────────────────────────────── -->
+    <section id="hero">
+      <canvas class="hero-canvas" id="hero-canvas"></canvas>
+
+      <!-- Floating words -->
+      <div class="floating-word" data-x="10" data-y="18" data-depth="0.3">cloud</div>
+      <div class="floating-word" data-x="19" data-y="38" data-depth="0.5">security</div>
+      <div class="floating-word" data-x="8" data-y="91" data-depth="0.2">carbon</div>
+      <div class="floating-word" data-x="78" data-y="15" data-depth="0.4">energy</div>
+      <div class="floating-word" data-x="91" data-y="40" data-depth="0.6">efficiency</div>
+      <div class="floating-word" data-x="84" data-y="53" data-depth="0.3">monitoring</div>
+      <div class="floating-word" data-x="87" data-y="62" data-depth="0.5">workloads</div>
+      <div class="floating-word" data-x="92" data-y="82" data-depth="0.2">footprint</div>
+      <div class="floating-word" data-x="69" data-y="86" data-depth="0.4">alerts</div>
+      <div class="floating-word" data-x="73" data-y="90" data-depth="0.6">automation</div>
+      <div class="floating-word" data-x="62" data-y="12" data-depth="0.3">resilience</div>
+      <div class="floating-word" data-x="35" data-y="90" data-depth="0.5">scanning</div>
+      <div class="floating-word" data-x="31" data-y="69" data-depth="0.2">sustainable</div>
+      <div class="floating-word" data-x="50" data-y="26" data-depth="0.4">optimize</div>
+      <div class="floating-word" data-x="46" data-y="76" data-depth="0.6">platform</div>
+      <div class="floating-word" data-x="6" data-y="50" data-depth="0.3">real-time</div>
+      <div class="floating-word" data-x="23" data-y="24" data-depth="0.5">vulnerability</div>
+      <div class="floating-word" data-x="81" data-y="72" data-depth="0.4">infrastructure</div>
+
+      <!-- SYNAPSER wordmark -->
+      <div class="hero-wordmark" id="hero-wordmark">
+        <div class="hero-title" id="hero-title" data-text="HILTI" aria-label="HILTI">HILTI</div>
+      </div>
+
+      <!-- Scroll hint -->
+      <div class="hero-scroll" id="hero-scroll">
+        <span>Scroll to Explore</span>
+      </div>
+    </section>
+
+    <!-- ─── MANIFESTO ─────────────────────────────────── -->
+    <section class="manifesto section-gap" id="manifesto">
+      <div class="manifesto-content" aria-label="Manifesto">
+        <h2 class="manifesto-line" data-dir="ltr">
+          <span class="manifesto-word is-keyword">Securing</span>
+          <span class="manifesto-word is-keyword">Cloud</span>
+          <span class="manifesto-word is-keyword">Platforms</span>
+          <span class="manifesto-word">for</span>
+          <span class="manifesto-word">Construction</span>
+        </h2>
+        <h2 class="manifesto-line" data-dir="rtl">
+          <span class="manifesto-word">Where</span>
+          <span class="manifesto-word">efficiency</span>
+          <span class="manifesto-word">becomes</span>
+          <span class="manifesto-word">trust</span>
+          <span class="manifesto-word">and</span>
+          <span class="manifesto-word">safety</span>
+        </h2>
+        <h2 class="manifesto-line" data-dir="ltr">
+          <span class="manifesto-word">Monitoring</span>
+          <span class="manifesto-word">vulnerabilities</span>
+          <span class="manifesto-word is-keyword">Beyond</span>
+          <span class="manifesto-word is-keyword">the</span>
+          <span class="manifesto-word is-keyword">Surface</span>
+        </h2>
+        <h2 class="manifesto-line" data-dir="rtl">
+          <span class="manifesto-word">Through</span>
+          <span class="manifesto-word">scanning</span>
+          <span class="manifesto-word">that</span>
+          <span class="manifesto-word">guards</span>
+          <span class="manifesto-word">and</span>
+          <span class="manifesto-word">signals</span>
+          <span class="manifesto-word">that</span>
+          <span class="manifesto-word">matter</span>
+        </h2>
+        <h2 class="manifesto-line" data-dir="ltr">
+          <span class="manifesto-word">High</span>
+          <span class="manifesto-word">carbon,</span>
+          <span class="manifesto-word">wasteful</span>
+          <span class="manifesto-word">workloads,</span>
+          <span class="manifesto-word">and</span>
+          <span class="manifesto-word">hidden</span>
+          <span class="manifesto-word">inefficiency</span>
+        </h2>
+        <h2 class="manifesto-line" data-dir="rtl">
+          <span class="manifesto-word">Reducing</span>
+          <span class="manifesto-word">footprint</span>
+          <span class="manifesto-word">where</span>
+          <span class="manifesto-word">security</span>
+          <span class="manifesto-word">meets</span>
+          <span class="manifesto-word">sustainability</span>
+        </h2>
+        <h2 class="manifesto-line" data-dir="ltr">
+          <span class="manifesto-word">Building</span>
+          <span class="manifesto-word">operations</span>
+          <span class="manifesto-word">with</span>
+          <span class="manifesto-word">clarity</span>
+          <span class="manifesto-word">and</span>
+          <span class="manifesto-word">trust</span>
+        </h2>
+        <h2 class="manifesto-line" data-dir="rtl">
+          <span class="manifesto-word">Optimizing</span>
+          <span class="manifesto-word">systems</span>
+          <span class="manifesto-word">for</span>
+          <span class="manifesto-word">smarter</span>
+          <span class="manifesto-word">resource</span>
+          <span class="manifesto-word">efficiency</span>
+        </h2>
+        <h2 class="manifesto-line" data-dir="ltr">
+          <span class="manifesto-word is-keyword">Securing</span>
+          <span class="manifesto-word is-keyword">Systems</span>
+          <span class="manifesto-word">where</span>
+          <span class="manifesto-word">every</span>
+          <span class="manifesto-word">workload</span>
+          <span class="manifesto-word">has</span>
+          <span class="manifesto-word">purpose</span>
+        </h2>
+        <div class="manifesto-video-stage" id="manifesto-video-wrap" aria-label="Track 02 Reel">
+          <div class="manifesto-video" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;background:repeating-linear-gradient(45deg, rgba(220,216,192,0.12) 0 14px, rgba(220,216,192,0.03) 14px 28px);">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.22em;color:var(--bg);opacity:0.75;">[ track 02 reel ]</span>
+            <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:clamp(1.4rem,3vw,2.6rem);text-align:center;line-height:1.05;color:var(--bg);opacity:0.9;padding:0 1.5rem;">SECURE · ENERGY-EFFICIENT CLOUD</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── VIDEO REEL ────────────────────────────────── -->
+    <div class="layout-container section-gap" style="display:none">
+      <div class="reel-section reveal-item" style="display:none">
+        <div class="reel-inner" id="reel-wrap">
+          <video class="reel-poster reel-video" id="synapser-reel-video-legacy"
+            data-src=""
+            data-poster=""
+            muted loop playsinline preload="none"
+            aria-label="Track 02 Reel"></video>
+          <div class="reel-overlay">
+            <div class="play-btn" aria-label="Play reel">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            </div>
+          </div>
+          <div class="reel-label">
+            <span style="font-family:'IBM Plex Mono',monospace">// Hilti Track 02 — Reel</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── WORKS ─────────────────────────────────────── -->
+    <div class="layout-container section-gap" id="works">
+      <div class="works-header reveal-item">
+        <div class="section-title"><span>OUTCOMES</span></div>
+        <div class="works-count">04 Outcomes</div>
+      </div>
+
+      <div class="keen-slider-wrap">
+        <button class="works-arrow prev" id="works-prev" aria-label="Previous outcome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <button class="works-arrow next" id="works-next" aria-label="Next outcome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+        <div id="works-slider" class="keen-slider">
+          <div class="keen-slider__slide slide-active">
+            <div class="slide-inner">
+              <div class="slide-img-wrap">
+                <div style="position:relative;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.9rem;background:repeating-linear-gradient(45deg, rgba(83,83,82,0.07) 0 11px, rgba(83,83,82,0.02) 11px 22px);">
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.22em;color:var(--text);opacity:0.5;">[ outcome visual ]</span>
+                  <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:2.4rem;line-height:1;color:var(--text);opacity:0.78;">O1</span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--text);opacity:0.6;text-align:center;padding:0 1.5rem;">Secure & Lean Cloud</span>
+                  <a href="features/secure-lean-cloud.html" class="outcome-btn" style="position:absolute;left:50%;bottom:13%;transform:translateX(-50%);">Explore feature <span class="arrow">→</span></a>
+                </div>
+              </div>
+              <div class="slide-meta">
+                <span>Security & Efficiency</span>
+                <span>Track 02</span>
+              </div>
+            </div>
+          </div>
+          <div class="keen-slider__slide slide-inactive">
+            <div class="slide-inner">
+              <div class="slide-img-wrap">
+                <div style="position:relative;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.9rem;background:repeating-linear-gradient(45deg, rgba(83,83,82,0.07) 0 11px, rgba(83,83,82,0.02) 11px 22px);">
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.22em;color:var(--text);opacity:0.5;">[ outcome visual ]</span>
+                  <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:2.4rem;line-height:1;color:var(--text);opacity:0.78;">O2</span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--text);opacity:0.6;text-align:center;padding:0 1.5rem;">Lower Carbon, Lower Cost</span>
+                  <a href="features/lower-carbon-lower-cost.html" class="outcome-btn" style="position:absolute;left:50%;bottom:13%;transform:translateX(-50%);">Explore feature <span class="arrow">→</span></a>
+                </div>
+              </div>
+              <div class="slide-meta">
+                <span>Carbon & Cost</span>
+                <span>Track 02</span>
+              </div>
+            </div>
+          </div>
+          <div class="keen-slider__slide slide-inactive">
+            <div class="slide-inner">
+              <div class="slide-img-wrap">
+                <div style="position:relative;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.9rem;background:repeating-linear-gradient(45deg, rgba(83,83,82,0.07) 0 11px, rgba(83,83,82,0.02) 11px 22px);">
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.22em;color:var(--text);opacity:0.5;">[ outcome visual ]</span>
+                  <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:2.4rem;line-height:1;color:var(--text);opacity:0.78;">O3</span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--text);opacity:0.6;text-align:center;padding:0 1.5rem;">Continuous Optimization</span>
+                  <a href="features/continuous-optimization.html" class="outcome-btn" style="position:absolute;left:50%;bottom:13%;transform:translateX(-50%);">Explore feature <span class="arrow">→</span></a>
+                </div>
+              </div>
+              <div class="slide-meta">
+                <span>Resource Efficiency</span>
+                <span>Track 02</span>
+              </div>
+            </div>
+          </div>
+          <div class="keen-slider__slide slide-inactive">
+            <div class="slide-inner">
+              <div class="slide-img-wrap">
+                <div style="position:relative;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.9rem;background:repeating-linear-gradient(45deg, rgba(83,83,82,0.07) 0 11px, rgba(83,83,82,0.02) 11px 22px);">
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.22em;color:var(--text);opacity:0.5;">[ outcome visual ]</span>
+                  <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:2.4rem;line-height:1;color:var(--text);opacity:0.78;">O4</span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--text);opacity:0.6;text-align:center;padding:0 1.5rem;">Construction-Ready Ops</span>
+                  <a href="features/construction-ready-ops.html" class="outcome-btn" style="position:absolute;left:50%;bottom:13%;transform:translateX(-50%);">Explore feature <span class="arrow">→</span></a>
+                </div>
+              </div>
+              <div class="slide-meta">
+                <span>Construction Workflow</span>
+                <span>Track 02</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Outcome info below slider -->
+      <div class="works-info" id="works-info">
+        <div class="works-info-row">
+          <a href="#" class="project-title-large" id="active-project-title">Secure &amp; Lean Cloud</a>
+        </div>
+        <div class="project-meta-grid">
+          <div>
+            <div class="meta-label">// 01 Description</div>
+            <div class="meta-value" id="active-project-desc">Stronger cloud security with lower energy use — safer, leaner cloud operations.</div>
+          </div>
+          <div>
+            <div class="meta-label">// 02 Capabilities</div>
+            <div class="meta-value" id="active-project-services">Real-time vulnerability monitoring, Energy baselining, Security posture</div>
+          </div>
+          <div>
+            <div class="meta-label">// 03 Theme</div>
+            <div class="meta-value" id="active-project-industry">Security &amp; Efficiency</div>
+          </div>
+          <div>
+            <div class="meta-label">// 04 Domain</div>
+            <div class="meta-value" id="active-project-location">Construction Tech</div>
+          </div>
+          <div>
+            <a href="#" class="btn-view-project">Learn more</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── SERVICES ──────────────────────────────────── -->
+    <div class="section-gap" id="services">
+      <div class="layout-container" style="margin-bottom:1rem">
+        <div class="section-title reveal-item" style="overflow:hidden">
+          <span style="display:block">Capabilities</span>
+        </div>
+      </div>
+
+      <!-- Security -->
+      <div class="service-row">
+        <div class="service-row-inner">
+          <div class="service-row-top">
+            <div class="service-row-left">
+              <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" width="1em" height="1em"><path d="M12 5m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M5 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M19 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M6.5 17.5l5.5 -4.5l5.5 4.5"/><path d="M12 7l0 6"/></svg>
+              <span>Security Monitoring</span>
+            </div>
+            <div class="service-row-right">
+              <span class="service-number">001//</span>
+              <a class="service-explore" href="#works">Explore more</a>
+            </div>
+          </div>
+          <div class="service-row-body">
+            <div>
+              <span class="service-row-num-big">001</span>
+              <span style="display:block;font-family:'IBM Plex Mono',monospace;font-size:1.2rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--bg)">//modules</span>
+            </div>
+            <div class="service-row-detail">
+              <div class="service-heading">Continuously monitor vulnerabilities across cloud environments</div>
+              <p class="service-description">Continuously scan fragmented cloud environments to surface vulnerabilities, track security posture in real time, and reduce the risk of attacks and data leaks.</p>
+              <div class="service-tags">
+                <span class="service-tag">Vulnerability scanning</span>
+                <span class="service-tag">Real-time monitoring</span>
+                <span class="service-tag">Security posture</span>
+                <span class="service-tag">Threat detection</span>
+                <span class="service-tag">Compliance audit</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Energy -->
+      <div class="service-row">
+        <div class="service-row-inner">
+          <div class="service-row-top">
+            <div class="service-row-left">
+              <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" width="1em" height="1em"><path d="M4 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"/><path d="M14 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"/><path d="M4 14m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"/><path d="M14 14m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"/></svg>
+              <span>Energy & Carbon</span>
+            </div>
+            <div class="service-row-right">
+              <span class="service-number">002//</span>
+              <a class="service-explore" href="#works">Explore more</a>
+            </div>
+          </div>
+          <div class="service-row-body">
+            <div>
+              <span class="service-row-num-big">002</span>
+              <span style="display:block;font-family:'IBM Plex Mono',monospace;font-size:1.2rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--bg)">//modules</span>
+            </div>
+            <div class="service-row-detail">
+              <div class="service-heading">Identify high-carbon and low-efficiency workloads</div>
+              <p class="service-description">Quantify the energy use and carbon footprint of cloud workloads, pinpoint high-carbon and inefficient resources, and build a clear basis for cutting emissions.</p>
+              <div class="service-tags">
+                <span class="service-tag">Energy baselining</span>
+                <span class="service-tag">Carbon tracking</span>
+                <span class="service-tag">Workload analysis</span>
+                <span class="service-tag">Efficiency scoring</span>
+                <span class="service-tag">Cost accounting</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Optimization -->
+      <div class="service-row">
+        <div class="service-row-inner">
+          <div class="service-row-top">
+            <div class="service-row-left">
+              <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" width="1em" height="1em"><path d="M6 17.6l-2 -1.1v-2.5"/><path d="M4 10v-2.5l2 -1.1"/><path d="M10 4.1l2 -1.1l2 1.1"/><path d="M18 6.4l2 1.1v2.5"/><path d="M20 14v2.5l-2 1.12"/><path d="M14 19.9l-2 1.1l-2 -1.1"/><path d="M12 12l2 -1.1"/><path d="M18 8.6l2 -1.1"/><path d="M12 12l0 2.5"/><path d="M12 18.5l0 2.5"/><path d="M12 12l-2 -1.12"/><path d="M6 8.6l-2 -1.1"/></svg>
+              <span>Smart Optimization</span>
+            </div>
+            <div class="service-row-right">
+              <span class="service-number">003//</span>
+              <a class="service-explore" href="#works">Explore more</a>
+            </div>
+          </div>
+          <div class="service-row-body">
+            <div>
+              <span class="service-row-num-big">003</span>
+              <span style="display:block;font-family:'IBM Plex Mono',monospace;font-size:1.2rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--bg)">//modules</span>
+            </div>
+            <div class="service-row-detail">
+              <div class="service-heading">Automated alerts and smart optimization recommendations</div>
+              <p class="service-description">Trigger automatic alerts on security risks or energy anomalies and deliver smart optimization recommendations that lower cost while continuously improving the system.</p>
+              <div class="service-tags">
+                <span class="service-tag">Automated alerts</span>
+                <span class="service-tag">Recommendations</span>
+                <span class="service-tag">Cost optimization</span>
+                <span class="service-tag">Auto-remediation</span>
+                <span class="service-tag">Continuous improvement</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Workflow -->
+      <div class="service-row">
+        <div class="service-row-inner">
+          <div class="service-row-top">
+            <div class="service-row-left">
+              <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" width="1em" height="1em"><path d="M7 8l-4 4l4 4"/><path d="M17 8l4 4l-4 4"/><path d="M14 4l-4 16"/></svg>
+              <span>Workflow Support</span>
+            </div>
+            <div class="service-row-right">
+              <span class="service-number">004//</span>
+              <a class="service-explore" href="#works">Explore more</a>
+            </div>
+          </div>
+          <div class="service-row-body">
+            <div>
+              <span class="service-row-num-big">004</span>
+              <span style="display:block;font-family:'IBM Plex Mono',monospace;font-size:1.2rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--bg)">//modules</span>
+            </div>
+            <div class="service-row-detail">
+              <div class="service-heading">Better support for construction site workflows</div>
+              <p class="service-description">Fit the real workflows of construction work, raising overall operational efficiency so security and energy savings truly serve on-site operations.</p>
+              <div class="service-tags">
+                <span class="service-tag">Workflow integration</span>
+                <span class="service-tag">Operational efficiency</span>
+                <span class="service-tag">On-site support</span>
+                <span class="service-tag">Resource scheduling</span>
+                <span class="service-tag">Team collaboration</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+      <!-- ─── PRICING ───────────────────────────────────── -->
+    <div class="layout-container section-gap" id="pricing">
+      <div class="pricing-header reveal-item">
+        <div class="section-title" style="font-size:clamp(2.5rem,6vw,5rem)"><span>Why It Matters</span></div>
+        <div class="pricing-subtitle">Three pillars of value</div>
+        <p class="pricing-desc">Built on three pillars — security, sustainability, and efficiency — for a safe and energy-efficient cloud platform.</p>
+      </div>
+
+      <div class="pricing-grid reveal-item">
+        <div class="pricing-card">
+          <div>
+            <div class="pricing-tier">01 / Security</div>
+            <div class="pricing-name">Security</div>
+            <div class="pricing-name-desc">Strengthen cloud security by continuously finding and fixing the vulnerabilities that guard construction-tech operations.</div>
+          </div>
+          <div class="pricing-cta">
+            <a href="#works" class="btn-primary">View challenge</a>
+            <a href="#manifesto" class="btn-secondary">Learn more</a>
+          </div>
+        </div>
+        <div class="pricing-card">
+          <div>
+            <div class="pricing-tier">02 / Sustainability</div>
+            <div class="pricing-name">Sustainability</div>
+            <div class="pricing-name-desc">Lower the carbon footprint by surfacing high-carbon, inefficient workloads — cutting emissions and cost together.</div>
+          </div>
+          <div class="pricing-cta">
+            <a href="#works" class="btn-primary">View challenge</a>
+            <a href="#manifesto" class="btn-secondary">Learn more</a>
+          </div>
+        </div>
+        <div class="pricing-card">
+          <div>
+            <div class="pricing-tier">03 / Efficiency</div>
+            <div class="pricing-name">Efficiency</div>
+            <div class="pricing-name-desc">Continuously optimize systems and resource use to raise the overall efficiency of construction workflows.</div>
+          </div>
+          <div class="pricing-cta">
+            <a href="#works" class="btn-primary">View challenge</a>
+            <a href="#manifesto" class="btn-secondary">Learn more</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+      <!-- ─── FAQ ───────────────────────────────────────── -->
+    <div class="layout-container section-gap" id="faq">
+      <div class="faq-header reveal-item">
+        <div class="section-title" style="font-size:clamp(2rem,4vw,3.5rem)"><span>Common<br/>questions</span></div>
+        <p class="faq-subtitle">Common questions about the Track 02 challenge — reach out if anything else comes up.</p>
+      </div>
+
+      <div class="faq-body reveal-item">
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            <span>What problem does this track solve?</span>
+            <div class="faq-icon">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            </div>
+          </button>
+          <div class="faq-answer">Cloud platforms underpin modern construction workflows, but because standards vary they can consume large amounts of energy and be exposed to cybersecurity risk. This track aims to tackle both at once.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            <span>Why do cloud platforms face both energy and security challenges?</span>
+            <div class="faq-icon">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            </div>
+          </button>
+          <div class="faq-answer">Cloud environments built by different teams to different standards are hard to govern consistently — they leave security gaps and run plenty of high-carbon, inefficient workloads, wasting energy and driving up cost.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            <span>What kind of solution is expected?</span>
+            <div class="faq-icon">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            </div>
+          </button>
+          <div class="faq-answer">Build a solution that continuously monitors security vulnerabilities in cloud environments while identifying high-carbon or low-efficiency workloads, enabling safer and more energy-efficient cloud operations.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            <span>Should the solution address both security and energy savings?</span>
+            <div class="faq-icon">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            </div>
+          </button>
+          <div class="faq-answer">Yes. An ideal solution lowers energy use and carbon footprint while maintaining security, provides automated alerts and smart optimization recommendations, and continuously optimizes the system for better resource efficiency.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            <span>How is success measured?</span>
+            <div class="faq-icon">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            </div>
+          </button>
+          <div class="faq-answer">Higher cloud security, lower carbon footprint and cost, better resource efficiency, and stronger support for construction workflows with higher overall operational efficiency.</div>
+        </div>
+      </div>
+
+      <div class="faq-pricing-cta reveal-item">
+        <p class="faq-pricing-question">Still have questions about the challenge?</p>
+        <div class="faq-cta-btns">
+          <a href="/cdn-cgi/l/email-protection#4028252c2c2f00343221232b70726e242536" class="btn-primary" style="min-width:120px">Contact us</a>
+          <a href="/cdn-cgi/l/email-protection#4a222f2626250a3e382b29217a78642e2f3c" class="btn-secondary" style="min-width:120px">Email Us</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── COLLABORATE ────────────────────────────────── -->
+    <div class="layout-container" id="collaborate">
+      <div class="collaborate-inner">
+        <div>
+          <div class="collaborate-title reveal-item">Join<br/>Track 02</div>
+          <a href="/cdn-cgi/l/email-protection#deb6bbb2b2b19eaaacbfbdb5eeecf0babba8" class="collaborate-email-link reveal-item"><span class="__cf_email__" data-cfemail="d6beb3babab996a2a4b7b5bde6e4f8b2b3a0">[email&#160;protected]</span></a>
+
+          <div class="collaborate-proposal reveal-item">
+            <a href="https://www.dropbox.com/scl/fi/hc97uftwftug1lpz9ngv3/MASTER_DECK.pdf?rlkey=yxudap3rkyek85608ii57j8aa&st=48nb9cnu&dl=0"
+               target="_blank" rel="noopener" class="btn-secondary" style="display:inline-block">View challenge brief</a>
+          </div>
+        </div>
+
+        <div class="collaborate-meta reveal-item">
+          <div class="meta-group">
+            <div class="meta-label">Location</div>
+            <div class="meta-value">Construction</div>
+            <div class="meta-value" style="opacity:0.5;font-size:0.75rem">Tech</div>
+          </div>
+          <div class="meta-group">
+            <div class="meta-label">Focus</div>
+            <div class="meta-value">Security</div>
+            <div class="meta-value" style="opacity:0.5;font-size:0.75rem">Energy Efficiency</div>
+          </div>
+          <div class="meta-group">
+            <div class="meta-label">Social</div>
+            <div class="social-links">
+              <a href="#" target="_blank" rel="noopener">Instagram</a>
+              <a href="#" target="_blank" rel="noopener">Behance</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Fixed Footer -->
+  <footer>
+    <div class="layout-container">
+      <div class="footer-inner">
+        <a href="/" class="footer-logo">Hilti · Track 02</a>
+        <a href="/cdn-cgi/l/email-protection#c2aaa7aeaead82b6b0a3a1a9f2f0eca6a7b4" class="footer-email">Email Us</a>
+      </div>
+    </div>
+  </footer>
+
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  window.scrollTo(0, 0);
+  window.addEventListener('pageshow', event => {
+    if (!location.hash || location.hash === '#') window.scrollTo(0, 0);
+  });
+  // ─── Cursor ──────────────────────────────────────────
+  const dot = document.getElementById('cursor-dot');
+  const ring = document.getElementById('cursor-ring');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    dot.style.left = mx + 'px';
+    dot.style.top = my + 'px';
+  });
+
+  function animRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animRing);
+  }
+  animRing();
+
+  // ─── Preloader ───────────────────────────────────────
+  let pct = 0;
+  const pEl = document.getElementById('preloader-num');
+  const pLoader = document.getElementById('preloader');
+  const logoInner = document.getElementById('preloader-logo');
+
+  function tick() {
+    if (pct < 100) {
+      pct += Math.random() * 3 + 0.5;
+      if (pct > 100) pct = 100;
+      pEl.textContent = String(Math.floor(pct)).padStart(2, '0');
+      const logoH = 60;
+      logoInner.style.transform = `translateY(-${(pct / 100) * logoH * 2}px)`;
+      setTimeout(tick, 28 + Math.random() * 30);
+    } else {
+      setTimeout(() => {
+        pLoader.classList.add('hide');
+        setTimeout(() => {
+          pLoader.style.display = 'none';
+          initAnimations();
+        }, 900);
+      }, 200);
+    }
+  }
+
+  window.addEventListener('load', () => setTimeout(tick, 300));
+
+  // ─── Three.js canvas particles ───────────────────────
+  (function () {
+    const canvas = document.getElementById('three-canvas');
+    if (!window.THREE || !canvas) return;
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 50;
+
+    const geo = new THREE.BufferGeometry();
+    const count = 800;
+    const positions = new Float32Array(count * 3);
+    const sizes = new Float32Array(count);
+    for (let i = 0; i < count; i++) {
+      positions[i * 3] = (Math.random() - 0.5) * 200;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 200;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 100;
+      sizes[i] = Math.random() * 2 + 0.5;
+    }
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geo.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+    const mat = new THREE.PointsMaterial({
+      color: 0x535352, size: 0.5, sizeAttenuation: true, transparent: true, opacity: 0.8
+    });
+    const points = new THREE.Points(geo, mat);
+    scene.add(points);
+
+    let scrollY = 0;
+    window.addEventListener('scroll', () => { scrollY = window.scrollY; });
+
+    function animate() {
+      requestAnimationFrame(animate);
+      points.rotation.y += 0.0004;
+      points.rotation.x += 0.0002;
+      camera.position.y = -scrollY * 0.005;
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  })();
+
+  // ─── Floating words parallax ─────────────────────────
+  const floatWords = document.querySelectorAll('.floating-word-old');
+  let mouseX = 0, mouseY = 0;
+
+  document.addEventListener('mousemove', e => {
+    mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+    mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+  });
+
+  function animWords() {
+    if (!floatWords.length) return;
+    floatWords.forEach(w => {
+      const d = parseFloat(w.dataset.depth) || 0.3;
+      const tx = mouseX * d * 25;
+      const ty = mouseY * d * 25;
+      w.style.transform = `translate(${tx}px, ${ty}px)`;
+    });
+    requestAnimationFrame(animWords);
+  }
+  animWords();
+
+  // Click floating word → scroll to section
+  floatWords.forEach(w => {
+    w.addEventListener('click', () => {
+      document.getElementById('manifesto').scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  // ─── GSAP + ScrollTrigger animations ─────────────────
+  (function initHeroNetwork() {
+    const hero = document.getElementById('hero');
+    const canvas = document.getElementById('hero-canvas');
+    const ctx = canvas.getContext('2d');
+    const words = Array.from(document.querySelectorAll('.floating-word'));
+    const title = document.getElementById('hero-title');
+    const titleText = title.dataset.text || title.textContent.trim();
+    let dpr = 1;
+    let heroRect = hero.getBoundingClientRect();
+    let mouse = { x: -9999, y: -9999, active: false };
+    let nodes = [];
+    let anchorAssignments = [];
+    let glitchTimer;
+    let titleWaveResetTimer;
+    let lastGlitch = 0;
+    let lastWave = 0;
+    let previousWaveX = null;
+    let waveDirection = 1;
+    let titleMagnet = false;
+    const titleLetters = Array.from(titleText).map(char => {
+      const letter = document.createElement('span');
+      letter.className = 'hero-title-letter';
+      letter.textContent = char;
+      return letter;
+    });
+
+    title.textContent = '';
+    titleLetters.forEach(letter => title.appendChild(letter));
+    for (let i = 0; i < 5; i++) {
+      const slice = document.createElement('span');
+      slice.className = 'hero-title-slice';
+      const inner = document.createElement('span');
+      inner.textContent = titleText;
+      slice.appendChild(inner);
+      title.appendChild(slice);
+    }
+
+    function shuffleValues(values) {
+      for (let i = values.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [values[i], values[j]] = [values[j], values[i]];
+      }
+      return values;
+    }
+
+    function buildAnchorAssignments() {
+      const letterCount = titleText.length;
+      anchorAssignments = shuffleValues(words.map((_, index) => index % letterCount));
+    }
+
+    function resizeHeroNetwork() {
+      heroRect = hero.getBoundingClientRect();
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(heroRect.width * dpr);
+      canvas.height = Math.round(heroRect.height * dpr);
+      canvas.style.width = heroRect.width + 'px';
+      canvas.style.height = heroRect.height + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      if (anchorAssignments.length !== words.length) buildAnchorAssignments();
+
+      nodes = words.map((el, index) => {
+        const previous = nodes[index];
+        const baseX = heroRect.width * (parseFloat(el.dataset.x) || 50) / 100;
+        const baseY = heroRect.height * (parseFloat(el.dataset.y) || 50) / 100;
+        const rect = el.getBoundingClientRect();
+        el.style.left = '0px';
+        el.style.top = '0px';
+        return {
+          el,
+          text: el.textContent.trim(),
+          baseX,
+          baseY,
+          x: previous ? previous.x : baseX,
+          y: previous ? previous.y : baseY,
+          vx: previous ? previous.vx : (Math.random() - 0.5) * 0.5,
+          vy: previous ? previous.vy : (Math.random() - 0.5) * 0.5,
+          w: rect.width,
+          h: rect.height,
+          phase: previous ? previous.phase : Math.random() * Math.PI * 2,
+          depth: parseFloat(el.dataset.depth) || 0.35,
+          letterIndex: previous ? previous.letterIndex : anchorAssignments[index],
+          letterJitter: previous ? previous.letterJitter : (Math.random() - 0.5) * 0.34,
+          anchorYJitter: previous ? previous.anchorYJitter : (Math.random() - 0.5) * 18,
+          movePhaseA: previous ? previous.movePhaseA : Math.random() * Math.PI * 2,
+          movePhaseB: previous ? previous.movePhaseB : Math.random() * Math.PI * 2,
+          moveSpeedA: previous ? previous.moveSpeedA : 0.13 + Math.random() * 0.14,
+          moveSpeedB: previous ? previous.moveSpeedB : 0.18 + Math.random() * 0.18,
+          moveAmpX: previous ? previous.moveAmpX : 48 + Math.random() * 74,
+          moveAmpY: previous ? previous.moveAmpY : 34 + Math.random() * 58,
+          marker: previous ? previous.marker : Math.random() > 0.72,
+          connected: false,
+        };
+      });
+    }
+
+    function titleAnchorForNode(node) {
+      const r = title.getBoundingClientRect();
+      const titleRect = {
+        left: r.left - heroRect.left,
+        top: r.top - heroRect.top,
+        right: r.right - heroRect.left,
+        bottom: r.bottom - heroRect.top,
+      };
+      const titleW = titleRect.right - titleRect.left;
+      const titleH = titleRect.bottom - titleRect.top;
+      const letterCount = titleText.length;
+      const letterW = titleW / letterCount;
+      const centerY = (titleRect.top + titleRect.bottom) / 2;
+      const letterX = titleRect.left + letterW * (node.letterIndex + 0.5 + node.letterJitter);
+      const x = Math.max(titleRect.left + letterW * 0.18, Math.min(titleRect.right - letterW * 0.18, letterX));
+
+      if (node.y < titleRect.top) {
+        return { x, y: titleRect.top + titleH * 0.11 + node.anchorYJitter * 0.35 };
+      }
+
+      if (node.y > titleRect.bottom) {
+        return { x, y: titleRect.bottom - titleH * 0.11 + node.anchorYJitter * 0.35 };
+      }
+
+      const sideY = node.y < centerY
+        ? titleRect.top + titleH * 0.28
+        : titleRect.bottom - titleH * 0.28;
+      return { x, y: sideY + node.anchorYJitter };
+    }
+
+    function lineStartForNode(node, anchor) {
+      const dx = anchor.x - node.x;
+      const dy = anchor.y - node.y;
+      const halfW = Math.max(node.w / 2 + 6, 10);
+      const halfH = Math.max(node.h / 2 + 4, 8);
+      const tx = dx ? halfW / Math.abs(dx) : Infinity;
+      const ty = dy ? halfH / Math.abs(dy) : Infinity;
+      const t = Math.min(tx, ty, 1);
+      return {
+        x: node.x + dx * t,
+        y: node.y + dy * t,
+      };
+    }
+
+    function drawLine(ax, ay, bx, by, alpha, squareAtStart) {
+      ctx.strokeStyle = `rgba(83,83,82,${alpha})`;
+      ctx.lineWidth = 1;
+      ctx.lineCap = 'butt';
+      ctx.beginPath();
+      ctx.moveTo(ax, ay);
+      ctx.lineTo(bx, by);
+      ctx.stroke();
+
+      if (squareAtStart) {
+        ctx.fillStyle = `rgba(83,83,82,${Math.min(alpha + 0.12, 0.38)})`;
+        ctx.fillRect(ax - 3.5, ay - 3.5, 7, 7);
+      }
+    }
+
+    function drawNetwork() {
+      ctx.clearRect(0, 0, heroRect.width, heroRect.height);
+      const visible = nodes.filter(node => node.el.offsetParent !== null);
+      visible.forEach(node => {
+        node.connected = false;
+        node.el.classList.remove('is-connected');
+      });
+
+      visible.forEach(node => {
+        const edge = titleAnchorForNode(node);
+        const start = lineStartForNode(node, edge);
+        const dist = Math.hypot(start.x - edge.x, start.y - edge.y);
+        if (dist > 24) {
+          const alpha = Math.max(0.08, Math.min(0.2, 0.23 - dist / 4200));
+          drawLine(start.x, start.y, edge.x, edge.y, alpha, node.marker);
+          node.connected = true;
+        }
+      });
+
+      visible.forEach(node => {
+        if (node.connected) node.el.classList.add('is-connected');
+      });
+    }
+
+    function updateNodes(time) {
+      const t = time * 0.001;
+      const titleRect = titleMagnet ? title.getBoundingClientRect() : null;
+      const magnetRect = titleRect ? {
+        left: titleRect.left - heroRect.left,
+        top: titleRect.top - heroRect.top,
+        right: titleRect.right - heroRect.left,
+        bottom: titleRect.bottom - heroRect.top,
+        centerX: titleRect.left - heroRect.left + titleRect.width / 2,
+        centerY: titleRect.top - heroRect.top + titleRect.height / 2
+      } : null;
+
+      nodes.forEach(node => {
+        if (node.el.offsetParent === null) return;
+
+        const driftX =
+          Math.sin(t * node.moveSpeedA + node.movePhaseA) * node.moveAmpX +
+          Math.sin(t * node.moveSpeedB + node.movePhaseB) * node.moveAmpX * 0.38;
+        const driftY =
+          Math.cos(t * (node.moveSpeedA * 0.92) + node.movePhaseB) * node.moveAmpY +
+          Math.sin(t * (node.moveSpeedB * 0.74) + node.phase) * node.moveAmpY * 0.42;
+        const targetX = node.baseX + driftX;
+        const targetY = node.baseY + driftY;
+
+        node.vx += (targetX - node.x) * 0.0045;
+        node.vy += (targetY - node.y) * 0.0045;
+
+        if (magnetRect) {
+          const edge = titleAnchorForNode(node);
+          const awayAngle = Math.atan2(node.baseY - magnetRect.centerY, node.baseX - magnetRect.centerX);
+          const hoverDistance = 72 + node.depth * 70 + Math.sin(t * 0.7 + node.phase) * 10;
+          const magnetX = edge.x + Math.cos(awayAngle) * hoverDistance;
+          const magnetY = edge.y + Math.sin(awayAngle) * hoverDistance;
+          node.vx += (magnetX - node.x) * 0.008;
+          node.vy += (magnetY - node.y) * 0.008;
+        }
+
+        if (mouse.active && !titleMagnet) {
+          const dx = node.x - mouse.x;
+          const dy = node.y - mouse.y;
+          const dist = Math.max(Math.hypot(dx, dy), 1);
+          const radius = 165;
+          if (dist < radius) {
+            const force = (1 - dist / radius) * 6.2;
+            node.vx += (dx / dist) * force;
+            node.vy += (dy / dist) * force;
+          }
+        }
+
+        node.vx *= 0.91;
+        node.vy *= 0.91;
+        node.x += node.vx;
+        node.y += node.vy;
+
+        node.x = Math.max(18, Math.min(heroRect.width - 18, node.x));
+        node.y = Math.max(18, Math.min(heroRect.height - 18, node.y));
+        node.el.style.transform = `translate3d(${node.x - node.w / 2}px, ${node.y - node.h / 2}px, 0)`;
+      });
+
+      drawNetwork();
+      requestAnimationFrame(updateNodes);
+    }
+
+    function triggerGlitch(clientX, clientY) {
+      const now = performance.now();
+      if (now - lastGlitch < 75) return;
+      lastGlitch = now;
+
+      const rect = title.getBoundingClientRect();
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+      title.style.setProperty('--glitch-x', `${x}px`);
+      title.style.setProperty('--glitch-y', `${y}px`);
+      title.style.setProperty('--glitch-radius', `${Math.max(48, rect.width * 0.085)}px`);
+
+      title.querySelectorAll('.hero-title-slice').forEach((slice) => {
+        const top = Math.max(0, Math.min(rect.height - 8, y + (Math.random() - 0.5) * 86));
+        const height = 7 + Math.random() * 18;
+        const shift = (Math.random() - 0.5) * 26;
+        slice.style.setProperty('--slice-top', `${top}px`);
+        slice.style.setProperty('--slice-height', `${height}px`);
+        slice.style.setProperty('--slice-shift', `${shift}px`);
+        slice.firstElementChild.style.transform = `translateY(-${top}px)`;
+      });
+
+      title.classList.remove('glitching');
+      void title.offsetWidth;
+      title.classList.add('glitching');
+      clearTimeout(glitchTimer);
+      glitchTimer = setTimeout(() => title.classList.remove('glitching'), 190);
+    }
+
+    function resetTitleWave() {
+      title.classList.remove('is-waving');
+      titleLetters.forEach((letter, index) => {
+        letter.style.transitionDelay = `${Math.min(index * 14, 90)}ms`;
+        letter.style.transform = 'translate3d(0, 0, 0) rotate(0deg) scaleY(1)';
+      });
+    }
+
+    function updateTitleWave(clientX) {
+      const now = performance.now();
+      if (now - lastWave < 18) return;
+      lastWave = now;
+
+      const rect = title.getBoundingClientRect();
+      const x = Math.max(0, Math.min(rect.width, clientX - rect.left));
+      const movement = previousWaveX === null ? 0 : x - previousWaveX;
+      if (Math.abs(movement) > 0.5) waveDirection = Math.sign(movement);
+      previousWaveX = x;
+
+      title.classList.add('is-waving');
+      const reach = Math.max(120, rect.width * 0.28);
+      titleLetters.forEach((letter, index) => {
+        const center = ((index + 0.5) / titleLetters.length) * rect.width;
+        const distance = center - x;
+        const influence = Math.max(0, 1 - Math.abs(distance) / reach);
+        const phase = (distance / reach) * Math.PI * 1.35;
+        const lift = Math.sin(phase) * 24 * influence;
+        const push = waveDirection * 15 * influence;
+        const rotation = waveDirection * Math.sin(phase) * 4.5 * influence;
+        const scaleY = 1 + influence * 0.055;
+        const trailing = waveDirection > 0 ? Math.max(0, center - x) : Math.max(0, x - center);
+        const delay = Math.min(85, trailing / Math.max(rect.width, 1) * 190);
+
+        letter.style.transitionDelay = `${delay}ms`;
+        letter.style.transform = `translate3d(${push}px, ${lift}px, 0) rotate(${rotation}deg) scaleY(${scaleY})`;
+      });
+
+      clearTimeout(titleWaveResetTimer);
+      titleWaveResetTimer = setTimeout(resetTitleWave, 260);
+    }
+
+    document.addEventListener('mousemove', e => {
+      heroRect = hero.getBoundingClientRect();
+      mouse.x = e.clientX - heroRect.left;
+      mouse.y = e.clientY - heroRect.top;
+      mouse.active = mouse.x >= 0 && mouse.x <= heroRect.width && mouse.y >= 0 && mouse.y <= heroRect.height;
+    });
+    document.addEventListener('mouseleave', () => { mouse.active = false; });
+    window.addEventListener('resize', resizeHeroNetwork);
+    window.addEventListener('scroll', () => { heroRect = hero.getBoundingClientRect(); }, { passive: true });
+
+    title.addEventListener('mouseenter', e => {
+      titleMagnet = true;
+      triggerGlitch(e.clientX, e.clientY);
+      updateTitleWave(e.clientX);
+    });
+    title.addEventListener('mousemove', e => {
+      titleMagnet = true;
+      updateTitleWave(e.clientX);
+    });
+    title.addEventListener('mouseleave', () => {
+      titleMagnet = false;
+      previousWaveX = null;
+      title.classList.remove('glitching');
+      resetTitleWave();
+    });
+
+    words.forEach(w => {
+      w.addEventListener('click', () => {
+        document.getElementById('manifesto').scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+
+    resizeHeroNetwork();
+    requestAnimationFrame(updateNodes);
+  })();
+
+  function initAnimations() {
+    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+      document.getElementById('hero-wordmark').style.opacity = '1';
+      document.getElementById('hero-scroll').style.opacity = '1';
+      document.querySelectorAll('.reveal-item').forEach(el => {
+        el.style.opacity = '1';
+        el.style.transform = 'none';
+      });
+      return;
+    }
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Keep the main wordmark visible immediately on first paint.
+    gsap.set('#hero-wordmark', { opacity: 1 });
+    gsap.to('#hero-scroll', {
+      opacity: 1, duration: 0.8, ease: 'power2.out', delay: 0.35
+    });
+
+    // Hero wordmark scale on scroll
+    gsap.to('#hero-wordmark', {
+      scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 1 },
+      scale: 1.03
+    });
+
+    // Scroll progress bar
+    const prog = document.getElementById('scroll-progress');
+    gsap.to(prog, { opacity: 1, duration: 0.5, scrollTrigger: { trigger: 'body', start: '100px top' } });
+    ScrollTrigger.create({
+      trigger: 'body', start: 'top top', end: 'bottom bottom',
+      onUpdate: self => { prog.style.height = (self.progress * 100) + '%'; }
+    });
+
+    // Manifesto sequence: enter, hold, fade, box, square, cluster
+    const manifesto = document.querySelector('.manifesto');
+    const manifestoContent = document.querySelector('.manifesto-content');
+    const lines = gsap.utils.toArray('.manifesto-line');
+    const keyWords = gsap.utils.toArray('.manifesto-word.is-keyword');
+    const quietWords = gsap.utils.toArray('.manifesto-word:not(.is-keyword)');
+    const squareSize = () => Math.max(40, Math.min(56, window.innerWidth * 0.036));
+    const clusterX = (_, el) => {
+      const sectionRect = manifestoContent.getBoundingClientRect();
+      const rect = el.getBoundingClientRect();
+      return sectionRect.left + sectionRect.width / 2 - (rect.left + rect.width / 2);
+    };
+    const clusterY = (_, el) => {
+      const sectionRect = manifestoContent.getBoundingClientRect();
+      const rect = el.getBoundingClientRect();
+      return sectionRect.top + sectionRect.height * 0.48 - (rect.top + rect.height / 2);
+    };
+    const manifestoVideoWrap = document.getElementById('manifesto-video-wrap');
+    const reelVideo = document.getElementById('synapser-reel-video');
+    const playReel = () => {
+      if (!reelVideo) return;
+      manifestoVideoWrap?.classList.add('is-playing');
+      reelVideo.play().catch(() => {
+        manifestoVideoWrap?.classList.remove('is-playing');
+      });
+    };
+    const resetReel = () => {
+      if (!reelVideo) return;
+      reelVideo.pause();
+      reelVideo.currentTime = 0;
+      manifestoVideoWrap?.classList.remove('is-playing');
+    };
+    manifestoVideoWrap?.addEventListener('click', playReel);
+
+    gsap.set(lines, {
+      x: i => (i % 2 === 0 ? -1 : 1) * (window.innerWidth * 0.46 + i * 12),
+      y: i => 205 + (i % 3) * 20,
+      opacity: 0
+    });
+
+    gsap.set(keyWords, {
+      width: 'auto',
+      height: 'auto',
+      padding: '0.03em 0.04em',
+      color: 'var(--text)',
+      backgroundColor: 'rgba(83,83,82,0)',
+      boxShadow: '0 0 0 0 rgba(83,83,82,0)',
+      transformOrigin: 'center center'
+    });
+    gsap.set(manifestoVideoWrap, {
+      opacity: 0,
+      scale: 0.045,
+      transformOrigin: 'center center'
+    });
+
+    const manifestoTimeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: '.manifesto',
+        start: 'top top',
+        end: '+=3000',
+        scrub: 2.2,
+        pin: '.manifesto-content',
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+        onLeave: playReel,
+        onUpdate: self => {
+          if (self.progress > 0.995) {
+            playReel();
+          } else if (self.progress < 0.88) {
+            resetReel();
+          }
+        }
+      }
+    })
+    .to(lines, {
+      x: i => (i % 2 === 0 ? -1 : 1) * window.innerWidth * 0.08,
+      y: 84,
+      opacity: 0.45,
+      duration: 0.22,
+      stagger: { amount: 0.08, from: 'start' },
+      ease: 'none'
+    }, 0)
+    .to(lines, {
+      x: 0,
+      y: 0,
+      opacity: 1,
+      duration: 0.2,
+      stagger: { amount: 0.06, from: 'start' },
+      ease: 'none'
+    }, 0.22)
+    .to(lines, {
+      x: 0,
+      y: 0,
+      opacity: 1,
+      duration: 0.3,
+      ease: 'none'
+    }, 0.44)
+    .to(quietWords, {
+      opacity: 0,
+      duration: 0.28,
+      stagger: { amount: 0.22, from: 'edges' },
+      ease: 'none'
+    }, 0.76)
+    .to(keyWords, {
+      backgroundColor: 'rgba(83,83,82,0.12)',
+      boxShadow: '0 0 0 8px rgba(83,83,82,0.08)',
+      duration: 0.22,
+      stagger: { amount: 0.12, from: 'start' },
+      ease: 'none'
+    }, 1.08)
+    .to(keyWords, {
+      backgroundColor: 'rgba(83,83,82,0.28)',
+      boxShadow: '0 0 0 2px rgba(83,83,82,0.12)',
+      duration: 0.22,
+      stagger: { amount: 0.1, from: 'center' },
+      ease: 'none'
+    }, 1.34)
+    .to(keyWords, {
+      width: squareSize,
+      height: squareSize,
+      padding: 0,
+      color: 'rgba(83,83,82,0)',
+      backgroundColor: '#41403e',
+      boxShadow: '0 0 0 0 rgba(83,83,82,0)',
+      duration: 0.24,
+      stagger: { amount: 0.14, from: 'center' },
+      ease: 'none',
+      onStart: () => keyWords.forEach(word => word.classList.add('is-block')),
+      onReverseComplete: () => keyWords.forEach(word => word.classList.remove('is-block'))
+    }, 1.62)
+    .to(keyWords, {
+      x: clusterX,
+      y: clusterY,
+      duration: 0.44,
+      stagger: { amount: 0.12, from: 'center' },
+      ease: 'none'
+    }, 1.96)
+    .to(keyWords, {
+      opacity: 0,
+      scale: 0.12,
+      duration: 0.18,
+      stagger: { amount: 0.05, from: 'center' },
+      ease: 'none'
+    }, 2.56)
+    .to(manifestoVideoWrap, {
+      opacity: 1,
+      scale: 0.045,
+      duration: 0.01,
+      ease: 'none'
+    }, 2.8)
+    .to(manifestoVideoWrap, {
+      opacity: 1,
+      scale: 1,
+      duration: 0.76,
+      ease: 'none'
+    }, 2.82);
+
+    // Reveal items
+    gsap.utils.toArray('.reveal-item:not(.reel-section)').forEach(el => {
+      gsap.fromTo(el,
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1, y: 0, duration: 1.2, ease: 'power3.out',
+          scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' }
+        }
+      );
+    });
+  }
+
+  // ─── Keen Slider ────────────────────────────────────
+  const projects = [
+    {
+      title: 'Secure & Lean Cloud',
+      desc: 'Stronger cloud security with lower energy use — safer, leaner cloud operations.',
+      services: 'Real-time vulnerability monitoring, Energy baselining, Security posture',
+      industry: 'Security & Efficiency',
+      location: 'Construction Tech'
+    },
+    {
+      title: 'Lower Carbon, Lower Cost',
+      desc: 'Cut carbon with automated alerts and smart optimization — reducing emissions and cost together.',
+      services: 'Carbon footprint tracking, Automated alerts, Smart recommendations, Cost analysis',
+      industry: 'Carbon & Cost',
+      location: 'Construction Tech'
+    },
+    {
+      title: 'Continuous Optimization',
+      desc: 'Continuously optimize systems for better resource efficiency.',
+      services: 'Workload analysis, Resource scheduling, Performance tuning',
+      industry: 'Resource Efficiency',
+      location: 'Construction Tech'
+    },
+    {
+      title: 'Construction-Ready Ops',
+      desc: 'Better support for construction workflows and higher overall operational efficiency.',
+      services: 'Workflow support, Operational efficiency, On-site integration',
+      industry: 'Construction Workflow',
+      location: 'Construction Tech'
+    }
+  ];
+
+  window.addEventListener('load', () => {
+    if (typeof KeenSlider === 'undefined') return;
+    const slider = new KeenSlider('#works-slider', {
+      loop: false,
+      mode: 'free-snap',
+      spacing: 24,
+      slidesPerView: 1.3,
+      breakpoints: {
+        '(min-width: 640px)': { slidesPerView: 2.2 },
+        '(min-width: 1024px)': { slidesPerView: 3.2 },
+      },
+      slideChanged(s) {
+        const idx = s.details().relativeSlide;
+        updateActiveSlide(idx);
+      }
+    });
+
+    const prevBtn = document.getElementById('works-prev');
+    const nextBtn = document.getElementById('works-next');
+    if (prevBtn) prevBtn.addEventListener('click', () => slider.prev());
+    if (nextBtn) nextBtn.addEventListener('click', () => slider.next());
+
+    function updateActiveSlide(idx) {
+      document.querySelectorAll('.keen-slider__slide').forEach((sl, i) => {
+        sl.classList.toggle('slide-active', i === idx);
+        sl.classList.toggle('slide-inactive', i !== idx);
+      });
+      const p = projects[idx];
+      if (!p) return;
+      document.getElementById('active-project-title').textContent = p.title;
+      document.getElementById('active-project-desc').textContent = p.desc;
+      document.getElementById('active-project-services').textContent = p.services;
+      document.getElementById('active-project-industry').innerHTML = p.industry;
+      document.getElementById('active-project-location').textContent = p.location;
+    }
+  });
+
+  // ─── FAQ toggle ──────────────────────────────────────
+  function toggleFaq(btn) {
+    const item = btn.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+
+  // ─── Scroll progress color shift ─────────────────────
+  window.addEventListener('scroll', () => {
+    const pct = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+    document.getElementById('scroll-progress').style.height = (pct * 100) + '%';
+  });
+  </script>
+</body>
+</html>
